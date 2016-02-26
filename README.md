@@ -1,13 +1,13 @@
 # go-pgerduty
 
-A CLI and [go](https://golang.org/) client for PagerDuty v2 API.
+go-pagerduty is a CLI and [go](https://golang.org/) client library for [PagerDuty v2 API](https://v2.developer.pagerduty.com/v2/page/api-reference).
+**Documentation:** <http://godoc.org/github.com/PagerDuty/go-pagerduty>
 
 ## Installation
 
 ```
 go get github.com/PagerDuty/go-pagerduty
 ```
-
 
 ## Usage
 
@@ -44,7 +44,7 @@ func main() {
 
 ## Contributing
 
-1. Fork it ( https://github.com/PagerDuty/blender/fork )
+1. Fork it ( https://github.com/PagerDuty/go-pagerduty/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
