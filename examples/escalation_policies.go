@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	} else {
 		for _, p := range eps.EscalationPolicies {
-			fmt.Println(p)
+			fmt.Println(p.Name)
 		}
 	}
 }
