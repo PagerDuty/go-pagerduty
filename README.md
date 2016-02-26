@@ -1,7 +1,7 @@
 # go-pgerduty
 
 go-pagerduty is a CLI and [go](https://golang.org/) client library for [PagerDuty v2 API](https://v2.developer.pagerduty.com/v2/page/api-reference).
-**Documentation:** <http://godoc.org/github.com/PagerDuty/go-pagerduty>
+[godoc](http://godoc.org/github.com/PagerDuty/go-pagerduty)
 
 ## Installation
 
