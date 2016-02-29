@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/Sirupsen/logrus"
-	"github.com/jessevdk/go-flags"
+	"fmt"
+	"github.com/mitchellh/cli"
+	"os"
 )
 
 /*
@@ -14,37 +14,43 @@ import (
 		https://github.com/hashicorp/serf
 */
 
-type Options struct {
-	Authtoken string `short:"t" long:"token" description:"PagerDuty API Authentication token" required:"true"`
-	Subdomain string `short:"d" long:"domain" description:"PagerDuty account name or DNS sub-domain" required:"true"`
-	Loglevel  string `short:"l" long:"loglevel" description:"Log level" required:"false" default:"info"`
+const (
+	version = "0.1"
+)
+
+func loadCommands() map[string]cli.CommandFactory {
+	return map[string]cli.CommandFactory{
+		"eps list": EpsLsCommand,
+	}
 }
 
-var options Options
-var parser = flags.NewParser(&options, flags.Default)
-
 func main() {
-	if _, err := parser.Parse(); err != nil {
-		log.Fatal(err)
-	}
-	switch options.Loglevel {
-	case "info":
-		log.SetLevel(log.InfoLevel)
-	case "warn":
-		log.SetLevel(log.WarnLevel)
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-	default:
-		log.Fatal("Unknown log level", options.Loglevel)
-	}
+	os.Exit(invokeCLI())
+}
 
-	client := pagerduty.NewClient(options.Subdomain, options.Authtoken)
-	var opts pagerduty.ListEscalationPoliciesOptions
-	if eps, err := client.ListEscalationPolicies(opts); err != nil {
-		log.Fatal(err)
-	} else {
-		for _, p := range eps.EscalationPolicies {
-			log.Info(p)
+func invokeCLI() int {
+	args := os.Args[1:]
+	for _, arg := range args {
+		if arg == "-v" || arg == "--version" {
+			newArgs := make([]string, len(args)+1)
+			newArgs[0] = "version"
+			copy(newArgs[1:], args)
+			args = newArgs
+			break
 		}
 	}
+
+	cli := &cli.CLI{
+		Args:     args,
+		Commands: loadCommands(),
+		HelpFunc: cli.BasicHelpFunc("pd"),
+	}
+
+	exitCode, err := cli.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error executing CLI: %s\n", err.Error())
+		return 1
+	}
+
+	return exitCode
 }

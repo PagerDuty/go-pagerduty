@@ -7,11 +7,11 @@ import (
 // APIObject represents generic api json response that is shared by most
 // domain object (like escalation
 type APIObject struct {
-	ID      string `json:"id"`
+	ID      string `json:"id,omitempty"`
 	Type    string
 	Summary string
-	Self    string
-	HtmlUrl string `json:"html_url"`
+	Self    string `json:"omitempty"`
+	HtmlUrl string `json:"html_url,omitempty"`
 }
 
 type EscalationRule struct {
@@ -39,11 +39,11 @@ type ListEscalationPolicyResponse struct {
 }
 
 type ListEscalationPoliciesOptions struct {
-	Query   string   `url:"query,omitempty"`
-	UserIDs []string `url:"user_ids,omitempty"`
-	TeamIDs []string `url:"team_ids,omitempty"`
-	Include []string `url:"include,omitempty"`
-	SortBy  string   `url:"sort_by,omitempty"`
+	Query    string   `url:"query,omitempty"`
+	UserIDs  []string `url:"user_ids,omitempty,brackets"`
+	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
+	Includes []string `url:"include,omitempty,brackets"`
+	SortBy   string   `url:"sort_by,omitempty"`
 }
 
 func (c *Client) ListEscalationPolicies(opts ListEscalationPoliciesOptions) (*ListEscalationPolicyResponse, error) {
@@ -51,10 +51,19 @@ func (c *Client) ListEscalationPolicies(opts ListEscalationPoliciesOptions) (*Li
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Do("GET", "/escalation_policies"+v.Encode())
+	resp, err := c.Get("/escalation_policies?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListEscalationPolicyResponse
 	return &result, c.decodeJson(resp, &result)
 }
+
+func (c *Client) CreateEscalationPolicy(ep *EscalationPolicy) error {
+	_, err := c.Post("/escalation_policies", ep)
+	return err
+}
+
+func DeleteEscalationPolicy() {}
+func GetEscalationPolicy()    {}
+func UpdateEscalationPolicy() {}
