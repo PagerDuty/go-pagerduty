@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"fmt"
 	"github.com/google/go-querystring/query"
 )
 
@@ -46,8 +47,8 @@ type ListEscalationPoliciesOptions struct {
 	SortBy   string   `url:"sort_by,omitempty"`
 }
 
-func (c *Client) ListEscalationPolicies(opts ListEscalationPoliciesOptions) (*ListEscalationPolicyResponse, error) {
-	v, err := query.Values(opts)
+func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListEscalationPolicyResponse, error) {
+	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
@@ -65,5 +66,28 @@ func (c *Client) CreateEscalationPolicy(ep *EscalationPolicy) error {
 }
 
 func DeleteEscalationPolicy() {}
-func GetEscalationPolicy()    {}
+
+type GetEscalationPolicyOptions struct {
+	Includes []string `url:"include,omitempty,brackets"`
+}
+
+func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (*EscalationPolicy, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Get("/escalation_policies/" + id + "?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]EscalationPolicy
+	if err := c.decodeJson(resp, &result); err != nil {
+		return nil, err
+	}
+	ep, ok := result["escalation_policy"]
+	if !ok {
+		return nil, fmt.Errorf("JSON responsde does not have escalation_policy field")
+	}
+	return &ep, nil
+}
 func UpdateEscalationPolicy() {}

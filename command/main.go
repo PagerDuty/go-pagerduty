@@ -21,6 +21,7 @@ const (
 func loadCommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
 		"eps list": EpsLsCommand,
+		"ep show":  EpShowCommand,
 	}
 }
 
