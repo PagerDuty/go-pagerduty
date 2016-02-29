@@ -5,10 +5,11 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/cli"
+	"gopkg.in/yaml.v2"
 	"strings"
 )
 
-type EpsLs struct {
+type EpLs struct {
 	Meta
 }
 
@@ -26,31 +27,31 @@ func (a *ArrayFlags) Set(v string) error {
 	return nil
 }
 
-func (c *EpsLs) Help() string {
+func (c *EpLs) Help() string {
 	helpText := `
 	ep ls  List escalation policies
 
 	Options:
 
-		 -query
-		 -user
-		 -team
-		 -include
-		 -sort
+		 -query     Filter escalation policies with certain name
+		 -user      Filter escalation policies by user id(s)
+		 -team      Filter escalation policies by team id(s)
+		 -include   Additional details to include
+		 -sort      Sort results by property (name:asc or name:dsc)
 
 	` + c.Meta.Help()
 	return strings.TrimSpace(helpText)
 }
 
-func (c *EpsLs) Synopsis() string {
+func (c *EpLs) Synopsis() string {
 	return "List escalation policies"
 }
 
-func EpsLsCommand() (cli.Command, error) {
-	return &EpsLs{}, nil
+func EpLsCommand() (cli.Command, error) {
+	return &EpLs{}, nil
 }
 
-func (c *EpsLs) Run(args []string) int {
+func (c *EpLs) Run(args []string) int {
 	var query string
 	var sortBy string
 	var userIDs []string
@@ -69,11 +70,10 @@ func (c *EpsLs) Run(args []string) int {
 		log.Errorln(err)
 		return -1
 	}
-	if err := c.Meta.Validate(); err != nil {
+	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
 		return -1
 	}
-	c.Meta.SetupLogging()
 	client := c.Meta.Client()
 	opts := pagerduty.ListEscalationPoliciesOptions{
 		Query:    query,
@@ -86,8 +86,14 @@ func (c *EpsLs) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for _, p := range eps.EscalationPolicies {
-			log.Info(p.Name, p.ID)
+		for i, p := range eps.EscalationPolicies {
+			fmt.Println("Entry: ", i)
+			data, err := yaml.Marshal(p)
+			if err != nil {
+				log.Error(err)
+				return -1
+			}
+			fmt.Println(string(data))
 		}
 	}
 	return 0
@@ -121,17 +127,15 @@ func EpShowCommand() (cli.Command, error) {
 func (c *EpShow) Run(args []string) int {
 	var includes []string
 	var epID string
-
 	flags := c.Meta.FlagSet("ep show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.StringVar(&epID, "id", "", "Escalation policy id")
 	flags.Var((*ArrayFlags)(&includes), "include", "Additional details to include (can be specified multiple times)")
-
 	if err := flags.Parse(args); err != nil {
 		log.Errorln(err)
 		return -1
 	}
-	if err := c.Meta.Validate(); err != nil {
+	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
 		return -1
 	}
@@ -139,7 +143,6 @@ func (c *EpShow) Run(args []string) int {
 		log.Error("You must provide escalation policy id")
 		return -1
 	}
-	c.Meta.SetupLogging()
 	client := c.Meta.Client()
 	o := &pagerduty.GetEscalationPolicyOptions{
 		Includes: includes,
@@ -149,6 +152,11 @@ func (c *EpShow) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	log.Println(ep)
+	data, err := yaml.Marshal(ep)
+	if err != nil {
+		log.Error(err)
+		return -1
+	}
+	fmt.Println(string(data))
 	return 0
 }

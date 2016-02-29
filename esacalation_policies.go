@@ -11,7 +11,7 @@ type APIObject struct {
 	ID      string `json:"id,omitempty"`
 	Type    string
 	Summary string
-	Self    string `json:"omitempty"`
+	Self    string `json:"omitempty",yaml:"omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 }
 
