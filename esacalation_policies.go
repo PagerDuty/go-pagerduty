@@ -15,6 +15,13 @@ type APIObject struct {
 	HtmlUrl string `json:"html_url,omitempty"`
 }
 
+type APIListObject struct {
+	Limit  uint
+	Offset uint
+	More   bool
+	Total  uint
+}
+
 type EscalationRule struct {
 	Id      string `json:"id"`
 	Delay   uint   `json:"escalation_delay_in_minutes"`
@@ -32,10 +39,7 @@ type EscalationPolicy struct {
 }
 
 type ListEscalationPolicyResponse struct {
-	Limit              uint
-	Offset             uint
-	More               bool
-	Total              uint
+	APIListObject
 	EscalationPolicies []EscalationPolicy `json:"escalation_policies"`
 }
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type EpLs struct {
+type EpList struct {
 	Meta
 }
 
@@ -27,7 +27,7 @@ func (a *ArrayFlags) Set(v string) error {
 	return nil
 }
 
-func (c *EpLs) Help() string {
+func (c *EpList) Help() string {
 	helpText := `
 	ep ls  List escalation policies
 
@@ -43,22 +43,22 @@ func (c *EpLs) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
-func (c *EpLs) Synopsis() string {
+func (c *EpList) Synopsis() string {
 	return "List escalation policies"
 }
 
-func EpLsCommand() (cli.Command, error) {
-	return &EpLs{}, nil
+func EpListCommand() (cli.Command, error) {
+	return &EpList{}, nil
 }
 
-func (c *EpLs) Run(args []string) int {
+func (c *EpList) Run(args []string) int {
 	var query string
 	var sortBy string
 	var userIDs []string
 	var teamIDs []string
 	var includes []string
 
-	flags := c.Meta.FlagSet("eps ls")
+	flags := c.Meta.FlagSet("ep list")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.StringVar(&query, "query", "", "Show escalation policies whose names contain the query")
 	flags.StringVar(&sortBy, "sort", "", "Sort results by name (ascending or descending)")

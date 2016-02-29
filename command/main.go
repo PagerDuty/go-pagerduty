@@ -20,8 +20,9 @@ const (
 
 func loadCommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
-		"ep list": EpLsCommand,
-		"ep show": EpShowCommand,
+		"ep list":   EpListCommand,
+		"ep show":   EpShowCommand,
+		"team list": TeamListCommand,
 	}
 }
 
