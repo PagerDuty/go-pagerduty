@@ -60,25 +60,27 @@ func (c *Client) GetTeam(id string) (*Team, error) {
 	return &t, nil
 }
 
-func (c *Client) UpdateTeam(t *Team) error {
-	//TODO
-	return nil
+func (c *Client) UpdateTeam(id string, t *Team) error {
+	_, err := c.Put("/teams/"+id, t)
+	return err
 }
 
-func (c *Client) RmoveEscalationPolicyFromTeam() error {
-	//TODO
-	return nil
+func (c *Client) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
+	_, err := c.Delete("/teams/" + teamID + "/escalation_policies/" + epID)
+	return err
 }
 
-func (c *Client) AddEscalationPolicyToTeam() error {
-	//TODO
-	return nil
+func (c *Client) AddEscalationPolicyToTeam(teamID, epID string) error {
+	_, err := c.Put("/teams/"+teamID+"/escalation_policies/"+epID, nil)
+	return err
 }
 
-func (c *Client) RemoveUserFromTeam() error {
-	return nil
+func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
+	_, err := c.Delete("/teams/" + teamID + "/users/" + userID)
+	return err
 }
 
-func (c *Client) AddUserToTeam() error {
-	return nil
+func (c *Client) AddUserToTeam(teamID, userID string) error {
+	_, err := c.Put("/teams/"+teamID+"/users/"+userID, nil)
+	return err
 }
