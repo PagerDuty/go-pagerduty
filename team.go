@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"fmt"
 	"github.com/google/go-querystring/query"
 )
 
@@ -34,26 +35,43 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 }
 
 func (c *Client) CreateTeam(t *Team) error {
-	return nil
+	_, err := c.Post("/teams", t)
+	return err
 }
 
 func (c *Client) DeleteTeam(id string) error {
-	return nil
+	_, err := c.Delete("/teams/" + id)
+	return err
 }
 
-func (c *Client) GetTeam(id string) error {
-	return nil
+func (c *Client) GetTeam(id string) (*Team, error) {
+	resp, err := c.Get("/teams/" + id)
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]Team
+	if err := c.decodeJson(resp, &result); err != nil {
+		return nil, err
+	}
+	t, ok := result["team"]
+	if !ok {
+		return nil, fmt.Errorf("JSON responsde does not have team field")
+	}
+	return &t, nil
 }
 
 func (c *Client) UpdateTeam(t *Team) error {
+	//TODO
 	return nil
 }
 
 func (c *Client) RmoveEscalationPolicyFromTeam() error {
+	//TODO
 	return nil
 }
 
 func (c *Client) AddEscalationPolicyToTeam() error {
+	//TODO
 	return nil
 }
 

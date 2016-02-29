@@ -22,6 +22,10 @@ func NewClient(subdomain, authToken string) *Client {
 	}
 }
 
+func (c *Client) Delete(path string) (*http.Response, error) {
+	return c.Do("DELETE", path, nil)
+}
+
 func (c *Client) Post(path string, payload interface{}) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {

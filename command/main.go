@@ -23,6 +23,7 @@ func loadCommands() map[string]cli.CommandFactory {
 		"ep list":   EpListCommand,
 		"ep show":   EpShowCommand,
 		"team list": TeamListCommand,
+		"team show": TeamShowCommand,
 	}
 }
 

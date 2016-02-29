@@ -11,7 +11,7 @@ type APIObject struct {
 	ID      string `json:"id,omitempty"`
 	Type    string
 	Summary string
-	Self    string `json:"omitempty",yaml:"omitempty"`
+	Self    string `json:"omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 }
 
@@ -69,7 +69,10 @@ func (c *Client) CreateEscalationPolicy(ep *EscalationPolicy) error {
 	return err
 }
 
-func DeleteEscalationPolicy() {}
+func (c *Client) DeleteEscalationPolicy(id string) error {
+	_, err := c.Delete("/escalation_policies/" + id)
+	return err
+}
 
 type GetEscalationPolicyOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
@@ -94,4 +97,8 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 	}
 	return &ep, nil
 }
-func UpdateEscalationPolicy() {}
+
+func (c *Client) UpdateEscalationPolicy(e *EscalationPolicy) error {
+	//TODO
+	return nil
+}
