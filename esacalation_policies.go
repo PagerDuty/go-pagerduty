@@ -64,8 +64,10 @@ func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListE
 	return &result, c.decodeJson(resp, &result)
 }
 
-func (c *Client) CreateEscalationPolicy(ep *EscalationPolicy) error {
-	_, err := c.Post("/escalation_policies", ep)
+func (c *Client) CreateEscalationPolicy(ep EscalationPolicy) error {
+	data := make(map[string]EscalationPolicy)
+	data["escalation_policy"] = ep
+	_, err := c.Post("/escalation_policies", data)
 	return err
 }
 
