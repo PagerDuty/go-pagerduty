@@ -5,23 +5,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// APIObject represents generic api json response that is shared by most
-// domain object (like escalation
-type APIObject struct {
-	ID      string `json:"id,omitempty"`
-	Type    string
-	Summary string
-	Self    string `json:"omitempty"`
-	HtmlUrl string `json:"html_url,omitempty"`
-}
-
-type APIListObject struct {
-	Limit  uint
-	Offset uint
-	More   bool
-	Total  uint
-}
-
 type EscalationRule struct {
 	Id      string `json:"id"`
 	Delay   uint   `json:"escalation_delay_in_minutes"`
@@ -31,11 +14,11 @@ type EscalationRule struct {
 type EscalationPolicy struct {
 	APIObject
 	Name            string
-	EscalationRules []APIObject `json:"escalation_rules"`
-	Services        []APIObject
-	NumLoops        uint `json:"num_loops"`
-	Teams           []APIObject
-	Description     string
+	EscalationRules []APIObject `json:"escalation_rules,omitempty"`
+	Services        []APIObject `json:"omitempty"`
+	NumLoops        uint        `json:"num_loops,omitempty"`
+	Teams           []APIObject `json:"omitempty"`
+	Description     string      `json:"omitempty"`
 }
 
 type ListEscalationPolicyResponse struct {

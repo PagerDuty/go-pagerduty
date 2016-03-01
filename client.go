@@ -8,6 +8,23 @@ import (
 	"net/http"
 )
 
+// APIObject represents generic api json response that is shared by most
+// domain object (like escalation
+type APIObject struct {
+	ID      string `json:"id,omitempty"`
+	Type    string
+	Summary string
+	Self    string `json:"omitempty"`
+	HtmlUrl string `json:"html_url,omitempty"`
+}
+
+type APIListObject struct {
+	Limit  uint
+	Offset uint
+	More   bool
+	Total  uint
+}
+
 // Client wraps http client
 type Client struct {
 	Subdomain string
