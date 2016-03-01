@@ -86,7 +86,7 @@ type ListServiceResponse struct {
 	Services []Service
 }
 
-func (c *Client) ListService(o ListServiceOptions) (*ListServiceResponse, error) {
+func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
