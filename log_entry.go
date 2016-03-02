@@ -6,7 +6,6 @@ import (
 )
 
 type Agent APIObject
-type Incident APIObject
 type Channel struct {
 	Type string
 }
