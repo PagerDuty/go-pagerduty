@@ -12,9 +12,9 @@ import (
 // domain object (like escalation
 type APIObject struct {
 	ID      string `json:"id,omitempty"`
-	Type    string
-	Summary string
-	Self    string `json:"omitempty"`
+	Type    string `json:"type,omitempty"`
+	Summary string `json:"summary,omitempty"`
+	Self    string `json:"self,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 }
 
