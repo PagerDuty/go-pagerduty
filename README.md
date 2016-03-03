@@ -13,7 +13,7 @@ go get github.com/PagerDuty/go-pagerduty
 
 ### CLI
 
-### From golang librairies
+### From golang libraries
 
 ```go
 package main
