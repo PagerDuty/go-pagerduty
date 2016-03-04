@@ -26,7 +26,7 @@ func (c *TeamShow) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
-func (c *TeamShow) Synopsis() string { return "Show team details" }
+func (c *TeamShow) Synopsis() string { return "Get details about an existing team" }
 
 func (c *TeamShow) Run(args []string) int {
 	var id string

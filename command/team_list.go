@@ -27,7 +27,9 @@ func (c *TeamList) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
-func (c *TeamList) Synopsis() string { return "List teams" }
+func (c *TeamList) Synopsis() string {
+	return "List teams of your PagerDuty account, optionally filtered by a search query"
+}
 
 func (c *TeamList) Run(args []string) int {
 	var query string
