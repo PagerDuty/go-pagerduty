@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"fmt"
 	"github.com/google/go-querystring/query"
 )
 
@@ -33,4 +34,39 @@ func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
 	}
 	var result ListAddonResponse
 	return &result, c.decodeJson(resp, &result)
+}
+
+func (c *Client) InstallAddon(a Addon) error {
+	data := make(map[string]Addon)
+	data["addon"] = a
+	_, err := c.Post("/addons", data)
+	return err
+}
+
+func (c *Client) DeleteAddon(id string) error {
+	_, err := c.Delete("/addons/" + id)
+	return err
+}
+
+func (c *Client) GetAddon(id string) (*Addon, error) {
+	resp, err := c.Get("/addons/" + id)
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]Addon
+	if err := c.decodeJson(resp, &result); err != nil {
+		return nil, err
+	}
+	a, ok := result["addon"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have 'addon' field")
+	}
+	return &a, nil
+}
+
+func (c *Client) UpdateAddon(id string, a Addon) error {
+	v := make(map[string]Addon)
+	v["addon"] = a
+	_, err := c.Put("/addons/"+id, v)
+	return err
 }
