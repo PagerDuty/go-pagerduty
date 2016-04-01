@@ -29,7 +29,7 @@ func (a *ArrayFlags) Set(v string) error {
 
 func (c *EscalationPolicyList) Help() string {
 	helpText := `
-	pd escalation-policy List all of the existing escalation policies
+	pd escalation-policy list List all of the existing escalation policies
 
 	Options:
 
@@ -58,7 +58,7 @@ func (c *EscalationPolicyList) Run(args []string) int {
 	var teamIDs []string
 	var includes []string
 
-	flags := c.Meta.FlagSet("ep list")
+	flags := c.Meta.FlagSet("escalation-policy list")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.StringVar(&query, "query", "", "Show escalation policies whose names contain the query")
 	flags.StringVar(&sortBy, "sort", "", "Sort results by name (ascending or descending)")
@@ -67,7 +67,7 @@ func (c *EscalationPolicyList) Run(args []string) int {
 	flags.Var((*ArrayFlags)(&includes), "include", "Additional details to include (can be specified multiple times)")
 
 	if err := flags.Parse(args); err != nil {
-		log.Errorln(err)
+		log.Error(err)
 		return -1
 	}
 	if err := c.Meta.Setup(); err != nil {

@@ -20,6 +20,7 @@ const (
 
 func loadCommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
+		"addon list":               AddonListCommand,
 		"escalation-policy list":   EscalationPolicyListCommand,
 		"escalation-policy create": EscalationPolicyCreateCommand,
 		"escalation-policy delete": EscalationPolicyDeleteCommand,
