@@ -2,14 +2,16 @@ package pagerduty
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-querystring/query"
+	"io/ioutil"
 )
 
 type Addon struct {
 	APIObject
-	Name     string
-	Src      string
-	Services []APIObject
+	Name     string      `json:"name,omitempty"`
+	Src      string      `json:"src,omitempty"`
+	Services []APIObject `json:"services,omitempty"`
 }
 
 type ListAddonOptions struct {
@@ -39,7 +41,14 @@ func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
 func (c *Client) InstallAddon(a Addon) error {
 	data := make(map[string]Addon)
 	data["addon"] = a
-	_, err := c.Post("/addons", data)
+	resp, err := c.Post("/addons", data)
+	defer resp.Body.Close()
+	if err != nil {
+		ct, rErr := ioutil.ReadAll(resp.Body)
+		if rErr == nil {
+			log.Debug(string(ct))
+		}
+	}
 	return err
 }
 

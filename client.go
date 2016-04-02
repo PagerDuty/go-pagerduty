@@ -3,6 +3,7 @@ package pagerduty
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"io"
 	"net/http"
@@ -56,6 +57,7 @@ func (c *Client) Post(path string, payload interface{}) (*http.Response, error) 
 	if err != nil {
 		return nil, err
 	}
+	log.Debugln(string(data))
 	return c.Do("POST", path, bytes.NewBuffer(data))
 }
 
@@ -65,7 +67,7 @@ func (c *Client) Get(path string) (*http.Response, error) {
 
 func (c *Client) Do(method, path string, body io.Reader) (*http.Response, error) {
 	endpoint := "https://" + c.Subdomain + ".pagerduty.com/api/v1" + path
-	log.Debugf("Endpoint", endpoint)
+	log.Debugln("Endpoint:", endpoint)
 	req, _ := http.NewRequest(method, endpoint, body)
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
 	req.Header.Set("Content-Type", "application/json")
@@ -73,6 +75,9 @@ func (c *Client) Do(method, path string, body io.Reader) (*http.Response, error)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return resp, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 	}
 	return resp, nil
 }
