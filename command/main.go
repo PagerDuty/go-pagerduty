@@ -22,6 +22,7 @@ func loadCommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
 		"addon list":    AddonListCommand,
 		"addon install": AddonInstallCommand,
+		"addon show":    AddonShowCommand,
 
 		"escalation-policy list":   EscalationPolicyListCommand,
 		"escalation-policy create": EscalationPolicyCreateCommand,
