@@ -64,9 +64,6 @@ func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, 
 	return &result, c.decodeJson(resp, &result)
 }
 
-type CreateScheduleOptions struct {
-}
-
 func (c *Client) CreateSchedule(s Schedule) error {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
@@ -117,7 +114,7 @@ func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error)
 	}
 	s, ok := result["schedule"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have schedule field")
+		return nil, fmt.Errorf("JSON response does not have schedule field")
 	}
 	return &s, nil
 }
