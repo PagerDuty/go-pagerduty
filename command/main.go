@@ -23,6 +23,8 @@ func loadCommands() map[string]cli.CommandFactory {
 		"addon list":    AddonListCommand,
 		"addon install": AddonInstallCommand,
 		"addon show":    AddonShowCommand,
+		"addon delete":  AddonDeleteCommand,
+		"addon update":  AddonUpdateCommand,
 
 		"escalation-policy list":   EscalationPolicyListCommand,
 		"escalation-policy create": EscalationPolicyCreateCommand,
