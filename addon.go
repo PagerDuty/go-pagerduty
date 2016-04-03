@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-querystring/query"
 	"io/ioutil"
+	"net/http"
 )
 
 type Addon struct {
@@ -44,12 +45,16 @@ func (c *Client) InstallAddon(a Addon) error {
 	resp, err := c.Post("/addons", data)
 	defer resp.Body.Close()
 	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusCreated {
 		ct, rErr := ioutil.ReadAll(resp.Body)
 		if rErr == nil {
 			log.Debug(string(ct))
 		}
+		return fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
 	}
-	return err
+	return nil
 }
 
 func (c *Client) DeleteAddon(id string) error {
