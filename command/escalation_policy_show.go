@@ -15,7 +15,7 @@ type EscalationPolicyShow struct {
 
 func (c *EscalationPolicyShow) Help() string {
 	helpText := `
-	ep show  show escalation policies
+	escalation-policy show  Show escalation policies
 
 	Options:
 

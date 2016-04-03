@@ -19,7 +19,9 @@ func (c *AddonList) Help() string {
 
 	Options:
 
-		 -query     Filter escalation policies with certain name
+		 -include    Include additional details
+		 -service-id Filter result by service ids
+		 -filter     Filter result by type
 	 ` + c.Meta.Help()
 	return strings.TrimSpace(helpText)
 }
