@@ -13,12 +13,12 @@ type EscalationRule struct {
 
 type EscalationPolicy struct {
 	APIObject
-	Name            string
+	Name            string      `json:"name,omitempty"`
 	EscalationRules []APIObject `json:"escalation_rules,omitempty"`
-	Services        []APIObject `json:"omitempty"`
+	Services        []APIObject `json:"services,omitempty"`
 	NumLoops        uint        `json:"num_loops,omitempty"`
-	Teams           []APIObject `json:"omitempty"`
-	Description     string      `json:"omitempty"`
+	Teams           []APIObject `json:"teams,omitempty"`
+	Description     string      `json:"description,omitempty"`
 }
 
 type ListEscalationPolicyResponse struct {

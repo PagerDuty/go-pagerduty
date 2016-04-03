@@ -2,7 +2,10 @@ package pagerduty
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-querystring/query"
+	"io/ioutil"
+	"net/http"
 )
 
 type EmailFilter struct {
@@ -16,10 +19,10 @@ type EmailFilter struct {
 
 type Integration struct {
 	APIObject
-	Name                  string
-	Service               APIObject
-	CreatedAt             string `json:"created_at"`
-	Vendor                APIObject
+	Name                  string        `json:"name,omitempty"`
+	Service               APIObject     `json:"service,omitempty"`
+	CreatedAt             string        `json:"created_at,omitempty"`
+	Vendor                APIObject     `json:"vendor,omitempty"`
 	IntegrationEmail      string        `json:"integration_email"`
 	EmailIncidentCreation string        `json:"email_incident_creation,omitempty"`
 	EmailFilterMode       string        `json:"email_filter_mode"`
@@ -27,23 +30,23 @@ type Integration struct {
 }
 
 type NamedTime struct {
-	Type string
-	Name string
+	Type string `json:"type,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type ScheduledAction struct {
-	Type      string
-	At        NamedTime
-	ToUrgency string `json:"to_urgency"`
+	Type      string    `json:"type,omitempty"`
+	At        NamedTime `json:"at,omitempty"`
+	ToUrgency string    `json:"to_urgency"`
 }
 
 type SupportHours struct {
-	Type    string
-	Urgency string
+	Type    string `json:"type,omitempty"`
+	Urgency string `json:"urgency,omitempty"`
 }
 
 type SupportHoursDetails struct {
-	Type       string
+	Type       string `json:"type,omitempty"`
 	Timezone   string `json:"time_zone"`
 	StartTime  string `json:"start_time"`
 	EndTime    string `json:"end_time"`
@@ -51,24 +54,24 @@ type SupportHoursDetails struct {
 }
 
 type IncidentUrgencyRule struct {
-	Type                string
-	DuringSupportHours  SupportHours `json:"during_support_hours"`
-	OutsideSupportHours SupportHours `json:"outside_support_hours"`
+	Type                string       `json:"type,omitempty"`
+	DuringSupportHours  SupportHours `json:"during_support_hours,omitempty"`
+	OutsideSupportHours SupportHours `json:"outside_support_hours,omitempty"`
 }
 
 type Service struct {
 	APIObject
-	Name                   string
-	Description            string
-	AutoResolveTimeout     uint             `json:"auto_resolve_timeout"`
-	AcknowledgementTimeout uint             `json:"acknowledgement_timeout"`
-	CreateAt               string           `json:"created_at"`
-	Status                 string           `json:"status"`
-	LastIncidentTimestamp  string           `json:"last_incident_timestamp"`
-	Integrations           []Integration    `json:"integrations"`
-	EscalationPolicy       EscalationPolicy `json:"escalation_policy"`
-	Teams                  []Team
-	IncidentUrgencyRule    IncidentUrgencyRule `json:"incident_urgnecy_rule"`
+	Name                   string              `json:"name,omitempty"`
+	Description            string              `json:"description,omitempty"`
+	AutoResolveTimeout     uint                `json:"auto_resolve_timeout,omitempty"`
+	AcknowledgementTimeout uint                `json:"acknowledgement_timeout,omitempty"`
+	CreateAt               string              `json:"created_at,omitempty"`
+	Status                 string              `json:"status,omitempty"`
+	LastIncidentTimestamp  string              `json:"last_incident_timestamp,omitempty"`
+	Integrations           []Integration       `json:"integrations,omitempty"`
+	EscalationPolicy       EscalationPolicy    `json:"escalation_policy,omitempty"`
+	Teams                  []Team              `json:"teams,omitempty"`
+	IncidentUrgencyRule    IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
 	SupportHours           SupportHoursDetails `json:"support_hours,omitempty"`
 	ScheduledActions       []ScheduledAction   `json:"scheduled_actions,omitempty"`
 }
@@ -118,7 +121,7 @@ func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	}
 	s, ok := result["service"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have service field")
+		return nil, fmt.Errorf("JSON response does not have service field")
 	}
 	return &s, nil
 }
@@ -126,7 +129,15 @@ func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 func (c *Client) CreateService(s Service) error {
 	data := make(map[string]Service)
 	data["service"] = s
-	_, err := c.Post("/services", data)
+	resp, err := c.Post("/services", data)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		ct, rErr := ioutil.ReadAll(resp.Body)
+		if rErr == nil {
+			log.Debug(string(ct))
+		}
+		return fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
+	}
 	return err
 }
 
