@@ -48,7 +48,7 @@ type ListSchedulesOptions struct {
 
 type ListSchedulesResponse struct {
 	APIListObject
-	Schdules []Schedule
+	Schedules []Schedule
 }
 
 func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, error) {
