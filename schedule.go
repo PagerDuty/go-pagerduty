@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -43,6 +44,7 @@ type Schedule struct {
 }
 
 type ListSchedulesOptions struct {
+	APIListObject
 	Query string `url:"query,omitempty"`
 }
 
@@ -72,6 +74,7 @@ func (c *Client) CreateSchedule(s Schedule) error {
 }
 
 type PreviewScheduleOptions struct {
+	APIListObject
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
 	Overflow bool   `url:"overflow,omitempty"`
@@ -94,6 +97,7 @@ func (c *Client) DeleteSchedule(id string) error {
 }
 
 type GetScheduleOptions struct {
+	APIListObject
 	TimeZone string `url:"time_zone,omitempty"`
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
@@ -131,6 +135,7 @@ func (c *Client) UpdateSchedule(id string, s Schedule) error {
 }
 
 type ListOverridesOptions struct {
+	APIListObject
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
 	Editable bool   `url:"editable,omitempty"`
@@ -175,6 +180,7 @@ func (c *Client) DeleteOverride(scheduleID, overrideID string) error {
 }
 
 type ListOnCallUsersOptions struct {
+	APIListObject
 	Since string `url:"since,omitempty"`
 	Until string `url:"until,omitempty"`
 }

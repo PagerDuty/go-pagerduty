@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"io"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // APIObject represents generic api json response that is shared by most
@@ -20,8 +21,8 @@ type APIObject struct {
 }
 
 type APIListObject struct {
-	Limit  uint
-	Offset uint
+	Limit  uint `url:"limit,omitempty"`
+	Offset uint `url:"offset,omitempty"`
 	More   bool
 	Total  uint
 }

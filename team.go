@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -17,6 +18,7 @@ type ListTeamResponse struct {
 }
 
 type ListTeamOptions struct {
+	APIListObject
 	Query string `url:"query,omitempty"`
 }
 

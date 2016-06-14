@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -44,6 +45,7 @@ type ListUsersResponse struct {
 }
 
 type ListUserOptions struct {
+	APIListObject
 	Query    string   `url:"query,omitempty"`
 	Includes []string `url:"include,omitempty,brackets"`
 }

@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -27,6 +28,7 @@ type ListEscalationPolicyResponse struct {
 }
 
 type ListEscalationPoliciesOptions struct {
+	APIListObject
 	Query    string   `url:"query,omitempty"`
 	UserIDs  []string `url:"user_ids,omitempty,brackets"`
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`

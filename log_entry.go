@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -27,6 +28,7 @@ type ListLogEntryResponse struct {
 }
 
 type ListLogEntriesOptions struct {
+	APIListObject
 	TimeZone   string   `url:"time_zone"`
 	Since      string   `url:"omitempty"`
 	Until      string   `url:"omitempty"`
