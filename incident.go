@@ -64,7 +64,7 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Get("/incidents" + v.Encode())
+	resp, err := c.Get("/incidents?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
