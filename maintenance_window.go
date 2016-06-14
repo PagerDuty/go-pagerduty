@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -22,6 +23,7 @@ type ListMaintenanceWindowsResponse struct {
 }
 
 type ListMaintenanceWindowsOptions struct {
+	APIListObject
 	Query      string   `url:"query,omitempty"`
 	Includes   []string `url:"include,omitempty,brackets"`
 	TeamIDs    []string `url:"team_ids,omitempty,brackets"`

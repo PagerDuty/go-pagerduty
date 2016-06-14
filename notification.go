@@ -13,6 +13,7 @@ type Notification struct {
 }
 
 type ListNotificationOptions struct {
+	APIListObject
 	TimeZone string   `url:"time_zone,omitempty"`
 	Since    string   `url:"since,omitempty"`
 	Until    string   `url:"until,omitempty"`

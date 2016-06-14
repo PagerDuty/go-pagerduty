@@ -2,10 +2,11 @@ package pagerduty
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/google/go-querystring/query"
 	"io/ioutil"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/google/go-querystring/query"
 )
 
 type Addon struct {
@@ -16,6 +17,7 @@ type Addon struct {
 }
 
 type ListAddonOptions struct {
+	APIListObject
 	Includes   []string `url:"include,omitempty,brackets"`
 	ServiceIDs []string `url:"service_ids,omitempty,brackets"`
 	Filter     string   `url:"filter,omitempty"`

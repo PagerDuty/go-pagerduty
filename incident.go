@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -43,6 +44,7 @@ type ListIncidentsResponse struct {
 }
 
 type ListIncidentsOptions struct {
+	APIListObject
 	Since       string   `url:"since,omitempty"`
 	Until       string   `url:"until,omitempty"`
 	DateRange   string   `url:"date_range,omitempty"`

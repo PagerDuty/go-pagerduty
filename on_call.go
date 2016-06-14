@@ -18,6 +18,7 @@ type ListOnCallsResponse struct {
 }
 
 type ListOnCallOptions struct {
+	APIListObject
 	TimeZone            string   `url:"time_zone,omitempty"`
 	Includes            []string `url:"include,omitempty,brackets"`
 	UserIDs             []string `url:"user_ids,omitempty,brackets"`

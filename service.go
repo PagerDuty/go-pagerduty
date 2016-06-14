@@ -2,10 +2,11 @@ package pagerduty
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/google/go-querystring/query"
 	"io/ioutil"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/google/go-querystring/query"
 )
 
 type EmailFilter struct {
@@ -77,6 +78,7 @@ type Service struct {
 }
 
 type ListServiceOptions struct {
+	APIListObject
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
 	TimeZone string   `url:"time_zone,omitempty"`
 	SortBy   string   `url:"sort_by,omitempty"`
