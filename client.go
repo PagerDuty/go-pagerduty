@@ -23,8 +23,8 @@ type APIObject struct {
 type APIListObject struct {
 	Limit  uint `url:"limit,omitempty"`
 	Offset uint `url:"offset,omitempty"`
-	More   bool
-	Total  uint
+	More   bool `url:"more,omitempty"`
+	Total  uint `url:"total,omitempty"`
 }
 
 // Client wraps http client
