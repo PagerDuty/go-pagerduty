@@ -47,6 +47,7 @@ type ListUsersResponse struct {
 type ListUserOptions struct {
 	APIListObject
 	Query    string   `url:"query,omitempty"`
+	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
