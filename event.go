@@ -22,12 +22,12 @@ type Event struct {
 }
 
 type EventResponse struct {
-	Status      string
-	Message     string
-	IncidentKey string
+	Status      string `json:"status"`
+	Message     string `json:"message"`
+	IncidentKey string `json:"incident_key"`
 }
 
-func CreateEvent(e Event) (*http.Response, error) {
+func CreateEvent(e Event) (*EventResponse, error) {
 	log.Debugln("Endpoint:", EventEndPoint)
 	data, err := json.Marshal(e)
 	if err != nil {
@@ -41,7 +41,12 @@ func CreateEvent(e Event) (*http.Response, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 	}
-	return resp, nil
+	var eventResponse EventResponse
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
+		return nil, err
+	}
+	return &eventResponse, nil
 }
