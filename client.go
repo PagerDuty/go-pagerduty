@@ -33,14 +33,12 @@ type APIListObject struct {
 
 // Client wraps http client
 type Client struct {
-	Subdomain string
 	authToken string
 }
 
 // NewClient creates an API client
-func NewClient(subdomain, authToken string) *Client {
+func NewClient(authToken string) *Client {
 	return &Client{
-		Subdomain: subdomain,
 		authToken: authToken,
 	}
 }

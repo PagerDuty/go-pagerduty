@@ -29,7 +29,6 @@ func (a *ArrayFlags) Set(v string) error {
 
 type Meta struct {
 	Authtoken string
-	Subdomain string
 	Loglevel  string
 }
 
@@ -38,21 +37,19 @@ type FlagSetFlags uint
 func (m *Meta) FlagSet(n string) *flag.FlagSet {
 	f := flag.NewFlagSet(n, flag.ContinueOnError)
 	f.StringVar(&m.Authtoken, "authtoken", "", "PagerDuty API authentication token")
-	f.StringVar(&m.Subdomain, "subdomain", "", "PagerDuty account name (subdomain)")
 	f.StringVar(&m.Loglevel, "loglevel", "", "Logging level")
 	return f
 }
 
 func (m *Meta) Client() *pagerduty.Client {
-	return pagerduty.NewClient(m.Subdomain, m.Authtoken)
+	return pagerduty.NewClient(m.Authtoken)
 }
 
 func (m *Meta) Help() string {
 	helpText := `
-	Generral options:
+	Common options:
 
 	-authtoken PagerDuty API authentication token
-	-subdomain PagerDuty account ID
 	-loglevel Logging level
 `
 	return strings.TrimSpace(helpText)
@@ -61,9 +58,6 @@ func (m *Meta) Help() string {
 func (m *Meta) validate() error {
 	if m.Authtoken == "" {
 		return fmt.Errorf("Authtoken can not be blank")
-	}
-	if m.Subdomain == "" {
-		return fmt.Errorf("Subdomain can not be blank")
 	}
 	return nil
 }
@@ -112,9 +106,6 @@ func (m *Meta) loadConfig() error {
 	}
 	if m.Loglevel == "" {
 		m.Loglevel = other.Loglevel
-	}
-	if m.Subdomain == "" {
-		m.Subdomain = other.Subdomain
 	}
 	return nil
 }
