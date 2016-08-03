@@ -23,12 +23,11 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 )
 
-var subdomain = "" // Set your account name here
 var	authtoken = "" // Set your auth token here
 
 func main() {
 	var opts pagerduty.ListEscalationPoliciesOptions
-	client := pagerduty.NewClient(subdomain, authtoken)
+	client := pagerduty.NewClient(authtoken)
 	if eps, err := client.ListEscalationPolicies(opts); err != nil {
 		panic(err)
 	} else {
