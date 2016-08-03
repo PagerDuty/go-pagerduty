@@ -10,6 +10,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+const (
+	APIEndpoint = "https://api.pagerduty.com"
+)
+
 // APIObject represents generic api json response that is shared by most
 // domain object (like escalation
 type APIObject struct {
@@ -67,7 +71,7 @@ func (c *Client) Get(path string) (*http.Response, error) {
 }
 
 func (c *Client) Do(method, path string, body io.Reader) (*http.Response, error) {
-	endpoint := "https://" + c.Subdomain + ".pagerduty.com/api/v1" + path
+	endpoint := APIEndpoint + path
 	log.Debugln("Endpoint:", endpoint)
 	req, _ := http.NewRequest(method, endpoint, body)
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
