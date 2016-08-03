@@ -11,9 +11,10 @@ import (
 const EventEndPoint = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 
 type Event struct {
-	Type        string        `json:"event_type"`
 	ServiceKey  string        `json:"service_key"`
-	Description string        `json:"description,omitempty"`
+	Type        string        `json:"event_type"`
+	IncidentKey string        `json:"incident_key,omitempty"`
+	Description string        `json:"description"`
 	Client      string        `json:"client,omitempty"`
 	ClientURL   string        `json:"client_url,omitempty"`
 	Details     interface{}   `json:"details,omitempty"`
