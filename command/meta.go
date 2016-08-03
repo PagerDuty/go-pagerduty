@@ -13,6 +13,20 @@ import (
 	"strings"
 )
 
+type ArrayFlags []string
+
+func (a *ArrayFlags) String() string {
+	return strings.Join(*a, ",")
+}
+
+func (a *ArrayFlags) Set(v string) error {
+	if *a == nil {
+		*a = make([]string, 0, 1)
+	}
+	*a = append(*a, v)
+	return nil
+}
+
 type Meta struct {
 	Authtoken string
 	Subdomain string

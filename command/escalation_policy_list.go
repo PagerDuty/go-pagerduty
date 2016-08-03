@@ -13,20 +13,6 @@ type EscalationPolicyList struct {
 	Meta
 }
 
-type ArrayFlags []string
-
-func (a *ArrayFlags) String() string {
-	return strings.Join(*a, ",")
-}
-
-func (a *ArrayFlags) Set(v string) error {
-	if *a == nil {
-		*a = make([]string, 0, 1)
-	}
-	*a = append(*a, v)
-	return nil
-}
-
 func (c *EscalationPolicyList) Help() string {
 	helpText := `
 	pd escalation-policy list List all of the existing escalation policies
