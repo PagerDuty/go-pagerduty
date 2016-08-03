@@ -6,14 +6,6 @@ import (
 	"os"
 )
 
-/*
-	Entrypoint for pd cli client based on the go bindings of API.
-	good cli examples:
-		https://github.com/Netflix-Skunkworks/go-jira
-		https://github.com/docker/docker
-		https://github.com/hashicorp/serf
-*/
-
 const (
 	version = "0.1"
 )
