@@ -36,11 +36,10 @@ func (c *OncallList) Run(args []string) int {
 	var scheduleIDs []string
 	var timeZone string
 	var userIDs []string
-	/* not yet implemented, defaults to now
-	var earliest string
 	var until string
 	var since string
-	*/
+	var earliest bool
+
 	flags := c.Meta.FlagSet("on-call list")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.Var((*ArrayFlags)(&includes), "include", "Additional details to include (can be specified multiple times)")
@@ -48,6 +47,9 @@ func (c *OncallList) Run(args []string) int {
 	flags.Var((*ArrayFlags)(&userIDs), "user-id", "Only show for user ID (can be specified multiple times)")
 	flags.Var((*ArrayFlags)(&escalationPolicyIDs), "escalationPolicy-id", "Only show for escalationPolicy ID (can be specified multiple times)")
 	flags.StringVar(&timeZone, "time-zone", "", "Time Zone")
+	flags.StringVar(&until, "until", "", "End of the time range over which you want to search")
+	flags.StringVar(&since, "since", "", "Start of the time range over which you want to search")
+	flags.BoolVar(&earliest, "earliest", false, "Return only the earliest on-call for each combination of escalation policy, escalation level, and user")
 
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
@@ -64,6 +66,9 @@ func (c *OncallList) Run(args []string) int {
 		TimeZone:            timeZone,
 		EscalationPolicyIDs: escalationPolicyIDs,
 		ScheduleIDs:         scheduleIDs,
+		Until:               until,
+		Since:               since,
+		Earliest:            earliest,
 	}
 	if oncs, err := client.ListOnCalls(opts); err != nil {
 		log.Error(err)

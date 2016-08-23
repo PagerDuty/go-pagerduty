@@ -27,9 +27,9 @@ type ListOnCallOptions struct {
 	UserIDs             []string `url:"user_ids,omitempty,brackets"`
 	EscalationPolicyIDs []string `url:"escalation_policy_ids,omitempty,brackets"`
 	ScheduleIDs         []string `url:"schedule_ids,omitempty,brackets"`
-	Since               string   `json:"since,omitempty"`
-	Until               string   `json:"until,omitempty"`
-	Earliest            bool     `json:"earliest,omitempty"`
+	Since               string   `url:"since,omitempty"`
+	Until               string   `url:"until,omitempty"`
+	Earliest            bool     `url:"earliest,omitempty"`
 }
 
 // ListOnCalls list the on-call entries during a given time range.
