@@ -69,15 +69,12 @@ func (c *OncallList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, p := range oncs.OnCalls {
-			fmt.Println("Entry:", i)
-			data, err := yaml.Marshal(p)
-			if err != nil {
-				log.Error(err)
-				return -1
-			}
-			fmt.Println(string(data))
+		data, err := yaml.Marshal(oncs.OnCalls)
+		if err != nil {
+			log.Error(err)
+			return -1
 		}
+		fmt.Println(string(data))
 	}
 	return 0
 }
