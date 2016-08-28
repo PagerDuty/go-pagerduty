@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// MaintenanceWindow is used to temporarily disable one or more services for a set period of time.
 type MaintenanceWindow struct {
 	APIObject
 	SequenceNumber uint   `json:"sequence_number,omitempty"`
@@ -17,11 +18,13 @@ type MaintenanceWindow struct {
 	CreatedBy      APIListObject `json:"created_by"`
 }
 
+// ListMaintenanceWindowsResponse is the data structur returned from calling the ListMaintenanceWindows API endpoint.
 type ListMaintenanceWindowsResponse struct {
 	APIListObject
 	MaintenanceWindows []MaintenanceWindow `json:"maintenance_windows"`
 }
 
+// ListMaintenanceWindowsOptions is the data structure used when calling the ListMaintenanceWindows API endpoint.
 type ListMaintenanceWindowsOptions struct {
 	APIListObject
 	Query      string   `url:"query,omitempty"`
@@ -31,46 +34,51 @@ type ListMaintenanceWindowsOptions struct {
 	Filter     string   `url:"filter,omitempty,brackets"`
 }
 
+// ListMaintenanceWindows lists existing maintenance windows, optionally filtered by service and/or team, or whether they are from the past, present or future.
 func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListMaintenanceWindowsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Get("/maintenance_windows?" + v.Encode())
+	resp, err := c.get("/maintenance_windows?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListMaintenanceWindowsResponse
-	return &result, c.decodeJson(resp, &result)
+	return &result, c.decodeJSON(resp, &result)
 }
 
+// CreateMaintaienanceWindows creates a new maintenance window for the specified services.
 func (c *Client) CreateMaintaienanceWindows(m MaintenanceWindow) error {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
-	_, err := c.Post("/mainteance_windows", data)
+	_, err := c.post("/mainteance_windows", data)
 	return err
 }
 
+// DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
 func (c *Client) DeleteMaintenanceWindow(id string) error {
-	_, err := c.Delete("/mainteance_windows/" + id)
+	_, err := c.delete("/mainteance_windows/" + id)
 	return err
 }
 
+// GetMaintenanceWindowOptions is the data structure used when calling the GetMaintenanceWindow API endpoint.
 type GetMaintenanceWindowOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// GetMaintenanceWindow gets an existing maintenance window.
 func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) (*MaintenanceWindow, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Get("/mainteance_windows/" + id + "?" + v.Encode())
+	resp, err := c.get("/mainteance_windows/" + id + "?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result map[string]MaintenanceWindow
-	if err := c.decodeJson(resp, &result); err != nil {
+	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	m, ok := result["maintenance_window"]
@@ -80,7 +88,8 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 	return &m, nil
 }
 
+// UpdateMaintenanceWindow updates an existing maintenance window.
 func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) error {
-	_, err := c.Put("/maintenance_windows/"+m.ID, m)
+	_, err := c.put("/maintenance_windows/"+m.ID, m)
 	return err
 }

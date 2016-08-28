@@ -9,44 +9,37 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-type EmailFilter struct {
-	SubjectMode    string `json:"subject_mode,omitempty"`
-	SubjectRegex   string `json:"subject_regex,omitempty"`
-	BodyMode       string `json:"body_mode,omitempty"`
-	BodyRegex      string `json:"body_regex,omitempty"`
-	FromEmailMode  string `json:"from_email_mode,omitempty"`
-	FromEmailRegex string `json:"from_email_regex,omitempty"`
-}
-
+// Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
 type Integration struct {
 	APIObject
-	Name                  string        `json:"name,omitempty"`
-	Service               APIObject     `json:"service,omitempty"`
-	CreatedAt             string        `json:"created_at,omitempty"`
-	Vendor                APIObject     `json:"vendor,omitempty"`
-	IntegrationEmail      string        `json:"integration_email"`
-	EmailIncidentCreation string        `json:"email_incident_creation,omitempty"`
-	EmailFilterMode       string        `json:"email_filter_mode"`
-	EmailFilters          []EmailFilter `json:"email_filters,omitempty"`
+	Name             string    `json:"name,omitempty"`
+	Service          APIObject `json:"service,omitempty"`
+	CreatedAt        string    `json:"created_at,omitempty"`
+	Vendor           APIObject `json:"vendor,omitempty"`
+	IntegrationEmail string    `json:"integration_email"`
 }
 
-type NamedTime struct {
+// InlineModel represents when a scheduled action will occur.
+type InlineModel struct {
 	Type string `json:"type,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
+// ScheduledAction contains scheduled actions for the service.
 type ScheduledAction struct {
-	Type      string    `json:"type,omitempty"`
-	At        NamedTime `json:"at,omitempty"`
-	ToUrgency string    `json:"to_urgency"`
+	Type      string      `json:"type,omitempty"`
+	At        InlineModel `json:"at,omitempty"`
+	ToUrgency string      `json:"to_urgency"`
 }
 
-type SupportHours struct {
+// IncidentUrgencyType are the incidents urgency during or outside support hours.
+type IncidentUrgencyType struct {
 	Type    string `json:"type,omitempty"`
 	Urgency string `json:"urgency,omitempty"`
 }
 
-type SupportHoursDetails struct {
+// SupportHours are the support hours for the service.
+type SupportHours struct {
 	Type       string `json:"type,omitempty"`
 	Timezone   string `json:"time_zone"`
 	StartTime  string `json:"start_time"`
@@ -54,12 +47,14 @@ type SupportHoursDetails struct {
 	DaysOfWeek []uint `json:"days_of_week"`
 }
 
+// IncidentUrgencyRule is the default urgency for new incidents.
 type IncidentUrgencyRule struct {
-	Type                string       `json:"type,omitempty"`
-	DuringSupportHours  SupportHours `json:"during_support_hours,omitempty"`
-	OutsideSupportHours SupportHours `json:"outside_support_hours,omitempty"`
+	Type                string              `json:"type,omitempty"`
+	DuringSupportHours  IncidentUrgencyType `json:"during_support_hours,omitempty"`
+	OutsideSupportHours IncidentUrgencyType `json:"outside_support_hours,omitempty"`
 }
 
+// Service represents something you monitor (like a web service, email service, or database service).
 type Service struct {
 	APIObject
 	Name                   string              `json:"name,omitempty"`
@@ -73,10 +68,11 @@ type Service struct {
 	EscalationPolicy       EscalationPolicy    `json:"escalation_policy,omitempty"`
 	Teams                  []Team              `json:"teams,omitempty"`
 	IncidentUrgencyRule    IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
-	SupportHours           SupportHoursDetails `json:"support_hours,omitempty"`
+	SupportHours           SupportHours        `json:"support_hours,omitempty"`
 	ScheduledActions       []ScheduledAction   `json:"scheduled_actions,omitempty"`
 }
 
+// ListServiceOptions is the data structure used when calling the ListServices API endpoint.
 type ListServiceOptions struct {
 	APIListObject
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
@@ -86,39 +82,43 @@ type ListServiceOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// ListServiceResponse is the data structure returned from calling the ListServices API endpoint.
 type ListServiceResponse struct {
 	APIListObject
 	Services []Service
 }
 
+// ListServices lists existing services.
 func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Get("/services?" + v.Encode())
+	resp, err := c.get("/services?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListServiceResponse
-	return &result, c.decodeJson(resp, &result)
+	return &result, c.decodeJSON(resp, &result)
 }
 
+// GetServiceOptions is the data structure used when calling the GetService API endpoint.
 type GetServiceOptions struct {
 	Includes []string `url:"include,brackets,omitempty"`
 }
 
+// GetService gets details about an existing service.
 func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Get("/services/" + id + "?" + v.Encode())
+	resp, err := c.get("/services/" + id + "?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result map[string]Service
-	if err := c.decodeJson(resp, &result); err != nil {
+	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	s, ok := result["service"]
@@ -128,10 +128,11 @@ func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	return &s, nil
 }
 
+// CreateService creates a new service.
 func (c *Client) CreateService(s Service) error {
 	data := make(map[string]Service)
 	data["service"] = s
-	resp, err := c.Post("/services", data)
+	resp, err := c.post("/services", data)
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusCreated {
 		ct, rErr := ioutil.ReadAll(resp.Body)
@@ -143,33 +144,38 @@ func (c *Client) CreateService(s Service) error {
 	return err
 }
 
+// UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) error {
-	_, err := c.Put("/services/"+s.ID, s)
+	_, err := c.put("/services/"+s.ID, s)
 	return err
 }
 
+// DeleteService deletes an existing service.
 func (c *Client) DeleteService(id string) error {
-	_, err := c.Delete("/services/" + id)
+	_, err := c.delete("/services/" + id)
 	return err
 }
 
+// CreateIntegration creates a new integration belonging to a service.
 func (c *Client) CreateIntegration(id string, i Integration) error {
-	_, err := c.Post("/services/"+id+"/integrations", i)
+	_, err := c.post("/services/"+id+"/integrations", i)
 	return err
 }
 
+// GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
 type GetIntegrationOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// GetIntegration gets details about an integration belonging to a service.
 func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
 	var result map[string]Integration
-	resp, err := c.Get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
-	if err := c.decodeJson(resp, &result); err != nil {
+	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
+	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	i, ok := result["integration"]
@@ -179,7 +185,8 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 	return &i, nil
 }
 
+// UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) error {
-	_, err := c.Put("/services/"+serviceID+"/integrations/"+i.ID, i)
+	_, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
 	return err
 }
