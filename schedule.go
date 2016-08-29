@@ -182,7 +182,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Overrides, 
 	}
 	overrides, ok := result["overrides"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have overrides field")
+		return nil, fmt.Errorf("JSON response does not have overrides field")
 	}
 	return overrides, nil
 }
@@ -222,7 +222,7 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 	}
 	u, ok := result["users"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have users field")
+		return nil, fmt.Errorf("JSON response does not have users field")
 	}
 	return u, nil
 }

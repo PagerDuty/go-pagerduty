@@ -78,7 +78,7 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	}
 	le, ok := result["log_entry"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have log_entry field")
+		return nil, fmt.Errorf("JSON response does not have log_entry field")
 	}
 	return &le, nil
 }

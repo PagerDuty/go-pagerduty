@@ -83,7 +83,7 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 	}
 	m, ok := result["maintenance_window"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have maintenance window field")
+		return nil, fmt.Errorf("JSON response does not have maintenance window field")
 	}
 	return &m, nil
 }

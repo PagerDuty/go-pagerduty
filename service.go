@@ -166,7 +166,7 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 	}
 	i, ok := result["integration"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have integration field")
+		return nil, fmt.Errorf("JSON response does not have integration field")
 	}
 	return &i, nil
 }
