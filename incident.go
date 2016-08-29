@@ -133,7 +133,7 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 	}
 	notes, ok := result["notes"]
 	if !ok {
-		return nil, fmt.Errorf("JSON responsde does not have notes field")
+		return nil, fmt.Errorf("JSON response does not have notes field")
 	}
 	return notes, nil
 }
