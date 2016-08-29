@@ -110,26 +110,12 @@ type GetServiceOptions struct {
 // GetService gets details about an existing service.
 func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
-	if err != nil {
-		return nil, err
-	}
 	resp, err := c.get("/services/" + id + "?" + v.Encode())
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]Service
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	s, ok := result["service"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have service field")
-	}
-	return &s, nil
+	return getServiceFromResponse(c, resp, err)
 }
 
 // CreateService creates a new service.
-func (c *Client) CreateService(s Service) error {
+func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
 	resp, err := c.post("/services", data)
@@ -139,9 +125,9 @@ func (c *Client) CreateService(s Service) error {
 		if rErr == nil {
 			log.Debug(string(ct))
 		}
-		return fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
 	}
-	return err
+	return getServiceFromResponse(c, resp, err)
 }
 
 // UpdateService updates an existing service.
@@ -189,4 +175,19 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 func (c *Client) UpdateIntegration(serviceID string, i Integration) error {
 	_, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
 	return err
+}
+
+func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service, error) {
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]Service
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+	s, ok := result["service"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have service field")
+	}
+	return &s, nil
 }
