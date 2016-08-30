@@ -32,6 +32,18 @@ type APIListObject struct {
 	Total  uint `url:"total,omitempty"`
 }
 
+// APIReference are the fields required to reference another API object.
+type APIReference struct {
+	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
+}
+
+type errorObject struct {
+	Code   int      `json:"code,omitempty"`
+	Mesage string   `json:"message,omitempty"`
+	Errors []string `json:"errors,omitempty"`
+}
+
 // Client wraps http client
 type Client struct {
 	authToken string
@@ -90,4 +102,16 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	defer resp.Body.Close()
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(payload)
+}
+
+func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {
+	var result map[string]errorObject
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+	s, ok := result["error"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have error field")
+	}
+	return &s, nil
 }

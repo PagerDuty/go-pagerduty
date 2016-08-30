@@ -1,22 +1,23 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-querystring/query"
 )
 
 // Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
 type Integration struct {
 	APIObject
-	Name             string    `json:"name,omitempty"`
-	Service          APIObject `json:"service,omitempty"`
-	CreatedAt        string    `json:"created_at,omitempty"`
-	Vendor           APIObject `json:"vendor,omitempty"`
-	IntegrationEmail string    `json:"integration_email"`
+	Name             string     `json:"name,omitempty"`
+	Service          *APIObject `json:"service,omitempty"`
+	CreatedAt        string     `json:"created_at,omitempty"`
+	Vendor           *APIObject `json:"vendor,omitempty"`
+	Type             string     `json:"type,omitempty"`
+	IntegrationKey   string     `json:"integration_key,omitempty"`
+	IntegrationEmail string     `json:"integration_email,omitempty"`
 }
 
 // InlineModel represents when a scheduled action will occur.
@@ -41,35 +42,36 @@ type IncidentUrgencyType struct {
 // SupportHours are the support hours for the service.
 type SupportHours struct {
 	Type       string `json:"type,omitempty"`
-	Timezone   string `json:"time_zone"`
-	StartTime  string `json:"start_time"`
-	EndTime    string `json:"end_time"`
-	DaysOfWeek []uint `json:"days_of_week"`
+	Timezone   string `json:"time_zone,omitempty"`
+	StartTime  string `json:"start_time,omitempty"`
+	EndTime    string `json:"end_time,omitempty"`
+	DaysOfWeek []uint `json:"days_of_week,omitempty"`
 }
 
 // IncidentUrgencyRule is the default urgency for new incidents.
 type IncidentUrgencyRule struct {
-	Type                string              `json:"type,omitempty"`
-	DuringSupportHours  IncidentUrgencyType `json:"during_support_hours,omitempty"`
-	OutsideSupportHours IncidentUrgencyType `json:"outside_support_hours,omitempty"`
+	Type                string               `json:"type,omitempty"`
+	Urgency             string               `json:"urgency,omitempty"`
+	DuringSupportHours  *IncidentUrgencyType `json:"during_support_hours,omitempty"`
+	OutsideSupportHours *IncidentUrgencyType `json:"outside_support_hours,omitempty"`
 }
 
 // Service represents something you monitor (like a web service, email service, or database service).
 type Service struct {
 	APIObject
-	Name                   string              `json:"name,omitempty"`
-	Description            string              `json:"description,omitempty"`
-	AutoResolveTimeout     uint                `json:"auto_resolve_timeout,omitempty"`
-	AcknowledgementTimeout uint                `json:"acknowledgement_timeout,omitempty"`
-	CreateAt               string              `json:"created_at,omitempty"`
-	Status                 string              `json:"status,omitempty"`
-	LastIncidentTimestamp  string              `json:"last_incident_timestamp,omitempty"`
-	Integrations           []Integration       `json:"integrations,omitempty"`
-	EscalationPolicy       EscalationPolicy    `json:"escalation_policy,omitempty"`
-	Teams                  []Team              `json:"teams,omitempty"`
-	IncidentUrgencyRule    IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
-	SupportHours           SupportHours        `json:"support_hours,omitempty"`
-	ScheduledActions       []ScheduledAction   `json:"scheduled_actions,omitempty"`
+	Name                   string               `json:"name,omitempty"`
+	Description            string               `json:"description,omitempty"`
+	AutoResolveTimeout     *uint                `json:"auto_resolve_timeout,omitempty"`
+	AcknowledgementTimeout *uint                `json:"acknowledgement_timeout,omitempty"`
+	CreateAt               string               `json:"created_at,omitempty"`
+	Status                 string               `json:"status,omitempty"`
+	LastIncidentTimestamp  string               `json:"last_incident_timestamp,omitempty"`
+	Integrations           []Integration        `json:"integrations,omitempty"`
+	EscalationPolicy       EscalationPolicy     `json:"escalation_policy,omitempty"`
+	Teams                  []Team               `json:"teams,omitempty"`
+	IncidentUrgencyRule    *IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
+	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
+	ScheduledActions       []ScheduledAction    `json:"scheduled_actions,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
@@ -121,19 +123,31 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 	resp, err := c.post("/services", data)
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusCreated {
-		ct, rErr := ioutil.ReadAll(resp.Body)
-		if rErr == nil {
-			log.Debug(string(ct))
+		var eo *errorObject
+		var dErr error
+		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
+			return nil, dErr
 		}
-		return nil, fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
+		d, _ := json.Marshal(s)
+		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
 	}
 	return getServiceFromResponse(c, resp, err)
 }
 
 // UpdateService updates an existing service.
-func (c *Client) UpdateService(s Service) error {
-	_, err := c.put("/services/"+s.ID, s)
-	return err
+func (c *Client) UpdateService(s Service) (*Service, error) {
+	resp, err := c.put("/services/"+s.ID, s)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		var eo *errorObject
+		var dErr error
+		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
+			return nil, dErr
+		}
+		d, _ := json.Marshal(s)
+		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
+	}
+	return getServiceFromResponse(c, resp, err)
 }
 
 // DeleteService deletes an existing service.
@@ -143,9 +157,19 @@ func (c *Client) DeleteService(id string) error {
 }
 
 // CreateIntegration creates a new integration belonging to a service.
-func (c *Client) CreateIntegration(id string, i Integration) error {
-	_, err := c.post("/services/"+id+"/integrations", i)
-	return err
+func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
+	resp, err := c.post("/services/"+id+"/integrations", i)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		var eo *errorObject
+		var dErr error
+		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
+			return nil, dErr
+		}
+		d, _ := json.Marshal(i)
+		return nil, fmt.Errorf("Failed to create. ID: %s. Data: %v. Error: %v", id, string(d), eo)
+	}
+	return getIntegrationFromResponse(c, resp, err)
 }
 
 // GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
@@ -161,6 +185,9 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 	}
 	var result map[string]Integration
 	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
@@ -172,8 +199,14 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 }
 
 // UpdateIntegration updates an integration belonging to a service.
-func (c *Client) UpdateIntegration(serviceID string, i Integration) error {
-	_, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
+func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
+	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
+	return getIntegrationFromResponse(c, resp, err)
+}
+
+// DeleteIntegration deletes an existing integration.
+func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
+	_, err := c.delete("/services/" + serviceID + "/integrations" + integrationID)
 	return err
 }
 
@@ -188,6 +221,21 @@ func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service
 	s, ok := result["service"]
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have service field")
+	}
+	return &s, nil
+}
+
+func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Integration, error) {
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]Integration
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+	s, ok := result["integration"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have integration field")
 	}
 	return &s, nil
 }

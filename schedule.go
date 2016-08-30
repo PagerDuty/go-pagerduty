@@ -1,23 +1,25 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
 
 // Restriction limits on-call responsibility for a layer to certain times of the day or week.
 type Restriction struct {
-	Type            string
+	Type            string `json:"type,omitempty"`
 	StartTimeOfDay  string `json:"start_time_of_day,omitempty"`
 	DurationSeconds uint   `json:"duration_seconds,omitempty"`
 }
 
 // RenderedScheduleEntry represents the computed set of schedule layer entries that put users on call for a schedule, and cannot be modified directly.
 type RenderedScheduleEntry struct {
-	Start string `json:"start,omitempty"`
-	End   string `json:"end,omitempty"`
-	User  APIObject
+	Start string    `json:"start,omitempty"`
+	End   string    `json:"end,omitempty"`
+	User  APIObject `json:"user,omitempty"`
 }
 
 // ScheduleLayer is an entry that puts users on call for a schedule.
@@ -27,8 +29,8 @@ type ScheduleLayer struct {
 	Start                      string                  `json:"start,omitempty"`
 	End                        string                  `json:"end,omitempty"`
 	RotationVirtualStart       string                  `json:"rotation_virtual_start,omitempty"`
-	RotationTurnLengthSeconds  uint                    `json:"rotation_virtual_start,omitempty"`
-	Users                      []APIObject             `json:"users,omitempty"`
+	RotationTurnLengthSeconds  uint                    `json:"rotation_turn_length_seconds,omitempty"`
+	Users                      []UserReference         `json:"users,omitempty"`
 	Restrictions               []Restriction           `json:"restrictions,omitempty"`
 	RenderedScheduleEntries    []RenderedScheduleEntry `json:"rendered_schedule_entries,omitempty"`
 	RenderedCoveragePercentage float64                 `json:"rendered_coverage_percentage,omitempty"`
@@ -39,7 +41,7 @@ type Schedule struct {
 	APIObject
 	Name                 string          `json:"name,omitempty"`
 	TimeZone             string          `json:"time_zone,omitempty"`
-	Desciption           string          `json:"description,omitempty"`
+	Description          string          `json:"description,omitempty"`
 	EscalationPolicies   []APIObject     `json:"escalation_policies,omitempty"`
 	Users                []APIObject     `json:"users,omitempty"`
 	ScheduleLayers       []ScheduleLayer `json:"schedule_layers,omitempty"`
@@ -59,6 +61,11 @@ type ListSchedulesResponse struct {
 	Schedules []Schedule
 }
 
+// UserReference is a reference to an authorized PagerDuty user.
+type UserReference struct {
+	User APIObject `json:"user"`
+}
+
 // ListSchedules lists the on-call schedules.
 func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, error) {
 	v, err := query.Values(o)
@@ -74,11 +81,21 @@ func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, 
 }
 
 // CreateSchedule creates a new on-call schedule.
-func (c *Client) CreateSchedule(s Schedule) error {
+func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
-	_, err := c.post("/schedules", data)
-	return err
+	resp, err := c.post("/schedules", data)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		var eo *errorObject
+		var dErr error
+		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
+			return nil, dErr
+		}
+		d, _ := json.Marshal(s)
+		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
+	}
+	return decodeScheduleFromResponse(c, resp, err)
 }
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
@@ -119,15 +136,15 @@ type GetScheduleOptions struct {
 func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error) {
 	v, err := query.Values(o)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
 	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("There was an error calling the GET API endpoint for schedules: %v", err)
 	}
 	var result map[string]Schedule
 	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not decode JSON response from GetSchedule: %v", err)
 	}
 	s, ok := result["schedule"]
 	if !ok {
@@ -142,11 +159,11 @@ type UpdateScheduleOptions struct {
 }
 
 // UpdateSchedule updates an existing on-call schedule.
-func (c *Client) UpdateSchedule(id string, s Schedule) error {
+func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
-	_, err := c.put("/schedules/"+id, v)
-	return err
+	resp, err := c.put("/schedules/"+id, v)
+	return decodeScheduleFromResponse(c, resp, err)
 }
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
@@ -225,4 +242,19 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 		return nil, fmt.Errorf("JSON response does not have users field")
 	}
 	return u, nil
+}
+
+func decodeScheduleFromResponse(c *Client, resp *http.Response, err error) (*Schedule, error) {
+	if err != nil {
+		return nil, err
+	}
+	var result map[string]Schedule
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("Could not decode Schedule from Response: %v", err)
+	}
+	t, ok := result["schedule"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have schedule field")
+	}
+	return &t, nil
 }
