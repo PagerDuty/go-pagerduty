@@ -89,13 +89,7 @@ func (c *Client) do(method, path string, body io.Reader) (*http.Response, error)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Token token="+c.authToken)
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
-		return resp, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
-	}
-	return resp, nil
+	return c.checkResponse(resp, err)
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
@@ -104,35 +98,19 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	return decoder.Decode(payload)
 }
 
-func (c *Client) decodeObjectFromResponse(resp *http.Response, err error, data interface{}, target interface{}, rootNode string) (interface{}, error) {
+func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, error) {
 	if err != nil {
-		return nil, fmt.Errorf("Error calling the API endpoint: %v", err)
+		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
 	}
-	defer resp.Body.Close()
 	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
 		var eo *errorObject
 		var getErr error
 		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
-			return nil, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
+			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
 		}
-		d, marshalErr := json.Marshal(data)
-		if marshalErr != nil {
-			return nil, fmt.Errorf("Could not marshal data '%+v': %s", data, marshalErr)
-		}
-		return nil, fmt.Errorf("Failed call API endpoint. Data: %v. Error: %v", string(d), eo)
+		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
 	}
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
-	}
-	m, castOK := target.(map[string]interface{})
-	if !castOK {
-		return nil, fmt.Errorf("Could not cast target as map[string]interface{}")
-	}
-	t, nodeOK := m[rootNode]
-	if !nodeOK {
-		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
-	}
-	return t, nil
+	return resp, nil
 }
 
 func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {

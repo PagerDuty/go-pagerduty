@@ -1,6 +1,11 @@
 package pagerduty
 
-import "github.com/google/go-querystring/query"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/google/go-querystring/query"
+)
 
 const (
 	escPath = "/escalation_policies"
@@ -60,9 +65,7 @@ func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, 
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = e
 	resp, err := c.post(escPath, data)
-	var target map[string]EscalationPolicy
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, e, target, "escalation_policy")
-	return ret.(*EscalationPolicy), decodeErr
+	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // DeleteEscalationPolicy deletes an existing escalation policy and rules.
@@ -83,15 +86,28 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 		return nil, err
 	}
 	resp, err := c.get(escPath + "/" + id + "?" + v.Encode())
-	var target map[string]EscalationPolicy
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "escalation_policy")
-	return ret.(*EscalationPolicy), decodeErr
+	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // UpdateEscalationPolicy updates an existing escalation policy and its rules.
 func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
 	resp, err := c.put(escPath+"/"+id, e)
+	return getEscalationPolicyFromResponse(c, resp, err)
+}
+
+func getEscalationPolicyFromResponse(c *Client, resp *http.Response, err error) (*EscalationPolicy, error) {
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
 	var target map[string]EscalationPolicy
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, e, target, "escalation_policy")
-	return ret.(*EscalationPolicy), decodeErr
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "escalation_policy"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }

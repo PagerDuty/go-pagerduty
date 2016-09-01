@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -83,9 +84,7 @@ func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
 	resp, err := c.post("/schedules", data)
-	var target map[string]Schedule
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "schedule")
-	return ret.(*Schedule), decodeErr
+	return getScheduleFromResponse(c, resp, err)
 }
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
@@ -129,9 +128,7 @@ func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error)
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
 	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
-	var target map[string]Schedule
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "schedule")
-	return ret.(*Schedule), decodeErr
+	return getScheduleFromResponse(c, resp, err)
 }
 
 // UpdateScheduleOptions is the data structure used when calling the UpdateSchedule API endpoint.
@@ -144,9 +141,7 @@ func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
 	resp, err := c.put("/schedules/"+id, v)
-	var target map[string]Schedule
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "schedule")
-	return ret.(*Schedule), decodeErr
+	return getScheduleFromResponse(c, resp, err)
 }
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
@@ -225,4 +220,20 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 		return nil, fmt.Errorf("JSON response does not have users field")
 	}
 	return u, nil
+}
+
+func getScheduleFromResponse(c *Client, resp *http.Response, err error) (*Schedule, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]Schedule
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "schedule"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }

@@ -1,6 +1,11 @@
 package pagerduty
 
-import "github.com/google/go-querystring/query"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/google/go-querystring/query"
+)
 
 // Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
 type Integration struct {
@@ -107,9 +112,7 @@ type GetServiceOptions struct {
 func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
 	resp, err := c.get("/services/" + id + "?" + v.Encode())
-	var target map[string]Service
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "service")
-	return ret.(*Service), decodeErr
+	return getServiceFromResponse(c, resp, err)
 }
 
 // CreateService creates a new service.
@@ -117,17 +120,13 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
 	resp, err := c.post("/services", data)
-	var target map[string]Service
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "service")
-	return ret.(*Service), decodeErr
+	return getServiceFromResponse(c, resp, err)
 }
 
 // UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) (*Service, error) {
 	resp, err := c.put("/services/"+s.ID, s)
-	var target map[string]Service
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "service")
-	return ret.(*Service), decodeErr
+	return getServiceFromResponse(c, resp, err)
 }
 
 // DeleteService deletes an existing service.
@@ -139,9 +138,7 @@ func (c *Client) DeleteService(id string) error {
 // CreateIntegration creates a new integration belonging to a service.
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	resp, err := c.post("/services/"+id+"/integrations", i)
-	var target map[string]Integration
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, i, target, "integration")
-	return ret.(*Integration), decodeErr
+	return getIntegrationFromResponse(c, resp, err)
 }
 
 // GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
@@ -156,21 +153,49 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 		return nil, queryErr
 	}
 	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
-	var target map[string]Integration
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, integrationID, target, "integration")
-	return ret.(*Integration), decodeErr
+	return getIntegrationFromResponse(c, resp, err)
 }
 
 // UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
 	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
-	var target map[string]Integration
-	ret, decodeErr := c.decodeObjectFromResponse(resp, err, i, target, "integration")
-	return ret.(*Integration), decodeErr
+	return getIntegrationFromResponse(c, resp, err)
 }
 
 // DeleteIntegration deletes an existing integration.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
 	_, err := c.delete("/services/" + serviceID + "/integrations" + integrationID)
 	return err
+}
+
+func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]Service
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "service"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
+}
+
+func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Integration, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]Integration
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
+	}
+	rootNode := "integration"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }
