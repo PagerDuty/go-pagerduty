@@ -1,9 +1,7 @@
 package pagerduty
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -85,17 +83,9 @@ func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
 	resp, err := c.post("/schedules", data)
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		var eo *errorObject
-		var dErr error
-		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
-			return nil, dErr
-		}
-		d, _ := json.Marshal(s)
-		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
-	}
-	return decodeScheduleFromResponse(c, resp, err)
+	var target map[string]Schedule
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "schedule")
+	return ret.(*Schedule), decodeErr
 }
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
@@ -139,18 +129,9 @@ func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error)
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
 	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
-	if err != nil {
-		return nil, fmt.Errorf("There was an error calling the GET API endpoint for schedules: %v", err)
-	}
-	var result map[string]Schedule
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, fmt.Errorf("Could not decode JSON response from GetSchedule: %v", err)
-	}
-	s, ok := result["schedule"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have schedule field")
-	}
-	return &s, nil
+	var target map[string]Schedule
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "schedule")
+	return ret.(*Schedule), decodeErr
 }
 
 // UpdateScheduleOptions is the data structure used when calling the UpdateSchedule API endpoint.
@@ -163,7 +144,9 @@ func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
 	resp, err := c.put("/schedules/"+id, v)
-	return decodeScheduleFromResponse(c, resp, err)
+	var target map[string]Schedule
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "schedule")
+	return ret.(*Schedule), decodeErr
 }
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
@@ -242,19 +225,4 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 		return nil, fmt.Errorf("JSON response does not have users field")
 	}
 	return u, nil
-}
-
-func decodeScheduleFromResponse(c *Client, resp *http.Response, err error) (*Schedule, error) {
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]Schedule
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, fmt.Errorf("Could not decode Schedule from Response: %v", err)
-	}
-	t, ok := result["schedule"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have schedule field")
-	}
-	return &t, nil
 }

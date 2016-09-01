@@ -1,12 +1,6 @@
 package pagerduty
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
-)
+import "github.com/google/go-querystring/query"
 
 const (
 	escPath = "/escalation_policies"
@@ -62,21 +56,13 @@ func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListE
 }
 
 // CreateEscalationPolicy creates a new escalation policy.
-func (c *Client) CreateEscalationPolicy(ep EscalationPolicy) (*EscalationPolicy, error) {
+func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
-	data["escalation_policy"] = ep
+	data["escalation_policy"] = e
 	resp, err := c.post(escPath, data)
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		var eo *errorObject
-		var dErr error
-		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
-			return nil, dErr
-		}
-		d, _ := json.Marshal(ep)
-		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
-	}
-	return decodeEscalationPolicyFromResponse(c, resp, err)
+	var target map[string]EscalationPolicy
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, e, target, "escalation_policy")
+	return ret.(*EscalationPolicy), decodeErr
 }
 
 // DeleteEscalationPolicy deletes an existing escalation policy and rules.
@@ -97,26 +83,15 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 		return nil, err
 	}
 	resp, err := c.get(escPath + "/" + id + "?" + v.Encode())
-	return decodeEscalationPolicyFromResponse(c, resp, err)
+	var target map[string]EscalationPolicy
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "escalation_policy")
+	return ret.(*EscalationPolicy), decodeErr
 }
 
 // UpdateEscalationPolicy updates an existing escalation policy and its rules.
 func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
 	resp, err := c.put(escPath+"/"+id, e)
-	return decodeEscalationPolicyFromResponse(c, resp, err)
-}
-
-func decodeEscalationPolicyFromResponse(c *Client, resp *http.Response, err error) (*EscalationPolicy, error) {
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]EscalationPolicy
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	t, ok := result["escalation_policy"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have escalation_policy field")
-	}
-	return &t, nil
+	var target map[string]EscalationPolicy
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, e, target, "escalation_policy")
+	return ret.(*EscalationPolicy), decodeErr
 }

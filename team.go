@@ -1,11 +1,6 @@
 package pagerduty
 
-import (
-	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
-)
+import "github.com/google/go-querystring/query"
 
 // Team is a collection of users and escalation policies that represent a group of people within an organization.
 type Team struct {
@@ -44,7 +39,9 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 // CreateTeam creates a new team.
 func (c *Client) CreateTeam(t *Team) (*Team, error) {
 	resp, err := c.post("/teams", t)
-	return decodeTeamFromResponse(c, resp, err)
+	var target map[string]Team
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, t, target, "team")
+	return ret.(*Team), decodeErr
 }
 
 // DeleteTeam removes an existing team.
@@ -56,13 +53,17 @@ func (c *Client) DeleteTeam(id string) error {
 // GetTeam gets details about an existing team.
 func (c *Client) GetTeam(id string) (*Team, error) {
 	resp, err := c.get("/teams/" + id)
-	return decodeTeamFromResponse(c, resp, err)
+	var target map[string]Team
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "team")
+	return ret.(*Team), decodeErr
 }
 
 // UpdateTeam updates an existing team.
 func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
 	resp, err := c.put("/teams/"+id, t)
-	return decodeTeamFromResponse(c, resp, err)
+	var target map[string]Team
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, t, target, "team")
+	return ret.(*Team), decodeErr
 }
 
 // RemoveEscalationPolicyFromTeam removes an escalation policy from a team.
@@ -87,19 +88,4 @@ func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
 func (c *Client) AddUserToTeam(teamID, userID string) error {
 	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil)
 	return err
-}
-
-func decodeTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, error) {
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]Team
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	t, ok := result["team"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have team field")
-	}
-	return &t, nil
 }

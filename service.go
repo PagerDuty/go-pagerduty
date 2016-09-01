@@ -1,12 +1,6 @@
 package pagerduty
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
-)
+import "github.com/google/go-querystring/query"
 
 // Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
 type Integration struct {
@@ -113,7 +107,9 @@ type GetServiceOptions struct {
 func (c *Client) GetService(id string, o GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
 	resp, err := c.get("/services/" + id + "?" + v.Encode())
-	return getServiceFromResponse(c, resp, err)
+	var target map[string]Service
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, id, target, "service")
+	return ret.(*Service), decodeErr
 }
 
 // CreateService creates a new service.
@@ -121,33 +117,17 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
 	resp, err := c.post("/services", data)
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		var eo *errorObject
-		var dErr error
-		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
-			return nil, dErr
-		}
-		d, _ := json.Marshal(s)
-		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
-	}
-	return getServiceFromResponse(c, resp, err)
+	var target map[string]Service
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "service")
+	return ret.(*Service), decodeErr
 }
 
 // UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) (*Service, error) {
 	resp, err := c.put("/services/"+s.ID, s)
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		var eo *errorObject
-		var dErr error
-		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
-			return nil, dErr
-		}
-		d, _ := json.Marshal(s)
-		return nil, fmt.Errorf("Failed to create. Data: %v. Error: %v", string(d), eo)
-	}
-	return getServiceFromResponse(c, resp, err)
+	var target map[string]Service
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, s, target, "service")
+	return ret.(*Service), decodeErr
 }
 
 // DeleteService deletes an existing service.
@@ -159,17 +139,9 @@ func (c *Client) DeleteService(id string) error {
 // CreateIntegration creates a new integration belonging to a service.
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	resp, err := c.post("/services/"+id+"/integrations", i)
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusCreated {
-		var eo *errorObject
-		var dErr error
-		if eo, dErr = c.getErrorFromResponse(resp); dErr != nil {
-			return nil, dErr
-		}
-		d, _ := json.Marshal(i)
-		return nil, fmt.Errorf("Failed to create. ID: %s. Data: %v. Error: %v", id, string(d), eo)
-	}
-	return getIntegrationFromResponse(c, resp, err)
+	var target map[string]Integration
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, i, target, "integration")
+	return ret.(*Integration), decodeErr
 }
 
 // GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
@@ -179,63 +151,26 @@ type GetIntegrationOptions struct {
 
 // GetIntegration gets details about an integration belonging to a service.
 func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
-	v, err := query.Values(o)
-	if err != nil {
-		return nil, err
+	v, queryErr := query.Values(o)
+	if queryErr != nil {
+		return nil, queryErr
 	}
-	var result map[string]Integration
 	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
-	if err != nil {
-		return nil, err
-	}
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	i, ok := result["integration"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have integration field")
-	}
-	return &i, nil
+	var target map[string]Integration
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, integrationID, target, "integration")
+	return ret.(*Integration), decodeErr
 }
 
 // UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
 	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
-	return getIntegrationFromResponse(c, resp, err)
+	var target map[string]Integration
+	ret, decodeErr := c.decodeObjectFromResponse(resp, err, i, target, "integration")
+	return ret.(*Integration), decodeErr
 }
 
 // DeleteIntegration deletes an existing integration.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
 	_, err := c.delete("/services/" + serviceID + "/integrations" + integrationID)
 	return err
-}
-
-func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service, error) {
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]Service
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	s, ok := result["service"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have service field")
-	}
-	return &s, nil
-}
-
-func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Integration, error) {
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]Integration
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	s, ok := result["integration"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have integration field")
-	}
-	return &s, nil
 }
