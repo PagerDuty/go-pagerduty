@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -76,11 +77,11 @@ func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 }
 
 // CreateUser creates a new user.
-func (c *Client) CreateUser(u User) error {
+func (c *Client) CreateUser(u User) (*User, error) {
 	data := make(map[string]User)
 	data["user"] = u
-	_, err := c.post("/users", data)
-	return err
+	resp, err := c.post("/users", data)
+	return getUserFromResponse(c, resp, err)
 }
 
 // DeleteUser deletes a user.
@@ -96,24 +97,29 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 		return nil, err
 	}
 	resp, err := c.get("/users/" + id + "?" + v.Encode())
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]User
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	u, ok := result["user"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have user field")
-	}
-	return &u, nil
+	return getUserFromResponse(c, resp, err)
 }
 
 // UpdateUser updates an existing user.
-func (c *Client) UpdateUser(u User) error {
+func (c *Client) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
 	v["user"] = u
-	_, err := c.put("/users/"+u.ID, v)
-	return err
+	resp, err := c.put("/users/"+u.ID, v)
+	return getUserFromResponse(c, resp, err)
+}
+
+func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]User
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "user"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }

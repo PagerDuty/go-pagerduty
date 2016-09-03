@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -49,11 +50,11 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 }
 
 // CreateMaintaienanceWindows creates a new maintenance window for the specified services.
-func (c *Client) CreateMaintaienanceWindows(m MaintenanceWindow) error {
+func (c *Client) CreateMaintaienanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
-	_, err := c.post("/mainteance_windows", data)
-	return err
+	resp, err := c.post("/mainteance_windows", data)
+	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
@@ -74,22 +75,27 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 		return nil, err
 	}
 	resp, err := c.get("/mainteance_windows/" + id + "?" + v.Encode())
-	if err != nil {
-		return nil, err
-	}
-	var result map[string]MaintenanceWindow
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	m, ok := result["maintenance_window"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have maintenance window field")
-	}
-	return &m, nil
+	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
 // UpdateMaintenanceWindow updates an existing maintenance window.
-func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) error {
-	_, err := c.put("/maintenance_windows/"+m.ID, m)
-	return err
+func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
+	resp, err := c.put("/maintenance_windows/"+m.ID, m)
+	return getMaintenanceWindowFromResponse(c, resp, err)
+}
+
+func getMaintenanceWindowFromResponse(c *Client, resp *http.Response, err error) (*MaintenanceWindow, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]MaintenanceWindow
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "maintenance_window"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }
