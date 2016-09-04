@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// IncidentDetail contains a representation of the incident associated with the action that caused this webhook message.
 type IncidentDetail struct {
 	ID                    string           `json:"id"`
 	IncidentNumber        uint             `json:"incident_number"`
@@ -18,6 +19,7 @@ type IncidentDetail struct {
 	TriggerDeatilsHTMLUrl string           `json:"trigger_details_html_url"`
 }
 
+// WebhookPayload is a single message array for a webhook.
 type WebhookPayload struct {
 	ID        string           `json:"id"`
 	Type      string           `json:"type"`
@@ -25,6 +27,7 @@ type WebhookPayload struct {
 	Data      *json.RawMessage `json:"data"`
 }
 
+// DecodeWebhook decodes a webhook from a response object.
 func DecodeWebhook(r io.Reader) (*WebhookPayload, error) {
 	var payload WebhookPayload
 	if err := json.NewDecoder(r).Decode(&payload); err != nil {
