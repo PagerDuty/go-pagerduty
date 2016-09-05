@@ -22,7 +22,7 @@ func (c *OncallList) Help() string {
 	helpText := `
 	pd oncall list List on-calls
 
-	`
+	` + c.Meta.Help()
 	return strings.TrimSpace(helpText)
 }
 
