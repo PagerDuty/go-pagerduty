@@ -66,7 +66,7 @@ func (c *AddonUpdate) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	if err := client.UpdateAddon(newAddon.ID, newAddon); err != nil {
+	if _, err := client.UpdateAddon(newAddon.ID, newAddon); err != nil {
 		log.Error(err)
 		return -1
 	}

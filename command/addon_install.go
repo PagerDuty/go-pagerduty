@@ -59,7 +59,7 @@ func (c *AddonInstall) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", a)
-	if err := client.InstallAddon(a); err != nil {
+	if _, err := client.InstallAddon(a); err != nil {
 		log.Error(err)
 		return -1
 	}
