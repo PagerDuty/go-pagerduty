@@ -34,7 +34,7 @@ func (c *IncidentList) Run(args []string) int {
 	var timeZone string
 	var sortBy string
 	var includes []string
-	flags := c.Meta.FlagSet("service list")
+	flags := c.Meta.FlagSet("incident list")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.Var((*ArrayFlags)(&includes), "include", "Additional details to include (can be specified multiple times)")
 	flags.Var((*ArrayFlags)(&teamIDs), "team-id", "Only show for team ID (can be specified multiple times)")
