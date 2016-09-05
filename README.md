@@ -5,38 +5,47 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for [PagerDut
 
 ## Installation
 
+### TO-DO
+Get godep save/restore to setup project 
+
+Load dependencies
+```bash
+$ go get github.com/mitchellh/cli
+$ go get github.com/mitchellh/go-homedir
+$ go get gopkg.in/yaml.v2
 ```
-go get github.com/PagerDuty/go-pagerduty
+
+Load pageduty CLI source:
+
+```bash
+$ go get github.com/PagerDuty/go-pagerduty
+```
+Build it and copy it to some place you have path to
+```bash
+$ cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
+$ make bin
+$ cp bin/pd /usr/local/bin/pd-cli
+```
+
+Setup YAML configuration file for the API Key:
+[Here are directions for generating it](https://support.pagerduty.com/hc/en-us/articles/202829310-Generating-an-API-Key)
+```bash
+$ echo "authtoken: your_AuthTokenGoes_Here" > ~/.pd.yaml
 ```
 
 ## Usage
 
 ### CLI
-
-### From golang libraries
-
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-)
-
-var	authtoken = "" // Set your auth token here
-
-func main() {
-	var opts pagerduty.ListEscalationPoliciesOptions
-	client := pagerduty.NewClient(authtoken)
-	if eps, err := client.ListEscalationPolicies(opts); err != nil {
-		panic(err)
-	} else {
-		for _, p := range eps.EscalationPolicies {
-			fmt.Println(p.Name)
-		}
-	}
-}
+To get help
+```bash
+$ pd-cli --help
 ```
+
+Try a command to make sure API key working
+```bash
+$ pd-cli user list
+```
+
 
 ## License
 [Apache 2](http://www.apache.org/licenses/LICENSE-2.0)
