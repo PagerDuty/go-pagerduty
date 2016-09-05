@@ -59,7 +59,7 @@ func (c *EscalationPolicyCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", ep)
-	if err := client.CreateEscalationPolicy(ep); err != nil {
+	if _, err := client.CreateEscalationPolicy(ep); err != nil {
 		log.Error(err)
 		return -1
 	}

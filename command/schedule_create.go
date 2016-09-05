@@ -59,7 +59,7 @@ func (c *ScheduleCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", s)
-	if err := client.CreateSchedule(s); err != nil {
+	if _, err := client.CreateSchedule(s); err != nil {
 		log.Error(err)
 		return -1
 	}

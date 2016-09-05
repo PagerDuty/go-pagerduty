@@ -55,7 +55,7 @@ func (c *UserList) Run(args []string) int {
 		return -1
 	}
 	client := c.Meta.Client()
-	opts := pagerduty.ListUserOptions{
+	opts := pagerduty.ListUsersOptions{
 		Query:    query,
 		TeamIDs:  teamIDs,
 		Includes: includes,

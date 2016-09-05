@@ -59,7 +59,7 @@ func (c *ServiceCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", s)
-	if err := client.CreateService(s); err != nil {
+	if _, err := client.CreateService(s); err != nil {
 		log.Error(err)
 		return -1
 	}
