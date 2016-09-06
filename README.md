@@ -13,6 +13,29 @@ go get github.com/PagerDuty/go-pagerduty
 
 ### CLI
 
+The CLI requires authentication token, which can be sepcified in `.pd.yml`
+file in home directory of the user, or passed as command line argument.
+Example of config file:
+
+```yaml
+---
+authtoken: fooBar
+```
+
+`pd` command provides a single entrypoint for all the API endpoints, with individual
+API represented by their own sub commands. For an exhaustive list of sub-commands, try:
+
+```
+pd --help
+```
+
+An example of the `service` sub-command
+
+```
+pd service list
+```
+
+
 ### From golang libraries
 
 ```go
