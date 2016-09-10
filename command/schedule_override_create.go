@@ -60,9 +60,11 @@ func (c *ScheduleOverrideCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", o)
-	if err := client.CreateOverride(flags.Arg(0), o); err != nil {
+	o1, err := client.CreateOverride(flags.Arg(0), o)
+	if err != nil {
 		log.Error(err)
 		return -1
 	}
+	log.Println("New override id:", o1.ID)
 	return 0
 }

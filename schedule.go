@@ -2,9 +2,8 @@ package pagerduty
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/google/go-querystring/query"
+	"net/http"
 )
 
 // Restriction limits on-call responsibility for a layer to certain times of the day or week.
@@ -84,7 +83,10 @@ func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
 	resp, err := c.post("/schedules", data)
-	return getScheduleFromResponse(c, resp, err)
+	if err != nil {
+		return nil, err
+	}
+	return getScheduleFromResponse(c, resp)
 }
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
@@ -128,7 +130,10 @@ func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error)
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
 	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
-	return getScheduleFromResponse(c, resp, err)
+	if err != nil {
+		return nil, err
+	}
+	return getScheduleFromResponse(c, resp)
 }
 
 // UpdateScheduleOptions is the data structure used when calling the UpdateSchedule API endpoint.
@@ -141,7 +146,10 @@ func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
 	resp, err := c.put("/schedules/"+id, v)
-	return getScheduleFromResponse(c, resp, err)
+	if err != nil {
+		return nil, err
+	}
+	return getScheduleFromResponse(c, resp)
 }
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
@@ -183,9 +191,14 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Overrides, 
 }
 
 // CreateOverride creates an override for a specific user covering the specified time range.
-func (c *Client) CreateOverride(id string, o Overrides) error {
-	_, err := c.post("/schedules/"+id+"/overrides", o)
-	return err
+func (c *Client) CreateOverride(id string, o Overrides) (*Overrides, error) {
+	data := make(map[string]Overrides)
+	data["override"] = o
+	resp, err := c.post("/schedules/"+id+"/overrides", data)
+	if err != nil {
+		return nil, err
+	}
+	return getOverrideFromResponse(c, resp)
 }
 
 // DeleteOverride removes an override.
@@ -222,10 +235,7 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 	return u, nil
 }
 
-func getScheduleFromResponse(c *Client, resp *http.Response, err error) (*Schedule, error) {
-	if err != nil {
-		return nil, err
-	}
+func getScheduleFromResponse(c *Client, resp *http.Response) (*Schedule, error) {
 	var target map[string]Schedule
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
@@ -236,4 +246,17 @@ func getScheduleFromResponse(c *Client, resp *http.Response, err error) (*Schedu
 		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
 	return &t, nil
+}
+
+func getOverrideFromResponse(c *Client, resp *http.Response) (*Overrides, error) {
+	var target map[string]Overrides
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "override"
+	o, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &o, nil
 }
