@@ -2,9 +2,8 @@ package pagerduty
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/google/go-querystring/query"
+	"net/http"
 )
 
 const (

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 const (
@@ -73,7 +71,6 @@ func (c *Client) post(path string, payload interface{}) (*http.Response, error) 
 	if err != nil {
 		return nil, err
 	}
-	log.Debugln(string(data))
 	return c.do("POST", path, bytes.NewBuffer(data))
 }
 
@@ -83,7 +80,6 @@ func (c *Client) get(path string) (*http.Response, error) {
 
 func (c *Client) do(method, path string, body io.Reader) (*http.Response, error) {
 	endpoint := apiEndpoint + path
-	log.Debugln("Endpoint:", endpoint)
 	req, _ := http.NewRequest(method, endpoint, body)
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
 	req.Header.Set("Content-Type", "application/json")

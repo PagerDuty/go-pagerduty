@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 const eventEndPoint = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
@@ -32,12 +30,10 @@ type EventResponse struct {
 
 // CreateEvent sends PagerDuty an event to report, acknowledge, or resolve a problem.
 func CreateEvent(e Event) (*EventResponse, error) {
-	log.Debugln("Endpoint:", eventEndPoint)
 	data, err := json.Marshal(e)
 	if err != nil {
 		return nil, err
 	}
-	log.Debugln(string(data))
 	req, _ := http.NewRequest("POST", eventEndPoint, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
