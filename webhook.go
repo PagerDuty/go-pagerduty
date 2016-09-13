@@ -15,7 +15,7 @@ type IncidentDetail struct {
 	Service               string           `json:"service"`
 	AssignedToUser        *json.RawMessage `json:"assigned_to_user"`
 	AssignedTo            []string         `json:"assigned_to"`
-	TriggerSummaryData    *json.RawMessage `json:"trigger_summary_daya"`
+	TriggerSummaryData    *json.RawMessage `json:"trigger_summary_data"`
 	TriggerDeatilsHTMLUrl string           `json:"trigger_details_html_url"`
 }
 
