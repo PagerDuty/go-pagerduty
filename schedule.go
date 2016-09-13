@@ -37,14 +37,14 @@ type ScheduleLayer struct {
 // Schedule determines the time periods that users are on call.
 type Schedule struct {
 	APIObject
-	Name                 string          `json:"name,omitempty"`
-	TimeZone             string          `json:"time_zone,omitempty"`
-	Description          string          `json:"description,omitempty"`
-	EscalationPolicies   []APIObject     `json:"escalation_policies,omitempty"`
-	Users                []APIObject     `json:"users,omitempty"`
-	ScheduleLayers       []ScheduleLayer `json:"schedule_layers,omitempty"`
-	OverridesSubschedule ScheduleLayer   `json:"override_subschedule,omitempty"`
-	FinalSchedule        ScheduleLayer   `json:"final_schedule,omitempty"`
+	Name                string          `json:"name,omitempty"`
+	TimeZone            string          `json:"time_zone,omitempty"`
+	Description         string          `json:"description,omitempty"`
+	EscalationPolicies  []APIObject     `json:"escalation_policies,omitempty"`
+	Users               []APIObject     `json:"users,omitempty"`
+	ScheduleLayers      []ScheduleLayer `json:"schedule_layers,omitempty"`
+	OverrideSubschedule ScheduleLayer   `json:"override_subschedule,omitempty"`
+	FinalSchedule       ScheduleLayer   `json:"final_schedule,omitempty"`
 }
 
 // ListSchedulesOptions is the data structure used when calling the ListSchedules API endpoint.
@@ -162,7 +162,7 @@ type ListOverridesOptions struct {
 }
 
 // Overrides are any schedule layers from the override layer.
-type Overrides struct {
+type Override struct {
 	ID    string    `json:"id,omitempty"`
 	Start string    `json:"start,omitempty"`
 	End   string    `json:"end,omitempty"`
@@ -170,7 +170,7 @@ type Overrides struct {
 }
 
 // ListOverrides lists overrides for a given time range.
-func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Overrides, error) {
+func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Overrides, 
 	if err != nil {
 		return nil, err
 	}
-	var result map[string][]Overrides
+	var result map[string][]Override
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
@@ -191,8 +191,8 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Overrides, 
 }
 
 // CreateOverride creates an override for a specific user covering the specified time range.
-func (c *Client) CreateOverride(id string, o Overrides) (*Overrides, error) {
-	data := make(map[string]Overrides)
+func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
+	data := make(map[string]Override)
 	data["override"] = o
 	resp, err := c.post("/schedules/"+id+"/overrides", data)
 	if err != nil {
@@ -248,8 +248,8 @@ func getScheduleFromResponse(c *Client, resp *http.Response) (*Schedule, error) 
 	return &t, nil
 }
 
-func getOverrideFromResponse(c *Client, resp *http.Response) (*Overrides, error) {
-	var target map[string]Overrides
+func getOverrideFromResponse(c *Client, resp *http.Response) (*Override, error) {
+	var target map[string]Override
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
