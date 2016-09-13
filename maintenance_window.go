@@ -2,9 +2,8 @@ package pagerduty
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/google/go-querystring/query"
+	"net/http"
 )
 
 // MaintenanceWindow is used to temporarily disable one or more services for a set period of time.

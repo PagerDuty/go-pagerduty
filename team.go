@@ -2,9 +2,8 @@ package pagerduty
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/google/go-querystring/query"
+	"net/http"
 )
 
 // Team is a collection of users and escalation policies that represent a group of people within an organization.

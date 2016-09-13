@@ -2,11 +2,8 @@ package pagerduty
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-
-	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-querystring/query"
+	"net/http"
 )
 
 // Addon is a third-party add-on to PagerDuty's UI.
@@ -55,10 +52,6 @@ func (c *Client) InstallAddon(a Addon) (*Addon, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusCreated {
-		ct, rErr := ioutil.ReadAll(resp.Body)
-		if rErr == nil {
-			log.Debug(string(ct))
-		}
 		return nil, fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
 	}
 	return getAddonFromResponse(c, resp)

@@ -41,7 +41,7 @@ func (c *ScheduleOverrideCreate) Run(args []string) int {
 		return -1
 	}
 	client := c.Meta.Client()
-	var o pagerduty.Overrides
+	var o pagerduty.Override
 	if len(flags.Args()) != 2 {
 		log.Error("Please specify input json file")
 		return -1
