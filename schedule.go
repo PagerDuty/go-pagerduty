@@ -145,7 +145,7 @@ type UpdateScheduleOptions struct {
 func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
-	resp, err := c.put("/schedules/"+id, v)
+	resp, err := c.put("/schedules/"+id, v, nil)
 	if err != nil {
 		return nil, err
 	}

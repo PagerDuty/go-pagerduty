@@ -76,7 +76,7 @@ func (c *Client) GetAddon(id string) (*Addon, error) {
 func (c *Client) UpdateAddon(id string, a Addon) (*Addon, error) {
 	v := make(map[string]Addon)
 	v["addon"] = a
-	resp, err := c.put("/addons/"+id, v)
+	resp, err := c.put("/addons/"+id, v, nil)
 	if err != nil {
 		return nil, err
 	}

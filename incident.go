@@ -78,20 +78,13 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// ManageIncidentsOptions is the data structure used when calling the ManageIncident API endpoint.
-type ManageIncidentsOptions struct {
-	From string `url:"from,omitempty"`
-}
-
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
-func (c *Client) ManageIncidents(incidents []Incident, o ManageIncidentsOptions) error {
-	v, err := query.Values(o)
-	if err != nil {
-		return err
-	}
+func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	r := make(map[string][]Incident)
+	headers := make(map[string]string)
+	headers["From"] = from
 	r["incidents"] = incidents
-	_, e := c.put("/incidents?"+v.Encode(), r)
+	_, e := c.put("/incidents", r, &headers)
 	return e
 }
 

@@ -103,7 +103,7 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 func (c *Client) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
 	v["user"] = u
-	resp, err := c.put("/users/"+u.ID, v)
+	resp, err := c.put("/users/"+u.ID, v, nil)
 	return getUserFromResponse(c, resp, err)
 }
 
