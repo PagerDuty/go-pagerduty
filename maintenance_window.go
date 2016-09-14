@@ -79,7 +79,7 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 
 // UpdateMaintenanceWindow updates an existing maintenance window.
 func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
-	resp, err := c.put("/maintenance_windows/"+m.ID, m)
+	resp, err := c.put("/maintenance_windows/"+m.ID, m, nil)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 

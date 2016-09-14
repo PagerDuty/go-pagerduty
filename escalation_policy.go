@@ -90,7 +90,7 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 
 // UpdateEscalationPolicy updates an existing escalation policy and its rules.
 func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
-	resp, err := c.put(escPath+"/"+id, e)
+	resp, err := c.put(escPath+"/"+id, e, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 

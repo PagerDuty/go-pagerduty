@@ -124,7 +124,7 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 
 // UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) (*Service, error) {
-	resp, err := c.put("/services/"+s.ID, s)
+	resp, err := c.put("/services/"+s.ID, s, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -157,7 +157,7 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 
 // UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i)
+	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 

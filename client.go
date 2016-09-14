@@ -55,15 +55,15 @@ func NewClient(authToken string) *Client {
 }
 
 func (c *Client) delete(path string) (*http.Response, error) {
-	return c.do("DELETE", path, nil)
+	return c.do("DELETE", path, nil, nil)
 }
 
-func (c *Client) put(path string, payload interface{}) (*http.Response, error) {
+func (c *Client) put(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	return c.do("PUT", path, bytes.NewBuffer(data))
+	return c.do("PUT", path, bytes.NewBuffer(data), headers)
 }
 
 func (c *Client) post(path string, payload interface{}) (*http.Response, error) {
@@ -71,19 +71,25 @@ func (c *Client) post(path string, payload interface{}) (*http.Response, error) 
 	if err != nil {
 		return nil, err
 	}
-	return c.do("POST", path, bytes.NewBuffer(data))
+	return c.do("POST", path, bytes.NewBuffer(data), nil)
 }
 
 func (c *Client) get(path string) (*http.Response, error) {
-	return c.do("GET", path, nil)
+	return c.do("GET", path, nil, nil)
 }
 
-func (c *Client) do(method, path string, body io.Reader) (*http.Response, error) {
+func (c *Client) do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
 	endpoint := apiEndpoint + path
 	req, _ := http.NewRequest(method, endpoint, body)
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
+	if headers != nil {
+		for k, v := range *headers {
+			req.Header.Set(k, v)
+		}
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Token token="+c.authToken)
+
 	resp, err := http.DefaultClient.Do(req)
 	return c.checkResponse(resp, err)
 }

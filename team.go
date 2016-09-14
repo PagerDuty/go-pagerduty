@@ -60,7 +60,7 @@ func (c *Client) GetTeam(id string) (*Team, error) {
 
 // UpdateTeam updates an existing team.
 func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
-	resp, err := c.put("/teams/"+id, t)
+	resp, err := c.put("/teams/"+id, t, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 
@@ -72,7 +72,7 @@ func (c *Client) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
 
 // AddEscalationPolicyToTeam adds an escalation policy to a team.
 func (c *Client) AddEscalationPolicyToTeam(teamID, epID string) error {
-	_, err := c.put("/teams/"+teamID+"/escalation_policies/"+epID, nil)
+	_, err := c.put("/teams/"+teamID+"/escalation_policies/"+epID, nil, nil)
 	return err
 }
 
@@ -84,7 +84,7 @@ func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
 
 // AddUserToTeam adds a user to a team.
 func (c *Client) AddUserToTeam(teamID, userID string) error {
-	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil)
+	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil, nil)
 	return err
 }
 
