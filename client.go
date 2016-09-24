@@ -59,11 +59,15 @@ func (c *Client) delete(path string) (*http.Response, error) {
 }
 
 func (c *Client) put(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
+
+	if payload != nil {
+		data, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		return c.do("PUT", path, bytes.NewBuffer(data), headers)
 	}
-	return c.do("PUT", path, bytes.NewBuffer(data), headers)
+	return c.do("PUT", path, nil, headers)
 }
 
 func (c *Client) post(path string, payload interface{}) (*http.Response, error) {
