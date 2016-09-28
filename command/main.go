@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	version = "0.1"
+	version = "0.0.0"
 )
 
 func loadCommands() map[string]cli.CommandFactory {
@@ -96,18 +96,14 @@ func loadCommands() map[string]cli.CommandFactory {
 }
 
 func main() {
-	os.Exit(invokeCLI())
+	os.Exit(invokeCLI(os.Args[1:]))
 }
 
-func invokeCLI() int {
-	args := os.Args[1:]
+func invokeCLI(args []string) int {
 	for _, arg := range args {
 		if arg == "-v" || arg == "--version" {
-			newArgs := make([]string, len(args)+1)
-			newArgs[0] = "version"
-			copy(newArgs[1:], args)
-			args = newArgs
-			break
+			fmt.Println(version)
+			return 0
 		}
 	}
 
