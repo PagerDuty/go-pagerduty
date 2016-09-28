@@ -12,7 +12,7 @@ var (
 
 func main() {
 	var opts pagerduty.ListEscalationPoliciesOptions
-	client := pagerduty.NewClient(subdomain, authtoken)
+	client := pagerduty.NewClient(authtoken)
 	if eps, err := client.ListEscalationPolicies(opts); err != nil {
 		panic(err)
 	} else {
