@@ -136,7 +136,9 @@ func (c *Client) DeleteService(id string) error {
 
 // CreateIntegration creates a new integration belonging to a service.
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
-	resp, err := c.post("/services/"+id+"/integrations", i)
+	data := make(map[string]Integration)
+	data["integration"] = i
+	resp, err := c.post("/services/"+id+"/integrations", data)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
