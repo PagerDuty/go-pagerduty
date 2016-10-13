@@ -10,7 +10,7 @@ var (
 	authtoken string
 )
 
-func main() {
+func ep() {
 	var opts pagerduty.ListEscalationPoliciesOptions
 	client := pagerduty.NewClient(authtoken)
 	if eps, err := client.ListEscalationPolicies(opts); err != nil {
