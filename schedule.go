@@ -2,8 +2,9 @@ package pagerduty
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Restriction limits on-call responsibility for a layer to certain times of the day or week.
@@ -179,15 +180,17 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, e
 	if err != nil {
 		return nil, err
 	}
-	var result map[string][]Override
+
+	result := struct {
+		Total     int
+		Overrides []Override
+	}{}
+
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
-	overrides, ok := result["overrides"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have overrides field")
-	}
-	return overrides, nil
+
+	return result.Overrides, nil
 }
 
 // CreateOverride creates an override for a specific user covering the specified time range.
