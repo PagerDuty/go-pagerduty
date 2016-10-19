@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -10,7 +11,10 @@ type Agent APIObject
 
 // Channel is the means by which the action was carried out.
 type Channel struct {
-	Type string
+	Type    string
+	Details string
+	Subject string
+	Summary string
 }
 
 // LogEntry is a list of all of the events that happened to an incident.
