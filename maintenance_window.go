@@ -48,8 +48,8 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// CreateMaintaienanceWindows creates a new maintenance window for the specified services.
-func (c *Client) CreateMaintaienanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
+// CreateMaintenanceWindows creates a new maintenance window for the specified services.
+func (c *Client) CreateMaintenanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
 	resp, err := c.post("/mainteance_windows", data)

@@ -59,7 +59,7 @@ func (c *MaintenanceWindowCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", m)
-	if _, err := client.CreateMaintaienanceWindows(m); err != nil {
+	if _, err := client.CreateMaintenanceWindows(m); err != nil {
 		log.Error(err)
 		return -1
 	}
