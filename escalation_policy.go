@@ -2,8 +2,9 @@ package pagerduty
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 const (
@@ -35,6 +36,11 @@ type ListEscalationPoliciesResponse struct {
 	EscalationPolicies []EscalationPolicy `json:"escalation_policies"`
 }
 
+type ListEscalationRulesResponse struct {
+	APIListObject
+	EscalationRules []EscalationRule `json:"escalation_rules"`
+}
+
 // ListEscalationPoliciesOptions is the data structure used when calling the ListEscalationPolicies API endpoint.
 type ListEscalationPoliciesOptions struct {
 	APIListObject
@@ -43,6 +49,11 @@ type ListEscalationPoliciesOptions struct {
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
 	Includes []string `url:"include,omitempty,brackets"`
 	SortBy   string   `url:"sort_by,omitempty"`
+}
+
+// GetEscalationRuleOptions is the data structure used when calling the GetEscalationRule API endpoint.
+type GetEscalationRuleOptions struct {
+	Includes []string `url:"include,omitempty,brackets"`
 }
 
 // ListEscalationPolicies lists all of the existing escalation policies.
@@ -94,6 +105,67 @@ func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*Escala
 	data["escalation_policy"] = *e
 	resp, err := c.put(escPath+"/"+id, data, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
+}
+
+// CreateEscalationRule creates a new escalation rule for an escalation policy
+// and appends it to the end of the existing escalation rules.
+func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
+	data := make(map[string]EscalationRule)
+	data["escalation_rule"] = e
+	resp, err := c.post(escPath+"/"+escID+"/escalation_rules", data)
+	return getEscalationRuleFromResponse(c, resp, err)
+}
+
+// GetEscalationRule gets information about an existing escalation rule.
+func (c *Client) GetEscalationRule(escID string, id string, o *GetEscalationRuleOptions) (*EscalationRule, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(escPath + "/" + escID + "/escalation_rules/" + id + "?" + v.Encode())
+	return getEscalationRuleFromResponse(c, resp, err)
+}
+
+// DeleteEscalationRule deletes an existing escalation rule.
+func (c *Client) DeleteEscalationRule(escID string, id string) error {
+	_, err := c.delete(escPath + "/" + escID + "/escalation_rules/" + id)
+	return err
+}
+
+// UpdateEscalationRule updates an existing escalation rule.
+func (c *Client) UpdateEscalationRule(escID string, id string, e *EscalationRule) (*EscalationRule, error) {
+	data := make(map[string]EscalationRule)
+	data["escalation_rule"] = *e
+	resp, err := c.put(escPath+"/"+escID+"/escalation_rules/"+id, data, nil)
+	return getEscalationRuleFromResponse(c, resp, err)
+}
+
+// ListEscalationRules lists all of the escalation rules for an existing escalation policy.
+func (c *Client) ListEscalationRules(escID string) (*ListEscalationRulesResponse, error) {
+	resp, err := c.get(escPath + "/" + escID + "/escalation_rules")
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListEscalationRulesResponse
+	return &result, c.decodeJSON(resp, &result)
+}
+
+func getEscalationRuleFromResponse(c *Client, resp *http.Response, err error) (*EscalationRule, error) {
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]EscalationRule
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "escalation_rule"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }
 
 func getEscalationPolicyFromResponse(c *Client, resp *http.Response, err error) (*EscalationPolicy, error) {
