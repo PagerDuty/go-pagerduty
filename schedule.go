@@ -58,7 +58,7 @@ type ListSchedulesOptions struct {
 // ListSchedulesResponse is the data structure returned from calling the ListSchedules API endpoint.
 type ListSchedulesResponse struct {
 	APIListObject
-	Schedules []Schedule
+	Schedules []Schedule `json:"schedules"`
 }
 
 // UserReference is a reference to an authorized PagerDuty user.
