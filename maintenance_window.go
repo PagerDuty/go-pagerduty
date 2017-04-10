@@ -2,8 +2,9 @@ package pagerduty
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 // MaintenanceWindow is used to temporarily disable one or more services for a set period of time.
@@ -52,13 +53,13 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 func (c *Client) CreateMaintaienanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
-	resp, err := c.post("/mainteance_windows", data)
+	resp, err := c.post("//maintenance_windows", data)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
 func (c *Client) DeleteMaintenanceWindow(id string) error {
-	_, err := c.delete("/mainteance_windows/" + id)
+	_, err := c.delete("//maintenance_windows/" + id)
 	return err
 }
 
@@ -73,7 +74,7 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/mainteance_windows/" + id + "?" + v.Encode())
+	resp, err := c.get("//maintenance_windows/" + id + "?" + v.Encode())
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
