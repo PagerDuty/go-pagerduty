@@ -71,6 +71,7 @@ type Service struct {
 	IncidentUrgencyRule    *IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
 	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
 	ScheduledActions       []ScheduledAction    `json:"scheduled_actions,omitempty"`
+	AlertCreation          string               `json:"alert_creation,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
