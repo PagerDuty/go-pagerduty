@@ -7,16 +7,57 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+type EmailFilter struct {
+	APIObject
+	SubjectMode    string `json:"subject_mode,omitempty"`
+	SubjectRegex   string `json:"subject_regex,omitempty"`
+	BodyMode       string `json:"body_mode,omitempty"`
+	BodyRegex      string `json:"body_regex,omitempty"`
+	FromEmailMode  string `json:"from_email_mode,omitempty"`
+	FromEmailRegex string `json:"from_email_regex,omitempty"`
+}
+
+type Children struct {
+	Type    string `json:"type,omitempty"`
+	Part    string `json:"part,omitempty"`
+	Matcher string `json:"matcher,omitempty"`
+}
+
+type MatchPredicate struct {
+	Type     string     `json:"type,omitempty"`
+	Children []Children `json:"children,omitempty"`
+}
+
+type ValueExtractor struct {
+	Type        string `json:"type,omitempty"`
+	ValueName   string `json:"value_name,omitempty"`
+	Part        string `json:"part,omitempty"`
+	StartsAfter string `json:"starts_after,omitempty"`
+	EndsBefore  string `json:"ends_before,omitempty"`
+}
+
+type EmailParser struct {
+	ID              int              `json:"id,omitempty"`
+	Action          string           `json:"action,omitempty"`
+	MatchPredicate  MatchPredicate   `json:"match_predicate,omitempty"`
+	ValueExtractors []ValueExtractor `json:"value_extractors,omitempty"`
+}
+
 // Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
 type Integration struct {
 	APIObject
-	Name             string     `json:"name,omitempty"`
-	Service          *APIObject `json:"service,omitempty"`
-	CreatedAt        string     `json:"created_at,omitempty"`
-	Vendor           *APIObject `json:"vendor,omitempty"`
-	Type             string     `json:"type,omitempty"`
-	IntegrationKey   string     `json:"integration_key,omitempty"`
-	IntegrationEmail string     `json:"integration_email,omitempty"`
+	Name                  string        `json:"name,omitempty"`
+	Service               *APIObject    `json:"service,omitempty"`
+	CreatedAt             string        `json:"created_at,omitempty"`
+	Vendor                *APIObject    `json:"vendor,omitempty"`
+	Type                  string        `json:"type,omitempty"`
+	IntegrationKey        string        `json:"integration_key,omitempty"`
+	IntegrationEmail      string        `json:"integration_email,omitempty"`
+	EmailIncidentCreation string        `json:"email_incident_creation,omitempty"`
+	EmailParsingFallback  string        `json:"email_parsing_fallback,omitempty"`
+	EmailFilterMode       string        `json:"email_filter_mode,omitempty"`
+	EmailFilters          []EmailFilter `json:"email_filters,omitempty"`
+	EmailParsers          []EmailParser `json:"email_parsers,omitempty"`
 }
 
 // InlineModel represents when a scheduled action will occur.
@@ -193,7 +234,7 @@ func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Int
 	}
 	var target map[string]Integration
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "integration"
 	t, nodeOK := target[rootNode]
