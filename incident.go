@@ -36,7 +36,7 @@ type Incident struct {
 	Acknowledgements     []Acknowledgement `json:"acknowledgements,omitempty"`
 	LastStatusChangeAt   string            `json:"last_status_change_at,omitempty"`
 	LastStatusChangeBy   APIObject         `json:"last_status_change_by,omitempty"`
-	FirstTriggerLogEntry APIObject         `json:"last_trigger_log_entry,omitempty"`
+	FirstTriggerLogEntry APIObject         `json:"first_trigger_log_entry,omitempty"`
 	EscalationPolicy     APIObject         `json:"escalation_policy,omitempty"`
 	Teams                []APIObject       `json:"teams,omitempty"`
 	Urgency              string            `json:"urgency,omitempty"`
