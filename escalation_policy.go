@@ -90,7 +90,7 @@ type GetEscalationPolicyOptions struct {
 }
 
 // GetEscalationPolicy gets information about an existing escalation policy and its rules.
-func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (*EscalationPolicy, error) {
+func (c *Client) GetEscalationPolicy(id string, o GetEscalationPolicyOptions) (*EscalationPolicy, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*Escalati
 }
 
 // GetEscalationRule gets information about an existing escalation rule.
-func (c *Client) GetEscalationRule(escID string, id string, o *GetEscalationRuleOptions) (*EscalationRule, error) {
+func (c *Client) GetEscalationRule(escID string, id string, o GetEscalationRuleOptions) (*EscalationRule, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
