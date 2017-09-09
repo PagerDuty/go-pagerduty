@@ -16,6 +16,7 @@ type OnCall struct {
 
 // ListOnCallsResponse is the data structure returned from calling the ListOnCalls API endpoint.
 type ListOnCallsResponse struct {
+	APIListObject
 	OnCalls []OnCall `json:"oncalls"`
 }
 
