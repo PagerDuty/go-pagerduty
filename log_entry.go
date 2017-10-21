@@ -52,6 +52,14 @@ type ListLogEntriesOptions struct {
 	Includes   []string `url:"include,omitempty,brackets"`
 }
 
+// ListIncidentLogEntriesOptions is the data structure used when calling the list log entries incident API endpoint.
+type ListIncidentLogEntriesOptions struct {
+    APIListObject
+    TimeZone   string   `url:"time_zone"`
+    IsOverview bool     `url:"is_overview,omitempty"`
+    Includes   []string `url:"include,omitempty,brackets"`
+}
+
 // ListLogEntries lists all of the incident log entries across the entire account.
 func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
 	v, err := query.Values(o)
@@ -92,3 +100,19 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	}
 	return &le, nil
 }
+
+// ListLogIncidentEntries lists all of the log entries for specific incident id
+func (c *Client) ListIncidentLogEntries(incident_id string, o ListIncidentLogEntriesOptions) (*ListLogEntryResponse, error) {
+    v, err := query.Values(o)
+    if err != nil {
+        return nil, err
+    }
+
+    resp, err := c.get("/incidents/" + incident_id + "/log_entries?" + v.Encode())
+    if err != nil {
+        return nil, err
+    }
+    var result ListLogEntryResponse
+    return &result, c.decodeJSON(resp, &result)
+}
+
