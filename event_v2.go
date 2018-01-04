@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -53,7 +54,11 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusAccepted {
-		return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
+		bytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
+		}
+		return nil, fmt.Errorf("HTTP Status Code: %d, Message: %s", resp.StatusCode, string(bytes))
 	}
 	var eventResponse V2EventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
