@@ -175,3 +175,28 @@ func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptio
 	var result ListIncidentLogEntriesResponse
 	return &result, c.decodeJSON(resp, &result)
 }
+
+// Alert is a list of all of the alerts that happened to an incident.
+type Alert struct {
+	APIObject
+	Service   APIObject `json:"service,omitempty"`
+	CreatedAt string    `json:"created_at,omitempty"`
+	Status    string    `json:"status,omitempty"`
+	AlertKey  string    `json:"alert_key,omitempty"`
+	Incident  APIObject `json:"incident,omitempty"`
+}
+
+type ListAlertResponse struct {
+	APIListObject
+	Alerts []Alert `json:"alerts,omitempty"`
+}
+
+// ListIncidentAlerts lists existing alerts entries for the specified incident.
+func (c *Client) ListIncidentAlerts(id string) (*ListAlertResponse, error) {
+	resp, err := c.get("/incidents/" + id + "/alerts")
+	if err != nil {
+		return nil, err
+	}
+	var result ListAlertResponse
+	return &result, c.decodeJSON(resp, &result)
+}
