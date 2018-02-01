@@ -42,7 +42,7 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 
 // CreateTeam creates a new team.
 func (c *Client) CreateTeam(t *Team) (*Team, error) {
-	resp, err := c.post("/teams", t)
+	resp, err := c.post("/teams", t, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 

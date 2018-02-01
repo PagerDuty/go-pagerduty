@@ -79,7 +79,7 @@ func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 func (c *Client) CreateUser(u User) (*User, error) {
 	data := make(map[string]User)
 	data["user"] = u
-	resp, err := c.post("/users", data)
+	resp, err := c.post("/users", data, nil)
 	return getUserFromResponse(c, resp, err)
 }
 

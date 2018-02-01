@@ -52,7 +52,7 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 func (c *Client) CreateMaintenanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
-	resp, err := c.post("/maintenance_windows", data)
+	resp, err := c.post("/maintenance_windows", data, nil)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 

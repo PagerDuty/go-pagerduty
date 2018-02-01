@@ -74,7 +74,7 @@ func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListE
 func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = e
-	resp, err := c.post(escPath, data)
+	resp, err := c.post(escPath, data, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
@@ -112,7 +112,7 @@ func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*Escala
 func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
 	data := make(map[string]EscalationRule)
 	data["escalation_rule"] = e
-	resp, err := c.post(escPath+"/"+escID+"/escalation_rules", data)
+	resp, err := c.post(escPath+"/"+escID+"/escalation_rules", data, nil)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
