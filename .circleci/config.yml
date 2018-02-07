@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.8.3
+    working_directory: /go/src/github.com/PagerDuty/go-pagerduty
+    steps:
+      - checkout
+      - run:
+          name: "Build"
+          command: make build
