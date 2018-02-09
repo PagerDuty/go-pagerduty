@@ -13,6 +13,7 @@ type ContactMethod struct {
 	Address        string `json:"address"`
 	Type           string `json:"type"`
 	Summary        string `json:"summary"`
+	HTMLUrl        string `json:"html_url"`
 	SendShortEmail bool   `json:"send_short_email"`
 }
 
@@ -45,6 +46,13 @@ type User struct {
 	Teams             []Team
 }
 
+// ContactMethodResponse is the data structure returned from calling the
+// GetUserContactMethod API endpoint.
+type ContactMethodResponse struct {
+	ContactMethods []ContactMethod `json:"contact_methods"`
+	Total          int
+}
+
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.
 type ListUsersResponse struct {
 	APIListObject
@@ -62,6 +70,18 @@ type ListUsersOptions struct {
 // GetUserOptions is the data structure used when calling the GetUser API endpoint.
 type GetUserOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
+}
+
+// GetUserContactMethod fetches contact methods of the existing user.
+func (c *Client) GetUserContactMethod(id string) (*ContactMethodResponse,
+error) {
+	resp, err := c.get("/users/" + id + "/contact_methods")
+	if err != nil {
+		return nil, err
+	}
+
+	var result ContactMethodResponse
+	return &result, c.decodeJSON(resp, &result)
 }
 
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
