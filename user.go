@@ -8,34 +8,37 @@ import (
 
 // ContactMethod is a way of contacting the user.
 type ContactMethod struct {
-	ID             string
-	Label          string
-	Address        string
-	Type           string
-	SendShortEmail bool `json:"send_short_email"`
+	ID             string `json:"id"`
+	Label          string `json:"label"`
+	Address        string `json:"address"`
+	Type           string `json:"type"`
+	Summary        string `json:"summary"`
+	SendShortEmail bool   `json:"send_short_email"`
 }
 
 // NotificationRule is a rule for notifying the user.
 type NotificationRule struct {
-	ID                  string
+	ID                  string        `json:"id"`
 	StartDelayInMinutes uint          `json:"start_delay_in_minutes"`
 	CreatedAt           string        `json:"created_at"`
 	ContactMethod       ContactMethod `json:"contact_method"`
-	Urgency             string
-	Type                string
+	Urgency             string        `json:"urgency"`
+	Type                string        `json:"type"`
 }
 
 // User is a member of a PagerDuty account that has the ability to interact with incidents and other data on the account.
 type User struct {
 	APIObject
-	Name              string `json:"name"`
-	Email             string `json:"email"`
-	Timezone          string `json:"timezone,omitempty"`
-	Color             string `json:"color,omitempty"`
-	Role              string `json:"role,omitempty"`
-	AvatarURL         string `json:"avatar_url,omitempty"`
-	Description       string `json:"description,omitempty"`
-	InvitationSent    bool
+	Type              string             `json:"type"`
+	Name              string             `json:"name"`
+	Summary           string             `json:"summary"`
+	Email             string             `json:"email"`
+	Timezone          string             `json:"time_zone,omitempty"`
+	Color             string             `json:"color,omitempty"`
+	Role              string             `json:"role,omitempty"`
+	AvatarURL         string             `json:"avatar_url,omitempty"`
+	Description       string             `json:"description,omitempty"`
+	InvitationSent    bool               `json:"invitation_sent,omitempty"`
 	ContactMethods    []ContactMethod    `json:"contact_methods"`
 	NotificationRules []NotificationRule `json:"notification_rules"`
 	JobTitle          string             `json:"job_title,omitempty"`
