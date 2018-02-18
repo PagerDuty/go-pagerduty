@@ -47,8 +47,11 @@ type Incident struct {
 
 type CreateIncidentOptions struct {
 	APIObject
-	Title   string       `json:"title,omitempty"`
-	Service APIReference `json:"service,omitempty"`
+	Title            string       `json:"title,omitempty"`
+	Service          APIReference `json:"service,omitempty"`
+	IncidentKey      string       `json:"incident_key,omitempty"`
+	EscalationPolicy APIObject    `json:"escalation_policy,omitempty"`
+	Assignments      []Assignment `json:"assignments,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
