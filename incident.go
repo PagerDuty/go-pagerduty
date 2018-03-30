@@ -72,6 +72,7 @@ type Incident struct {
 	ResolveReason        ResolveReason     `json:"resolve_reason,omitempty"`
 	AlertCounts          AlertCounts       `json:"alertcounts,omitempty"`
 	Body                 IncidentBody      `json:"body,omitempty"`
+	IsMergeable          bool              `json:"is_mergeable,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
