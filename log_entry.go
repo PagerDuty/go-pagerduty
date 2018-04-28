@@ -32,7 +32,7 @@ type LogEntry struct {
 	APIObject
 	CreatedAt              string `json:"created_at"`
 	Agent                  Agent
-	Channel                Channel
+	Channel                Channel `json:"channel,omitempty"`
 	Incident               Incident
 	Teams                  []Team
 	Contexts               []Context
