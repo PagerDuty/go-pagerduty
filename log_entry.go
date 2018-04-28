@@ -11,11 +11,11 @@ type Agent APIObject
 
 // Channel is the means by which the action was carried out.
 type Channel struct {
-	Type        string `json:"type,omitempty"`
-	ServiceKey  string `json:"service_key,omitempty"`
-	Description string `json:"description,omitempty"`
-	IncidentKey string `json:"incident_key,omitempty"`
-	Details     string `json:"details,omitempty"`
+	Type        string            `json:"type,omitempty"`
+	ServiceKey  string            `json:"service_key,omitempty"`
+	Description string            `json:"description,omitempty"`
+	IncidentKey string            `json:"incident_key,omitempty"`
+	Details     map[string]string `json:"details,omitempty"`
 }
 
 // Context are to be included with the trigger such as links to graphs or images.
