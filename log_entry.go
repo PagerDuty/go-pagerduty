@@ -11,7 +11,11 @@ type Agent APIObject
 
 // Channel is the means by which the action was carried out.
 type Channel struct {
-	Type string
+	Type        string            `json:"type,omitempty"`
+	ServiceKey  string            `json:"service_key,omitempty"`
+	Description string            `json:"description,omitempty"`
+	IncidentKey string            `json:"incident_key,omitempty"`
+	Details     map[string]string `json:"details,omitempty"`
 }
 
 // Context are to be included with the trigger such as links to graphs or images.
@@ -28,7 +32,7 @@ type LogEntry struct {
 	APIObject
 	CreatedAt              string `json:"created_at"`
 	Agent                  Agent
-	Channel                Channel
+	Channel                Channel `json:"channel,omitempty"`
 	Incident               Incident
 	Teams                  []Team
 	Contexts               []Context
