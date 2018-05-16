@@ -35,30 +35,30 @@ type ListMaintenanceWindowsOptions struct {
 }
 
 // ListMaintenanceWindows lists existing maintenance windows, optionally filtered by service and/or team, or whether they are from the past, present or future.
-func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListMaintenanceWindowsResponse, error) {
+func (pd *PagerdutyClient) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListMaintenanceWindowsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/maintenance_windows?" + v.Encode())
+	resp, err := pd.Get("/maintenance_windows?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListMaintenanceWindowsResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // CreateMaintenanceWindows creates a new maintenance window for the specified services.
-func (c *Client) CreateMaintenanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
+func (pd *PagerdutyClient) CreateMaintenanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	data := make(map[string]MaintenanceWindow)
 	data["maintenance_window"] = m
-	resp, err := c.post("/maintenance_windows", data)
-	return getMaintenanceWindowFromResponse(c, resp, err)
+	resp, err := pd.Post("/maintenance_windows", data)
+	return getMaintenanceWindowFromResponse(pd, resp, err)
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
-func (c *Client) DeleteMaintenanceWindow(id string) error {
-	_, err := c.delete("/maintenance_windows/" + id)
+func (pd *PagerdutyClient) DeleteMaintenanceWindow(id string) error {
+	_, err := pd.Delete("/maintenance_windows/" + id)
 	return err
 }
 
@@ -68,27 +68,27 @@ type GetMaintenanceWindowOptions struct {
 }
 
 // GetMaintenanceWindow gets an existing maintenance window.
-func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) (*MaintenanceWindow, error) {
+func (pd *PagerdutyClient) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) (*MaintenanceWindow, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/maintenance_windows/" + id + "?" + v.Encode())
-	return getMaintenanceWindowFromResponse(c, resp, err)
+	resp, err := pd.Get("/maintenance_windows/" + id + "?" + v.Encode())
+	return getMaintenanceWindowFromResponse(pd, resp, err)
 }
 
 // UpdateMaintenanceWindow updates an existing maintenance window.
-func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
-	resp, err := c.put("/maintenance_windows/"+m.ID, m, nil)
-	return getMaintenanceWindowFromResponse(c, resp, err)
+func (pd *PagerdutyClient) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
+	resp, err := pd.Put("/maintenance_windows/"+m.ID, m, nil)
+	return getMaintenanceWindowFromResponse(pd, resp, err)
 }
 
-func getMaintenanceWindowFromResponse(c *Client, resp *http.Response, err error) (*MaintenanceWindow, error) {
+func getMaintenanceWindowFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*MaintenanceWindow, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]MaintenanceWindow
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "maintenance_window"

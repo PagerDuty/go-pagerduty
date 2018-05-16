@@ -30,15 +30,15 @@ type ListNotificationsResponse struct {
 }
 
 // ListNotifications lists notifications for a given time range, optionally filtered by type (sms_notification, email_notification, phone_notification, or push_notification).
-func (c *Client) ListNotifications(o ListNotificationOptions) (*ListNotificationsResponse, error) {
+func (pd *PagerdutyClient) ListNotifications(o ListNotificationOptions) (*ListNotificationsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/notifications?" + v.Encode())
+	resp, err := pd.Get("/notifications?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListNotificationsResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }

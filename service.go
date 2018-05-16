@@ -91,17 +91,17 @@ type ListServiceResponse struct {
 }
 
 // ListServices lists existing services.
-func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
+func (pd *PagerdutyClient) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/services?" + v.Encode())
+	resp, err := pd.Get("/services?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListServiceResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // GetServiceOptions is the data structure used when calling the GetService API endpoint.
@@ -110,38 +110,38 @@ type GetServiceOptions struct {
 }
 
 // GetService gets details about an existing service.
-func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
+func (pd *PagerdutyClient) GetService(id string, o *GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
-	resp, err := c.get("/services/" + id + "?" + v.Encode())
-	return getServiceFromResponse(c, resp, err)
+	resp, err := pd.Get("/services/" + id + "?" + v.Encode())
+	return getServiceFromResponse(pd, resp, err)
 }
 
 // CreateService creates a new service.
-func (c *Client) CreateService(s Service) (*Service, error) {
+func (pd *PagerdutyClient) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
-	resp, err := c.post("/services", data)
-	return getServiceFromResponse(c, resp, err)
+	resp, err := pd.Post("/services", data)
+	return getServiceFromResponse(pd, resp, err)
 }
 
 // UpdateService updates an existing service.
-func (c *Client) UpdateService(s Service) (*Service, error) {
-	resp, err := c.put("/services/"+s.ID, s, nil)
-	return getServiceFromResponse(c, resp, err)
+func (pd *PagerdutyClient) UpdateService(s Service) (*Service, error) {
+	resp, err := pd.Put("/services/"+s.ID, s, nil)
+	return getServiceFromResponse(pd, resp, err)
 }
 
 // DeleteService deletes an existing service.
-func (c *Client) DeleteService(id string) error {
-	_, err := c.delete("/services/" + id)
+func (pd *PagerdutyClient) DeleteService(id string) error {
+	_, err := pd.Delete("/services/" + id)
 	return err
 }
 
 // CreateIntegration creates a new integration belonging to a service.
-func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
+func (pd *PagerdutyClient) CreateIntegration(id string, i Integration) (*Integration, error) {
 	data := make(map[string]Integration)
 	data["integration"] = i
-	resp, err := c.post("/services/"+id+"/integrations", data)
-	return getIntegrationFromResponse(c, resp, err)
+	resp, err := pd.Post("/services/"+id+"/integrations", data)
+	return getIntegrationFromResponse(pd, resp, err)
 }
 
 // GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
@@ -150,33 +150,33 @@ type GetIntegrationOptions struct {
 }
 
 // GetIntegration gets details about an integration belonging to a service.
-func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
+func (pd *PagerdutyClient) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
 	v, queryErr := query.Values(o)
 	if queryErr != nil {
 		return nil, queryErr
 	}
-	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
-	return getIntegrationFromResponse(c, resp, err)
+	resp, err := pd.Get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
+	return getIntegrationFromResponse(pd, resp, err)
 }
 
 // UpdateIntegration updates an integration belonging to a service.
-func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i, nil)
-	return getIntegrationFromResponse(c, resp, err)
+func (pd *PagerdutyClient) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
+	resp, err := pd.Put("/services/"+serviceID+"/integrations/"+i.ID, i, nil)
+	return getIntegrationFromResponse(pd, resp, err)
 }
 
 // DeleteIntegration deletes an existing integration.
-func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
-	_, err := c.delete("/services/" + serviceID + "/integrations/" + integrationID)
+func (pd *PagerdutyClient) DeleteIntegration(serviceID string, integrationID string) error {
+	_, err := pd.Delete("/services/" + serviceID + "/integrations/" + integrationID)
 	return err
 }
 
-func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service, error) {
+func getServiceFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*Service, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]Service
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "service"
@@ -187,12 +187,12 @@ func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service
 	return &t, nil
 }
 
-func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Integration, error) {
+func getIntegrationFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*Integration, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]Integration
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
 	}
 	rootNode := "integration"

@@ -57,17 +57,17 @@ type ListLogEntriesOptions struct {
 }
 
 // ListLogEntries lists all of the incident log entries across the entire account.
-func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
+func (pd *PagerdutyClient) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries?" + v.Encode())
+	resp, err := pd.Get("/log_entries?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListLogEntryResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // GetLogEntryOptions is the data structure used when calling the GetLogEntry API endpoint.
@@ -77,17 +77,17 @@ type GetLogEntryOptions struct {
 }
 
 // GetLogEntry list log entries for the specified incident.
-func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error) {
+func (pd *PagerdutyClient) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries/" + id + "?" + v.Encode())
+	resp, err := pd.Get("/log_entries/" + id + "?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result map[string]LogEntry
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	le, ok := result["log_entry"]

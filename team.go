@@ -26,74 +26,74 @@ type ListTeamOptions struct {
 }
 
 // ListTeams lists teams of your PagerDuty account, optionally filtered by a search query.
-func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
+func (pd *PagerdutyClient) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.get("/teams?" + v.Encode())
+	resp, err := pd.Get("/teams?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListTeamResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // CreateTeam creates a new team.
-func (c *Client) CreateTeam(t *Team) (*Team, error) {
-	resp, err := c.post("/teams", t)
-	return getTeamFromResponse(c, resp, err)
+func (pd *PagerdutyClient) CreateTeam(t *Team) (*Team, error) {
+	resp, err := pd.Post("/teams", t)
+	return getTeamFromResponse(pd, resp, err)
 }
 
 // DeleteTeam removes an existing team.
-func (c *Client) DeleteTeam(id string) error {
-	_, err := c.delete("/teams/" + id)
+func (pd *PagerdutyClient) DeleteTeam(id string) error {
+	_, err := pd.Delete("/teams/" + id)
 	return err
 }
 
 // GetTeam gets details about an existing team.
-func (c *Client) GetTeam(id string) (*Team, error) {
-	resp, err := c.get("/teams/" + id)
-	return getTeamFromResponse(c, resp, err)
+func (pd *PagerdutyClient) GetTeam(id string) (*Team, error) {
+	resp, err := pd.Get("/teams/" + id)
+	return getTeamFromResponse(pd, resp, err)
 }
 
 // UpdateTeam updates an existing team.
-func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
-	resp, err := c.put("/teams/"+id, t, nil)
-	return getTeamFromResponse(c, resp, err)
+func (pd *PagerdutyClient) UpdateTeam(id string, t *Team) (*Team, error) {
+	resp, err := pd.Put("/teams/"+id, t, nil)
+	return getTeamFromResponse(pd, resp, err)
 }
 
 // RemoveEscalationPolicyFromTeam removes an escalation policy from a team.
-func (c *Client) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
-	_, err := c.delete("/teams/" + teamID + "/escalation_policies/" + epID)
+func (pd *PagerdutyClient) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
+	_, err := pd.Delete("/teams/" + teamID + "/escalation_policies/" + epID)
 	return err
 }
 
 // AddEscalationPolicyToTeam adds an escalation policy to a team.
-func (c *Client) AddEscalationPolicyToTeam(teamID, epID string) error {
-	_, err := c.put("/teams/"+teamID+"/escalation_policies/"+epID, nil, nil)
+func (pd *PagerdutyClient) AddEscalationPolicyToTeam(teamID, epID string) error {
+	_, err := pd.Put("/teams/"+teamID+"/escalation_policies/"+epID, nil, nil)
 	return err
 }
 
 // RemoveUserFromTeam removes a user from a team.
-func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
-	_, err := c.delete("/teams/" + teamID + "/users/" + userID)
+func (pd *PagerdutyClient) RemoveUserFromTeam(teamID, userID string) error {
+	_, err := pd.Delete("/teams/" + teamID + "/users/" + userID)
 	return err
 }
 
 // AddUserToTeam adds a user to a team.
-func (c *Client) AddUserToTeam(teamID, userID string) error {
-	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil, nil)
+func (pd *PagerdutyClient) AddUserToTeam(teamID, userID string) error {
+	_, err := pd.Put("/teams/"+teamID+"/users/"+userID, nil, nil)
 	return err
 }
 
-func getTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, error) {
+func getTeamFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*Team, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]Team
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "team"

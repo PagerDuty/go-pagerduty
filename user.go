@@ -62,57 +62,57 @@ type GetUserOptions struct {
 }
 
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
-func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
+func (pd *PagerdutyClient) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/users?" + v.Encode())
+	resp, err := pd.Get("/users?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListUsersResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // CreateUser creates a new user.
-func (c *Client) CreateUser(u User) (*User, error) {
+func (pd *PagerdutyClient) CreateUser(u User) (*User, error) {
 	data := make(map[string]User)
 	data["user"] = u
-	resp, err := c.post("/users", data)
-	return getUserFromResponse(c, resp, err)
+	resp, err := pd.Post("/users", data)
+	return getUserFromResponse(pd, resp, err)
 }
 
 // DeleteUser deletes a user.
-func (c *Client) DeleteUser(id string) error {
-	_, err := c.delete("/users/" + id)
+func (pd *PagerdutyClient) DeleteUser(id string) error {
+	_, err := pd.Delete("/users/" + id)
 	return err
 }
 
 // GetUser gets details about an existing user.
-func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
+func (pd *PagerdutyClient) GetUser(id string, o GetUserOptions) (*User, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/users/" + id + "?" + v.Encode())
-	return getUserFromResponse(c, resp, err)
+	resp, err := pd.Get("/users/" + id + "?" + v.Encode())
+	return getUserFromResponse(pd, resp, err)
 }
 
 // UpdateUser updates an existing user.
-func (c *Client) UpdateUser(u User) (*User, error) {
+func (pd *PagerdutyClient) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
 	v["user"] = u
-	resp, err := c.put("/users/"+u.ID, v, nil)
-	return getUserFromResponse(c, resp, err)
+	resp, err := pd.Put("/users/"+u.ID, v, nil)
+	return getUserFromResponse(pd, resp, err)
 }
 
-func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, error) {
+func getUserFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]User
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "user"

@@ -29,24 +29,24 @@ type ListAddonResponse struct {
 }
 
 // ListAddons lists all of the add-ons installed on your account.
-func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
+func (c *PagerdutyClient) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/addons?" + v.Encode())
+	resp, err := c.Get("/addons?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListAddonResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // InstallAddon installs an add-on for your account.
-func (c *Client) InstallAddon(a Addon) (*Addon, error) {
+func (c *PagerdutyClient) InstallAddon(a Addon) (*Addon, error) {
 	data := make(map[string]Addon)
 	data["addon"] = a
-	resp, err := c.post("/addons", data)
+	resp, err := c.Post("/addons", data)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
@@ -58,14 +58,14 @@ func (c *Client) InstallAddon(a Addon) (*Addon, error) {
 }
 
 // DeleteAddon deletes an add-on from your account.
-func (c *Client) DeleteAddon(id string) error {
-	_, err := c.delete("/addons/" + id)
+func (c *PagerdutyClient) DeleteAddon(id string) error {
+	_, err := c.Delete("/addons/" + id)
 	return err
 }
 
 // GetAddon gets details about an existing add-on.
-func (c *Client) GetAddon(id string) (*Addon, error) {
-	resp, err := c.get("/addons/" + id)
+func (c *PagerdutyClient) GetAddon(id string) (*Addon, error) {
+	resp, err := c.Get("/addons/" + id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,19 +73,19 @@ func (c *Client) GetAddon(id string) (*Addon, error) {
 }
 
 // UpdateAddon updates an existing add-on.
-func (c *Client) UpdateAddon(id string, a Addon) (*Addon, error) {
+func (c *PagerdutyClient) UpdateAddon(id string, a Addon) (*Addon, error) {
 	v := make(map[string]Addon)
 	v["addon"] = a
-	resp, err := c.put("/addons/"+id, v, nil)
+	resp, err := c.Put("/addons/"+id, v, nil)
 	if err != nil {
 		return nil, err
 	}
 	return getAddonFromResponse(c, resp)
 }
 
-func getAddonFromResponse(c *Client, resp *http.Response) (*Addon, error) {
+func getAddonFromResponse(c *PagerdutyClient, resp *http.Response) (*Addon, error) {
 	var result map[string]Addon
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	a, ok := result["addon"]

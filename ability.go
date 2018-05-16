@@ -6,17 +6,17 @@ type ListAbilityResponse struct {
 }
 
 // ListAbilities lists all abilities on your account.
-func (c *Client) ListAbilities() (*ListAbilityResponse, error) {
-	resp, err := c.get("/abilities")
+func (c *PagerdutyClient) ListAbilities() (*ListAbilityResponse, error) {
+	resp, err := c.Get("/abilities")
 	if err != nil {
 		return nil, err
 	}
 	var result ListAbilityResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // TestAbility Check if your account has the given ability.
-func (c *Client) TestAbility(ability string) error {
-	_, err := c.get("/abilities/" + ability)
+func (c *PagerdutyClient) TestAbility(ability string) error {
+	_, err := c.Get("/abilities/" + ability)
 	return err
 }

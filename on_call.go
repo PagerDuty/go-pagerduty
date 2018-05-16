@@ -34,15 +34,15 @@ type ListOnCallOptions struct {
 }
 
 // ListOnCalls list the on-call entries during a given time range.
-func (c *Client) ListOnCalls(o ListOnCallOptions) (*ListOnCallsResponse, error) {
+func (pd *PagerdutyClient) ListOnCalls(o ListOnCallOptions) (*ListOnCallsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/oncalls?" + v.Encode())
+	resp, err := pd.Get("/oncalls?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListOnCallsResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }

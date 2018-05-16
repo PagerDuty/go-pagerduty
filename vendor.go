@@ -34,35 +34,35 @@ type ListVendorOptions struct {
 }
 
 // ListVendors lists existing vendors.
-func (c *Client) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
+func (pd *PagerdutyClient) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
 	v, err := query.Values(o)
 
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.get("/vendors?" + v.Encode())
+	resp, err := pd.Get("/vendors?" + v.Encode())
 
 	if err != nil {
 		return nil, err
 	}
 
 	var result ListVendorResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // GetVendor gets details about an existing vendor.
-func (c *Client) GetVendor(id string) (*Vendor, error) {
-	resp, err := c.get("/vendors/" + id)
-	return getVendorFromResponse(c, resp, err)
+func (pd *PagerdutyClient) GetVendor(id string) (*Vendor, error) {
+	resp, err := pd.Get("/vendors/" + id)
+	return getVendorFromResponse(pd, resp, err)
 }
 
-func getVendorFromResponse(c *Client, resp *http.Response, err error) (*Vendor, error) {
+func getVendorFromResponse(pd *PagerdutyClient, resp *http.Response, err error) (*Vendor, error) {
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]Vendor
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "vendor"

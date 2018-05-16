@@ -67,37 +67,37 @@ type ListIncidentsOptions struct {
 }
 
 // ListIncidents lists existing incidents.
-func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, error) {
+func (c *PagerdutyClient) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/incidents?" + v.Encode())
+	resp, err := c.Get("/incidents?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListIncidentsResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
-func (c *Client) ManageIncidents(from string, incidents []Incident) error {
+func (c *PagerdutyClient) ManageIncidents(from string, incidents []Incident) error {
 	r := make(map[string][]Incident)
 	headers := make(map[string]string)
 	headers["From"] = from
 	r["incidents"] = incidents
-	_, e := c.put("/incidents", r, &headers)
+	_, e := c.Put("/incidents", r, &headers)
 	return e
 }
 
 // GetIncident shows detailed information about an incident.
-func (c *Client) GetIncident(id string) (*Incident, error) {
-	resp, err := c.get("/incidents/" + id)
+func (c *PagerdutyClient) GetIncident(id string) (*Incident, error) {
+	resp, err := c.Get("/incidents/" + id)
 	if err != nil {
 		return nil, err
 	}
 	var result map[string]Incident
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	i, ok := result["incident"]
@@ -116,13 +116,13 @@ type IncidentNote struct {
 }
 
 // ListIncidentNotes lists existing notes for the specified incident.
-func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
-	resp, err := c.get("/incidents/" + id + "/notes")
+func (c *PagerdutyClient) ListIncidentNotes(id string) ([]IncidentNote, error) {
+	resp, err := c.Get("/incidents/" + id + "/notes")
 	if err != nil {
 		return nil, err
 	}
 	var result map[string][]IncidentNote
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	notes, ok := result["notes"]
@@ -133,18 +133,18 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 }
 
 // CreateIncidentNote creates a new note for the specified incident.
-func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
+func (c *PagerdutyClient) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data)
+	_, err := c.Post("/incidents/"+id+"/notes", data)
 	return err
 }
 
 // SnoozeIncident sets an incident to not alert for a specified period of time.
-func (c *Client) SnoozeIncident(id string, duration uint) error {
+func (c *PagerdutyClient) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post("/incidents/"+id+"/snooze", data)
+	_, err := c.Post("/incidents/"+id+"/snooze", data)
 	return err
 }
 
@@ -163,15 +163,15 @@ type ListIncidentLogEntriesOptions struct {
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.
-func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error) {
+func (c *PagerdutyClient) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/incidents/" + id + "/log_entries?" + v.Encode())
+	resp, err := c.Get("/incidents/" + id + "/log_entries?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListIncidentLogEntriesResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }

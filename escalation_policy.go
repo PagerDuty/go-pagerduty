@@ -57,30 +57,30 @@ type GetEscalationRuleOptions struct {
 }
 
 // ListEscalationPolicies lists all of the existing escalation policies.
-func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListEscalationPoliciesResponse, error) {
+func (c *PagerdutyClient) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListEscalationPoliciesResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "?" + v.Encode())
+	resp, err := c.Get(escPath + "?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListEscalationPoliciesResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // CreateEscalationPolicy creates a new escalation policy.
-func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
+func (c *PagerdutyClient) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = e
-	resp, err := c.post(escPath, data)
+	resp, err := c.Post(escPath, data)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // DeleteEscalationPolicy deletes an existing escalation policy and rules.
-func (c *Client) DeleteEscalationPolicy(id string) error {
-	_, err := c.delete(escPath + "/" + id)
+func (c *PagerdutyClient) DeleteEscalationPolicy(id string) error {
+	_, err := c.Delete(escPath + "/" + id)
 	return err
 }
 
@@ -90,74 +90,74 @@ type GetEscalationPolicyOptions struct {
 }
 
 // GetEscalationPolicy gets information about an existing escalation policy and its rules.
-func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (*EscalationPolicy, error) {
+func (c *PagerdutyClient) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (*EscalationPolicy, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "/" + id + "?" + v.Encode())
+	resp, err := c.Get(escPath + "/" + id + "?" + v.Encode())
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // UpdateEscalationPolicy updates an existing escalation policy and its rules.
-func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
+func (c *PagerdutyClient) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = *e
-	resp, err := c.put(escPath+"/"+id, data, nil)
+	resp, err := c.Put(escPath+"/"+id, data, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // CreateEscalationRule creates a new escalation rule for an escalation policy
 // and appends it to the end of the existing escalation rules.
-func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
+func (c *PagerdutyClient) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
 	data := make(map[string]EscalationRule)
 	data["escalation_rule"] = e
-	resp, err := c.post(escPath+"/"+escID+"/escalation_rules", data)
+	resp, err := c.Post(escPath+"/"+escID+"/escalation_rules", data)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
 // GetEscalationRule gets information about an existing escalation rule.
-func (c *Client) GetEscalationRule(escID string, id string, o *GetEscalationRuleOptions) (*EscalationRule, error) {
+func (c *PagerdutyClient) GetEscalationRule(escID string, id string, o *GetEscalationRuleOptions) (*EscalationRule, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "/" + escID + "/escalation_rules/" + id + "?" + v.Encode())
+	resp, err := c.Get(escPath + "/" + escID + "/escalation_rules/" + id + "?" + v.Encode())
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
 // DeleteEscalationRule deletes an existing escalation rule.
-func (c *Client) DeleteEscalationRule(escID string, id string) error {
-	_, err := c.delete(escPath + "/" + escID + "/escalation_rules/" + id)
+func (c *PagerdutyClient) DeleteEscalationRule(escID string, id string) error {
+	_, err := c.Delete(escPath + "/" + escID + "/escalation_rules/" + id)
 	return err
 }
 
 // UpdateEscalationRule updates an existing escalation rule.
-func (c *Client) UpdateEscalationRule(escID string, id string, e *EscalationRule) (*EscalationRule, error) {
+func (c *PagerdutyClient) UpdateEscalationRule(escID string, id string, e *EscalationRule) (*EscalationRule, error) {
 	data := make(map[string]EscalationRule)
 	data["escalation_rule"] = *e
-	resp, err := c.put(escPath+"/"+escID+"/escalation_rules/"+id, data, nil)
+	resp, err := c.Put(escPath+"/"+escID+"/escalation_rules/"+id, data, nil)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
 // ListEscalationRules lists all of the escalation rules for an existing escalation policy.
-func (c *Client) ListEscalationRules(escID string) (*ListEscalationRulesResponse, error) {
-	resp, err := c.get(escPath + "/" + escID + "/escalation_rules")
+func (c *PagerdutyClient) ListEscalationRules(escID string) (*ListEscalationRulesResponse, error) {
+	resp, err := c.Get(escPath + "/" + escID + "/escalation_rules")
 	if err != nil {
 		return nil, err
 	}
 
 	var result ListEscalationRulesResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
-func getEscalationRuleFromResponse(c *Client, resp *http.Response, err error) (*EscalationRule, error) {
+func getEscalationRuleFromResponse(c *PagerdutyClient, resp *http.Response, err error) (*EscalationRule, error) {
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]EscalationRule
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "escalation_rule"
@@ -168,13 +168,13 @@ func getEscalationRuleFromResponse(c *Client, resp *http.Response, err error) (*
 	return &t, nil
 }
 
-func getEscalationPolicyFromResponse(c *Client, resp *http.Response, err error) (*EscalationPolicy, error) {
+func getEscalationPolicyFromResponse(c *PagerdutyClient, resp *http.Response, err error) (*EscalationPolicy, error) {
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 	var target map[string]EscalationPolicy
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "escalation_policy"

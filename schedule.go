@@ -15,7 +15,7 @@ type Restriction struct {
 	DurationSeconds uint   `json:"duration_seconds,omitempty"`
 }
 
-// RenderedScheduleEntry represents the computed set of schedule layer entries that put users on call for a schedule, and cannot be modified directly.
+// RenderedScheduleEntry represents the computed set of schedule layer entries that Put users on call for a schedule, and cannot be modified directly.
 type RenderedScheduleEntry struct {
 	Start string    `json:"start,omitempty"`
 	End   string    `json:"end,omitempty"`
@@ -67,28 +67,28 @@ type UserReference struct {
 }
 
 // ListSchedules lists the on-call schedules.
-func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, error) {
+func (pd *PagerdutyClient) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules?" + v.Encode())
+	resp, err := pd.Get("/schedules?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListSchedulesResponse
-	return &result, c.decodeJSON(resp, &result)
+	return &result, DecodeJSON(resp, &result)
 }
 
 // CreateSchedule creates a new on-call schedule.
-func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
+func (pd *PagerdutyClient) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
-	resp, err := c.post("/schedules", data)
+	resp, err := pd.Post("/schedules", data)
 	if err != nil {
 		return nil, err
 	}
-	return getScheduleFromResponse(c, resp)
+	return getScheduleFromResponse(pd, resp)
 }
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
@@ -100,20 +100,20 @@ type PreviewScheduleOptions struct {
 }
 
 // PreviewSchedule previews what an on-call schedule would look like without saving it.
-func (c *Client) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
+func (pd *PagerdutyClient) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
 	v, err := query.Values(o)
 	if err != nil {
 		return err
 	}
 	var data map[string]Schedule
 	data["schedule"] = s
-	_, e := c.post("/schedules/preview?"+v.Encode(), data)
+	_, e := pd.Post("/schedules/preview?"+v.Encode(), data)
 	return e
 }
 
 // DeleteSchedule deletes an on-call schedule.
-func (c *Client) DeleteSchedule(id string) error {
-	_, err := c.delete("/schedules/" + id)
+func (pd *PagerdutyClient) DeleteSchedule(id string) error {
+	_, err := pd.Delete("/schedules/" + id)
 	return err
 }
 
@@ -126,16 +126,16 @@ type GetScheduleOptions struct {
 }
 
 // GetSchedule shows detailed information about a schedule, including entries for each layer and sub-schedule.
-func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error) {
+func (pd *PagerdutyClient) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
-	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
+	resp, err := pd.Get("/schedules/" + id + "?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
-	return getScheduleFromResponse(c, resp)
+	return getScheduleFromResponse(pd, resp)
 }
 
 // UpdateScheduleOptions is the data structure used when calling the UpdateSchedule API endpoint.
@@ -144,14 +144,14 @@ type UpdateScheduleOptions struct {
 }
 
 // UpdateSchedule updates an existing on-call schedule.
-func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
+func (pd *PagerdutyClient) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
-	resp, err := c.put("/schedules/"+id, v, nil)
+	resp, err := pd.Put("/schedules/"+id, v, nil)
 	if err != nil {
 		return nil, err
 	}
-	return getScheduleFromResponse(c, resp)
+	return getScheduleFromResponse(pd, resp)
 }
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
@@ -172,17 +172,17 @@ type Override struct {
 }
 
 // ListOverrides lists overrides for a given time range.
-func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, error) {
+func (pd *PagerdutyClient) ListOverrides(id string, o ListOverridesOptions) ([]Override, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules/" + id + "/overrides?" + v.Encode())
+	resp, err := pd.Get("/schedules/" + id + "/overrides?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result map[string][]Override
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	overrides, ok := result["overrides"]
@@ -193,19 +193,19 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, e
 }
 
 // CreateOverride creates an override for a specific user covering the specified time range.
-func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
+func (pd *PagerdutyClient) CreateOverride(id string, o Override) (*Override, error) {
 	data := make(map[string]Override)
 	data["override"] = o
-	resp, err := c.post("/schedules/"+id+"/overrides", data)
+	resp, err := pd.Post("/schedules/"+id+"/overrides", data)
 	if err != nil {
 		return nil, err
 	}
-	return getOverrideFromResponse(c, resp)
+	return getOverrideFromResponse(pd, resp)
 }
 
 // DeleteOverride removes an override.
-func (c *Client) DeleteOverride(scheduleID, overrideID string) error {
-	_, err := c.delete("/schedules/" + scheduleID + "/overrides/" + overrideID)
+func (pd *PagerdutyClient) DeleteOverride(scheduleID, overrideID string) error {
+	_, err := pd.Delete("/schedules/" + scheduleID + "/overrides/" + overrideID)
 	return err
 }
 
@@ -217,17 +217,17 @@ type ListOnCallUsersOptions struct {
 }
 
 // ListOnCallUsers lists all of the users on call in a given schedule for a given time range.
-func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, error) {
+func (pd *PagerdutyClient) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules/" + id + "/users?" + v.Encode())
+	resp, err := pd.Get("/schedules/" + id + "/users?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result map[string][]User
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err := DecodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 	u, ok := result["users"]
@@ -237,9 +237,9 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 	return u, nil
 }
 
-func getScheduleFromResponse(c *Client, resp *http.Response) (*Schedule, error) {
+func getScheduleFromResponse(pd *PagerdutyClient, resp *http.Response) (*Schedule, error) {
 	var target map[string]Schedule
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "schedule"
@@ -250,9 +250,9 @@ func getScheduleFromResponse(c *Client, resp *http.Response) (*Schedule, error) 
 	return &t, nil
 }
 
-func getOverrideFromResponse(c *Client, resp *http.Response) (*Override, error) {
+func getOverrideFromResponse(pd *PagerdutyClient, resp *http.Response) (*Override, error) {
 	var target map[string]Override
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+	if dErr := DecodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "override"
