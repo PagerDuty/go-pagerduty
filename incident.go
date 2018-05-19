@@ -102,7 +102,7 @@ func (c *Client) ModifiedManageIncidents(from string, incidents []UpdateIncident
 
 // UpdateIncident for manage
 type UpdateIncident struct {
-	APIListObject
+	APIObject
 	Resolution string `json:"resolution,omitempty"`
 	Title      string `json:"title,omitempty"`
 	Status     string `json:"status,omitempty"`
