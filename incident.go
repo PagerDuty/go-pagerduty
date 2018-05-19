@@ -81,13 +81,22 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
-func (c *Client) ManageIncidents(from string, incidents []Incident) error {
-	r := make(map[string][]Incident)
+func (c *Client) ManageIncidents(from string, incidents []ManageIncident) error {
+	r := make(map[string][]ManageIncident)
 	headers := make(map[string]string)
 	headers["From"] = from
 	r["incidents"] = incidents
 	_, e := c.put("/incidents", r, &headers)
 	return e
+}
+
+// ManageIncident is the struct to manage an incident
+type ManageIncident struct {
+	APIObject
+	Resolution  string       `json:"resolution,omitempty"`
+	Status      string       `json:"status,omitempty"`
+	Priority    APIObject    `json:"priority,omitempty"`
+	Assignments []Assignment `json:"assignments,omitempty"`
 }
 
 // GetIncident shows detailed information about an incident.
