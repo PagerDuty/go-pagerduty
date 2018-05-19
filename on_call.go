@@ -6,7 +6,7 @@ import (
 
 // OnCall represents a contiguous unit of time for which a user will be on call for a given escalation policy and escalation rule.
 type OnCall struct {
-	User             User      `json:"user,omitempty"`
+	User             APIObject `json:"user,omitempty"`
 	Schedule         APIObject `json:"schedule,omitempty"`
 	EscalationPolicy APIObject `json:"escalation_policy,omitempty"`
 	EscalationLevel  uint      `json:"escalation_level,omitempty"`
