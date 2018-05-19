@@ -90,6 +90,24 @@ func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	return e
 }
 
+// ModifiedManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
+func (c *Client) ModifiedManageIncidents(from string, incidents []UpdateIncident) error {
+	r := make(map[string][]UpdateIncident)
+	headers := make(map[string]string)
+	headers["From"] = from
+	r["incidents"] = incidents
+	_, e := c.put("/incidents", r, &headers)
+	return e
+}
+
+// UpdateIncident for manage
+type UpdateIncident struct {
+	APIListObject
+	Resolution string `json:"resolution,omitempty"`
+	Title      string `json:"title,omitempty"`
+	Status     string `json:"status,omitempty"`
+}
+
 // GetIncident shows detailed information about an incident.
 func (c *Client) GetIncident(id string) (*Incident, error) {
 	resp, err := c.get("/incidents/" + id)
