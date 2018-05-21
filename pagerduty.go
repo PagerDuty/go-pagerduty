@@ -129,7 +129,7 @@ type Pagerduty interface {
 // NewPagerduty creates a new client instance.
 func NewPagerduty(authToken string) Pagerduty {
 	pd := PagerdutyClient{
-		authToken:       authToken,
+		authToken: authToken,
 	}
 	return &pd
 }
@@ -162,6 +162,14 @@ func (pd *PagerdutyClient) Post(path string, payload interface{}) (*http.Respons
 	return pd.Do("POST", path, bytes.NewBuffer(data), nil)
 }
 
+func (pd *PagerdutyClient) PostWithHeader(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	return pd.Do("POST", path, bytes.NewBuffer(data), headers)
+}
+
 func (pd *PagerdutyClient) Get(path string) (*http.Response, error) {
 	return pd.Do("GET", path, nil, nil)
 }
@@ -176,7 +184,7 @@ func (pd *PagerdutyClient) Do(method, path string, body io.Reader, headers *map[
 		}
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Token token="+ pd.authToken)
+	req.Header.Set("Authorization", "Token token="+pd.authToken)
 
 	resp, err := http.DefaultClient.Do(req)
 	return pd.CheckResponse(resp, err)

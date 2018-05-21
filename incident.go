@@ -133,10 +133,12 @@ func (c *PagerdutyClient) ListIncidentNotes(id string) ([]IncidentNote, error) {
 }
 
 // CreateIncidentNote creates a new note for the specified incident.
-func (c *PagerdutyClient) CreateIncidentNote(id string, note IncidentNote) error {
+func (c *PagerdutyClient) CreateIncidentNote(id string, from string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
+	headers := make(map[string]string)
+	headers["From"] = from
 	data["note"] = note
-	_, err := c.Post("/incidents/"+id+"/notes", data)
+	_, err := c.PostWithHeader("/incidents/"+id+"/notes", data, &headers)
 	return err
 }
 
