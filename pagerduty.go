@@ -77,7 +77,7 @@ type Pagerduty interface {
 	ManageIncidents(from string, incidents []Incident) error
 	GetIncident(id string) (*Incident, error)
 	ListIncidentNotes(id string) ([]IncidentNote, error)
-	CreateIncidentNote(id string, note IncidentNote) error
+	CreateIncidentNote(id string, from string, note IncidentNote) error
 	SnoozeIncident(id string, duration uint) error
 	ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error)
 	ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error)
