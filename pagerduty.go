@@ -48,14 +48,6 @@ type PagerdutyClient struct {
 
 // Pagerduty all methods that the pagerduty can execute
 type Pagerduty interface {
-	AuthToken() string
-	Delete(path string) (*http.Response, error)
-	Put(path string, payload interface{}, headers *map[string]string) (*http.Response, error)
-	Post(path string, payload interface{}) (*http.Response, error)
-	Get(path string) (*http.Response, error)
-	Do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error)
-	CheckResponse(resp *http.Response, err error) (*http.Response, error)
-	GetErrorFromResponse(resp *http.Response) (*errorObject, error)
 	ListAbilities() (*ListAbilityResponse, error)
 	TestAbility(ability string) error
 	ListAddons(o ListAddonOptions) (*ListAddonResponse, error)
