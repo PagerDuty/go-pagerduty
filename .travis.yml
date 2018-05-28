@@ -1,11 +1,20 @@
 language: go
-dist: trusty
-go:
-  - 1.8.3
 
-branches:
-  only:
-    - master
+addons:
+  apt:
+    packages:
+    # needed for the nfpm pipe:
+    - rpm
 
-script:
-  - make build
+# needed for the docker pipe
+# services:
+# - docker
+
+# calls goreleaser
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: curl -sL https://git.io/goreleaser | bash
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = linux
