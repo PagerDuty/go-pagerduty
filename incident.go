@@ -1,7 +1,10 @@
 package pagerduty
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -41,6 +44,21 @@ type Incident struct {
 	Teams                []APIObject       `json:"teams,omitempty"`
 	Urgency              string            `json:"urgency,omitempty"`
 	Status               string            `json:"status,omitempty"`
+}
+
+// CreateIncidentOptions is the structure used when passing parameters to CreateIncident.
+type CreateIncidentOptions struct {
+	APIObject
+	Title            string       `json:"title,omitempty"`
+	Service          APIReference `json:"service,omitempty"`
+	IncidentKey      string       `json:"incident_key,omitempty"`
+	EscalationPolicy APIObject    `json:"escalation_policy,omitempty"`
+	Assignments      []Assignment `json:"assignments,omitempty"`
+}
+
+// CreateIncidentResponse  is the structure returned from a CreateIncident call.
+type CreateIncidentResponse struct {
+	Incident Incident `json:"incident"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
@@ -88,6 +106,35 @@ func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	r["incidents"] = incidents
 	_, e := c.put("/incidents", r, &headers)
 	return e
+}
+
+// CreateIncident creates an incident.
+func (c *Client) CreateIncident(from string, o CreateIncidentOptions) (*Incident, error) {
+	headers := make(map[string]string)
+	headers["From"] = from
+	data := make(map[string]CreateIncidentOptions)
+	data["incident"] = o
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// cannot use c.post since need to set From Header
+	resp, err := c.do("POST", "/incidents", bytes.NewBuffer(b), &headers)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		err = fmt.Errorf("status code %d returned", resp.StatusCode)
+		return nil, err
+	}
+	var result CreateIncidentResponse
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result.Incident, nil
 }
 
 // GetIncident shows detailed information about an incident.
