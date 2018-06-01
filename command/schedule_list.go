@@ -6,7 +6,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	pagerduty "github.com/PagerDuty/go-pagerduty"
+	"github.com/PagerDuty/go-pagerduty/pagerduty"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/cli"
 )
