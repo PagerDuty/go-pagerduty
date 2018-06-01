@@ -45,12 +45,19 @@ type errorObject struct {
 // Client wraps http client
 type Client struct {
 	authToken string
+	client    *http.Client
 }
 
 // NewClient creates an API client
 func NewClient(authToken string) *Client {
+	return NewClientWithHTTPClient(authToken, http.DefaultClient)
+}
+
+// NewClientWithHTTPClient creates an API client with a specific *http.Client.
+func NewClientWithHTTPClient(authToken string, client *http.Client) *Client {
 	return &Client{
 		authToken: authToken,
+		client:    client,
 	}
 }
 
@@ -94,7 +101,7 @@ func (c *Client) do(method, path string, body io.Reader, headers *map[string]str
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Token token="+c.authToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.client.Do(req)
 	return c.checkResponse(resp, err)
 }
 

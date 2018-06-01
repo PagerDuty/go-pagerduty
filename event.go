@@ -28,15 +28,22 @@ type EventResponse struct {
 	IncidentKey string `json:"incident_key"`
 }
 
-// CreateEvent sends PagerDuty an event to report, acknowledge, or resolve a problem.
+// CreateEvent sends PagerDuty an event to report, acknowledge, or resolve a
+// problem using the http.DefaultClient.
 func CreateEvent(e Event) (*EventResponse, error) {
+	return CreateEventWithHTTPClient(e, http.DefaultClient)
+}
+
+// CreateEvent sends PagerDuty an event to report, acknowledge, or resolve a
+// problem using the provided *http.Client.
+func CreateEventWithHTTPClient(e Event, client *http.Client) (*EventResponse, error) {
 	data, err := json.Marshal(e)
 	if err != nil {
 		return nil, err
 	}
 	req, _ := http.NewRequest("POST", eventEndPoint, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
