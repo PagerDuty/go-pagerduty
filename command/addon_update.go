@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
+	"github.com/PagerDuty/go-pagerduty/pagerduty"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/cli"
 	"strings"
