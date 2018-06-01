@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"runtime"
+	"time"
 )
 
 const (
@@ -42,15 +45,54 @@ type errorObject struct {
 	Errors  interface{} `json:"errors,omitempty"`
 }
 
+func newDefaultHTTPClient() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			MaxIdleConns:          10,
+			IdleConnTimeout:       60 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			MaxIdleConnsPerHost:   runtime.GOMAXPROCS(0) + 1,
+		},
+	}
+}
+
+// HTTPClient is an interface which declares the functionality we need from an
+// HTTP client. This is to allow consumers to provide their own HTTP client as
+// needed, without restricting them to only using *http.Client.
+type HTTPClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
+// defaultHTTPClient is our own default HTTP client. We use this, instead of
+// http.DefaultClient, to avoid other packages tweaks to http.DefaultClient
+// causing issues with our HTTP calls. This also allows us to tweak the
+// transport values to be more resilient without making changes to the
+// http.DefaultClient.
+//
+// Keep this unexported so consumers of the package can't make changes to it.
+var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
+
 // Client wraps http client
 type Client struct {
 	authToken string
+
+	// HTTPClient is the HTTP client used for making requests against the
+	// PagerDuty API. You can use either *http.Client here, or your own
+	// implementation.
+	HTTPClient HTTPClient
 }
 
 // NewClient creates an API client
 func NewClient(authToken string) *Client {
 	return &Client{
-		authToken: authToken,
+		authToken:  authToken,
+		HTTPClient: defaultHTTPClient,
 	}
 }
 
@@ -94,7 +136,7 @@ func (c *Client) do(method, path string, body io.Reader, headers *map[string]str
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Token token="+c.authToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	return c.checkResponse(resp, err)
 }
 
