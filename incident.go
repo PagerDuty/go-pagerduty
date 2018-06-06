@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/go-querystring/query"
@@ -80,13 +81,50 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
+// CreateIncidentOptions is the structure used when passing paremters to the CreateIncident API endpoint.
+type CreateIncidentOptions struct {
+	// From is a valid email address appended to a From header when POSTing to the CreateIncident API endpoint.
+	From string
+}
+
+// CreateIncident is the structure used when POSTing to the CreateIncident API endpoint.
+type CreateIncident struct {
+	Incident struct {
+		Type             string       `json:"type"`
+		Title            string       `json:"title"`
+		Service          APIReference `json:"service"`
+		Priority         APIReference `json:"priority"`
+		IncidentKey      string       `json:"incident_key"`
+		Body             APIDetails   `json:"details"`
+		EscalationPolicy APIReference `json:"escalation_policy"`
+	} `json:"incident"`
+}
+
+// CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
+func (c *Client) CreateIncidents(o CreateIncidentOptions, i CreateIncident) (Incident, error) {
+	headers := make(map[string]string)
+	headers["From"] = o.From
+	resp, e := c.post("/incidents", i, &headers)
+	if e != nil {
+		return nil, e
+	}
+
+	var ii Incident
+	e = json.NewDecoder(resp.Body).Decode(ii)
+	if e != nil {
+		return nil, e
+	}
+
+	return ii, nil
+}
+
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
 func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	r := make(map[string][]Incident)
 	headers := make(map[string]string)
 	headers["From"] = from
 	r["incidents"] = incidents
-	_, e := c.put("/incidents", r, &headers)
+	resp, e := c.put("/incidents", r, &headers)
 	return e
 }
 
