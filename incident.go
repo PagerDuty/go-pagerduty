@@ -81,9 +81,14 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
-//
+// CreateIncident is the structure POST'd to the incidents endpoint. It wraps a CreateIncidentValue
 type CreateIncident struct {
 	Incident CreateIncidentValue `json:"incident"`
+}
+
+// CreatedIncidentResponse is returned from the API when creating a response.
+type CreatedIncidentResponse struct {
+	Incident Incident `json:incident`
 }
 
 // CreateIncidentValue is the structure used when POSTing to the CreateIncident API endpoint.
@@ -106,13 +111,13 @@ func (c *Client) CreateIncidents(from string, i *CreateIncident) (*Incident, err
 		return nil, e
 	}
 
-	var ii Incident
+	var ii CreatedIncidentResponse
 	e = json.NewDecoder(resp.Body).Decode(&ii)
 	if e != nil {
 		return nil, e
 	}
 
-	return &ii, nil
+	return &ii.Incident, nil
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
