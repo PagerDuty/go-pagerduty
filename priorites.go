@@ -18,7 +18,7 @@ type Priorities struct {
 
 // ListPriorities lists existing priorities
 func (c *Client) ListPriorities() (*Priorities, error) {
-	resp, e := c.get("/priorites")
+	resp, e := c.get("/priorities")
 	if e != nil {
 		return nil, e
 	}
