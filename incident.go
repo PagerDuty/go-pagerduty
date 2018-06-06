@@ -101,7 +101,7 @@ type CreateIncident struct {
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
-func (c *Client) CreateIncidents(o CreateIncidentOptions, i CreateIncident) (Incident, error) {
+func (c *Client) CreateIncidents(o CreateIncidentOptions, i *CreateIncident) (*Incident, error) {
 	headers := make(map[string]string)
 	headers["From"] = o.From
 	resp, e := c.post("/incidents", i, &headers)
@@ -115,7 +115,7 @@ func (c *Client) CreateIncidents(o CreateIncidentOptions, i CreateIncident) (Inc
 		return nil, e
 	}
 
-	return ii, nil
+	return &ii, nil
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
@@ -124,7 +124,7 @@ func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	headers := make(map[string]string)
 	headers["From"] = from
 	r["incidents"] = incidents
-	resp, e := c.put("/incidents", r, &headers)
+	_, e := c.put("/incidents", r, &headers)
 	return e
 }
 
@@ -174,7 +174,7 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data)
+	_, err := c.post("/incidents/"+id+"/notes", data, nil)
 	return err
 }
 
@@ -182,7 +182,7 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 func (c *Client) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post("/incidents/"+id+"/snooze", data)
+	_, err := c.post("/incidents/"+id+"/snooze", data, nil)
 	return err
 }
 

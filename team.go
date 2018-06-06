@@ -2,8 +2,9 @@ package pagerduty
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Team is a collection of users and escalation policies that represent a group of people within an organization.
@@ -42,7 +43,7 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 
 // CreateTeam creates a new team.
 func (c *Client) CreateTeam(t *Team) (*Team, error) {
-	resp, err := c.post("/teams", t)
+	resp, err := c.post("/teams", t, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 

@@ -120,7 +120,7 @@ func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
-	resp, err := c.post("/services", data)
+	resp, err := c.post("/services", data, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -140,7 +140,7 @@ func (c *Client) DeleteService(id string) error {
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	data := make(map[string]Integration)
 	data["integration"] = i
-	resp, err := c.post("/services/"+id+"/integrations", data)
+	resp, err := c.post("/services/"+id+"/integrations", data, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 

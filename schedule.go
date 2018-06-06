@@ -84,7 +84,7 @@ func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, 
 func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
-	resp, err := c.post("/schedules", data)
+	resp, err := c.post("/schedules", data, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (c *Client) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
 	}
 	var data map[string]Schedule
 	data["schedule"] = s
-	_, e := c.post("/schedules/preview?"+v.Encode(), data)
+	_, e := c.post("/schedules/preview?"+v.Encode(), data, nil)
 	return e
 }
 
@@ -196,7 +196,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, e
 func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
 	data := make(map[string]Override)
 	data["override"] = o
-	resp, err := c.post("/schedules/"+id+"/overrides", data)
+	resp, err := c.post("/schedules/"+id+"/overrides", data, nil)
 	if err != nil {
 		return nil, err
 	}
