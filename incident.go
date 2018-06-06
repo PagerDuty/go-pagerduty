@@ -81,17 +81,20 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// CreateIncident is the structure used when POSTing to the CreateIncident API endpoint.
+//
 type CreateIncident struct {
-	Incident struct {
-		Type             string       `json:"type"`
-		Title            string       `json:"title"`
-		Service          APIReference `json:"service"`
-		Priority         APIReference `json:"priority"`
-		IncidentKey      string       `json:"incident_key"`
-		Body             APIDetails   `json:"details"`
-		EscalationPolicy APIReference `json:"escalation_policy"`
-	} `json:"incident"`
+	Incident CreateIncidentValue `json:"incident"`
+}
+
+// CreateIncidentValue is the structure used when POSTing to the CreateIncident API endpoint.
+type CreateIncidentValue struct {
+	Type             string       `json:"type"`
+	Title            string       `json:"title"`
+	Service          APIReference `json:"service"`
+	Priority         APIReference `json:"priority"`
+	IncidentKey      string       `json:"incident_key"`
+	Body             APIDetails   `json:"details"`
+	EscalationPolicy APIReference `json:"escalation_policy"`
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
