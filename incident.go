@@ -81,12 +81,6 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// CreateIncidentOptions is the structure used when passing paremters to the CreateIncident API endpoint.
-type CreateIncidentOptions struct {
-	// From is a valid email address appended to a From header when POSTing to the CreateIncident API endpoint.
-	From string
-}
-
 // CreateIncident is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncident struct {
 	Incident struct {
@@ -101,16 +95,16 @@ type CreateIncident struct {
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
-func (c *Client) CreateIncidents(o CreateIncidentOptions, i *CreateIncident) (*Incident, error) {
+func (c *Client) CreateIncidents(from string, i *CreateIncident) (*Incident, error) {
 	headers := make(map[string]string)
-	headers["From"] = o.From
+	headers["From"] = from
 	resp, e := c.post("/incidents", i, &headers)
 	if e != nil {
 		return nil, e
 	}
 
 	var ii Incident
-	e = json.NewDecoder(resp.Body).Decode(ii)
+	e = json.NewDecoder(resp.Body).Decode(&ii)
 	if e != nil {
 		return nil, e
 	}
