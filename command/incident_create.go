@@ -39,11 +39,13 @@ func (c *IncidentCreate) Run(args []string) int {
 	var service string
 	var title string
 	var from string
+	var body string
 	flags := c.Meta.FlagSet("incident create")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.StringVar(&service, "service", "", "service ID")
 	flags.StringVar(&title, "title", "", "incident title")
 	flags.StringVar(&from, "from", "", "user creating the ticket")
+	flags.StringVar(&body, "body", "", "detailed ticket description")
 
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
@@ -62,6 +64,12 @@ func (c *IncidentCreate) Run(args []string) int {
 			ID:   service,
 		},
 		Title: title,
+	}
+	if body != "" {
+		opts.Body = pagerduty.Body{
+			Type:    "incident_body",
+			Details: body,
+		}
 	}
 	if incident, err := client.CreateIncident(from, opts); err != nil {
 		log.Error(err)

@@ -54,6 +54,14 @@ type CreateIncidentOptions struct {
 	IncidentKey      string       `json:"incident_key,omitempty"`
 	EscalationPolicy APIObject    `json:"escalation_policy,omitempty"`
 	Assignments      []Assignment `json:"assignments,omitempty"`
+	Body             Body         `json:"body,omitempty"`
+}
+
+// Body is the detailed description for a ticket
+// To include, Type must be "incident_body"
+type Body struct {
+	Type    string `json:"type,omitempty"`
+	Details string `json:"details,omitempty"`
 }
 
 // CreateIncidentResponse  is the structure returned from a CreateIncident call.
