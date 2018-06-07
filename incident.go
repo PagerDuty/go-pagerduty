@@ -86,8 +86,8 @@ type CreateIncident struct {
 	Incident CreateIncidentValue `json:"incident"`
 }
 
-// CreatedIncidentResponse is returned from the API when creating a response.
-type CreatedIncidentResponse struct {
+// CreateIncidentResponse is returned from the API when creating a response.
+type CreateIncidentResponse struct {
 	Incident Incident `json:incident`
 }
 
@@ -98,7 +98,7 @@ type CreateIncidentValue struct {
 	Service          APIReference `json:"service"`
 	Priority         APIReference `json:"priority"`
 	IncidentKey      string       `json:"incident_key"`
-	Body             APIDetails   `json:"details"`
+	Body             APIDetails   `json:"body"`
 	EscalationPolicy APIReference `json:"escalation_policy"`
 }
 
@@ -111,7 +111,7 @@ func (c *Client) CreateIncidents(from string, i *CreateIncident) (*Incident, err
 		return nil, e
 	}
 
-	var ii CreatedIncidentResponse
+	var ii CreateIncidentResponse
 	e = json.NewDecoder(resp.Body).Decode(&ii)
 	if e != nil {
 		return nil, e
