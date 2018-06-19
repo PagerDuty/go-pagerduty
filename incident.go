@@ -86,8 +86,8 @@ type CreateIncident struct {
 	Incident CreateIncidentValue `json:"incident"`
 }
 
-// CreateIncidentResponse is returned from the API when creating a response.
-type CreateIncidentResponse struct {
+// createIncidentResponse is returned from the API when creating a response.
+type createIncidentResponse struct {
 	Incident Incident `json:incident`
 }
 
@@ -103,7 +103,7 @@ type CreateIncidentValue struct {
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
-func (c *Client) CreateIncidents(from string, i *CreateIncident) (*Incident, error) {
+func (c *Client) CreateIncident(from string, i *CreateIncident) (*Incident, error) {
 	headers := make(map[string]string)
 	headers["From"] = from
 	resp, e := c.post("/incidents", i, &headers)
@@ -111,7 +111,7 @@ func (c *Client) CreateIncidents(from string, i *CreateIncident) (*Incident, err
 		return nil, e
 	}
 
-	var ii CreateIncidentResponse
+	var ii createIncidentResponse
 	e = json.NewDecoder(resp.Body).Decode(&ii)
 	if e != nil {
 		return nil, e
