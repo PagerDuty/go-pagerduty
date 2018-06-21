@@ -83,7 +83,7 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 
 // CreateIncident is the structure POST'd to the incidents endpoint. It wraps a CreateIncidentValue
 type CreateIncident struct {
-	Incident CreateIncidentValue `json:"incident"`
+	Incident CreateIncidentOptions `json:"incident"`
 }
 
 // createIncidentResponse is returned from the API when creating a response.
@@ -91,8 +91,8 @@ type createIncidentResponse struct {
 	Incident Incident `json:incident`
 }
 
-// CreateIncidentValue is the structure used when POSTing to the CreateIncident API endpoint.
-type CreateIncidentValue struct {
+// CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
+type CreateIncidentOptions struct {
 	Type             string       `json:"type"`
 	Title            string       `json:"title"`
 	Service          APIReference `json:"service"`
