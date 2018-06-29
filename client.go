@@ -39,6 +39,11 @@ type APIReference struct {
 	Type string `json:"type,omitempty"`
 }
 
+type APIDetails struct {
+	Type    string `json:"type,omitempty"`
+	Details string `json:"details,omitempty"`
+}
+
 type errorObject struct {
 	Code    int         `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
@@ -112,12 +117,12 @@ func (c *Client) put(path string, payload interface{}, headers *map[string]strin
 	return c.do("PUT", path, nil, headers)
 }
 
-func (c *Client) post(path string, payload interface{}) (*http.Response, error) {
+func (c *Client) post(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	return c.do("POST", path, bytes.NewBuffer(data), nil)
+	return c.do("POST", path, bytes.NewBuffer(data), headers)
 }
 
 func (c *Client) get(path string) (*http.Response, error) {

@@ -2,8 +2,9 @@ package pagerduty
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Addon is a third-party add-on to PagerDuty's UI.
@@ -46,7 +47,7 @@ func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
 func (c *Client) InstallAddon(a Addon) (*Addon, error) {
 	data := make(map[string]Addon)
 	data["addon"] = a
-	resp, err := c.post("/addons", data)
+	resp, err := c.post("/addons", data, nil)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/go-querystring/query"
@@ -80,6 +81,45 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return &result, c.decodeJSON(resp, &result)
 }
 
+// CreateIncident is the structure POST'd to the incidents endpoint. It wraps a CreateIncidentValue
+type CreateIncident struct {
+	Incident CreateIncidentOptions `json:"incident"`
+}
+
+// createIncidentResponse is returned from the API when creating a response.
+type createIncidentResponse struct {
+	Incident Incident `json:incident`
+}
+
+// CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
+type CreateIncidentOptions struct {
+	Type             string       `json:"type"`
+	Title            string       `json:"title"`
+	Service          APIReference `json:"service"`
+	Priority         APIReference `json:"priority"`
+	IncidentKey      string       `json:"incident_key"`
+	Body             APIDetails   `json:"body"`
+	EscalationPolicy APIReference `json:"escalation_policy"`
+}
+
+// CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
+func (c *Client) CreateIncident(from string, i *CreateIncident) (*Incident, error) {
+	headers := make(map[string]string)
+	headers["From"] = from
+	resp, e := c.post("/incidents", i, &headers)
+	if e != nil {
+		return nil, e
+	}
+
+	var ii createIncidentResponse
+	e = json.NewDecoder(resp.Body).Decode(&ii)
+	if e != nil {
+		return nil, e
+	}
+
+	return &ii.Incident, nil
+}
+
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
 func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	r := make(map[string][]Incident)
@@ -136,7 +176,7 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data)
+	_, err := c.post("/incidents/"+id+"/notes", data, nil)
 	return err
 }
 
@@ -144,7 +184,7 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 func (c *Client) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post("/incidents/"+id+"/snooze", data)
+	_, err := c.post("/incidents/"+id+"/snooze", data, nil)
 	return err
 }
 
