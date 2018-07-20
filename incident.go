@@ -103,10 +103,10 @@ type CreateIncidentOptions struct {
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
-func (c *Client) CreateIncident(from string, i *CreateIncident) (*Incident, error) {
+func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Incident, error) {
 	headers := make(map[string]string)
 	headers["From"] = from
-	resp, e := c.post("/incidents", i, &headers)
+	resp, e := c.post("/incidents", o, &headers)
 	if e != nil {
 		return nil, e
 	}
