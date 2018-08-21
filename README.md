@@ -25,6 +25,12 @@ authtoken: fooBar
 `pd` command provides a single entrypoint for all the API endpoints, with individual
 API represented by their own sub commands. For an exhaustive list of sub-commands, try:
 
+__Install:__
+```
+cd $GOPATH/github.com/PagerDuty/go-pagerduty
+go build -o $GOPATH/bin/pd command/*
+```
+
 ```
 pd --help
 ```
