@@ -42,6 +42,8 @@ type Incident struct {
 	Teams                []APIObject       `json:"teams,omitempty"`
 	Urgency              string            `json:"urgency,omitempty"`
 	Status               string            `json:"status,omitempty"`
+	Id                   string            `json:"id,omitempty"`
+	Priority             APIObject         `json:"priority,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
