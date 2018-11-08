@@ -31,7 +31,7 @@ type User struct {
 	APIObject
 	Name              string `json:"name"`
 	Email             string `json:"email"`
-	Timezone          string `json:"timezone,omitempty"`
+	Timezone          string `json:"time_zone,omitempty"`
 	Color             string `json:"color,omitempty"`
 	Role              string `json:"role,omitempty"`
 	AvatarURL         string `json:"avatar_url,omitempty"`
