@@ -95,13 +95,13 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
-	Type             string       `json:"type"`
-	Title            string       `json:"title"`
-	Service          APIReference `json:"service"`
-	Priority         APIReference `json:"priority"`
-	IncidentKey      string       `json:"incident_key"`
-	Body             APIDetails   `json:"body"`
-	EscalationPolicy APIReference `json:"escalation_policy"`
+	Type             string        `json:"type"`
+	Title            string        `json:"title"`
+	Service          *APIReference `json:"service"`
+	Priority         *APIReference `json:"priority,omitempty"`
+	IncidentKey      string        `json:"incident_key,omitempty"`
+	Body             *APIDetails   `json:"body,omitempty"`
+	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
