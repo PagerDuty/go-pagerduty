@@ -59,10 +59,9 @@ func main() {
 	client := pagerduty.NewClient(authtoken)
 	if eps, err := client.ListEscalationPolicies(opts); err != nil {
 		panic(err)
-	} else {
-		for _, p := range eps.EscalationPolicies {
-			fmt.Println(p.Name)
-		}
+	}
+	for _, p := range eps.EscalationPolicies {
+		fmt.Println(p.Name)
 	}
 }
 ```
