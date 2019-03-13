@@ -57,7 +57,8 @@ var	authtoken = "" // Set your auth token here
 func main() {
 	var opts pagerduty.ListEscalationPoliciesOptions
 	client := pagerduty.NewClient(authtoken)
-	if eps, err := client.ListEscalationPolicies(opts); err != nil {
+	eps, err := client.ListEscalationPolicies(opts)
+	if err != nil {
 		panic(err)
 	}
 	for _, p := range eps.EscalationPolicies {
