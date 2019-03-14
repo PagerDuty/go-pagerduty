@@ -174,6 +174,31 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 	return notes, nil
 }
 
+// IncidentAlert is a alert for the specified incident.
+type IncidentAlert struct {
+	ID        string    `json:"id,omitempty"`
+	Summary	  string    `json:"summary,omitempty"`
+	CreatedAt string    `json:"created_at,omitempty"`
+	AlertKey  string    `json:"alert_key,omitempty"`
+}
+
+// ListIncidentAlerts lists existing alerts for the specified incident.
+func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
+	resp, err := c.get("/incidents/"+id+"/alerts")
+	if err != nil {
+		return nil, err
+	}
+	var result map[string][]IncidentAlert
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+	alerts, ok := result["alerts"]
+	if !ok {
+		return nil, fmt.Errorf("JSON response does not have alerts field")
+	}
+	return alerts, nil
+}
+
 // CreateIncidentNote creates a new note for the specified incident.
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
