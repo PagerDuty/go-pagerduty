@@ -92,6 +92,9 @@ func loadCommands() map[string]cli.CommandFactory {
 		"user notification-rule delete": UserNotificationRuleDeleteCommand,
 		"user notification-rule show":   UserNotificationRuleShowCommand,
 		"user notification-rule update": UserNotificationRuleUpdateCommand,
+
+		"vendor list": VendorListCommand,
+		"vendor show": VendorShowCommand,
 	}
 }
 
