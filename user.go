@@ -73,6 +73,12 @@ type GetUserOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// ListUserContactMethodsResponse is the data structure returned from calling the ListUserContactMethods API endpoint.
+type ListUserContactMethodsResponse struct {
+	APIListObject
+	ContactMethods []ContactMethod `json:"contact_methods"`
+}
+
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
 func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 	v, err := query.Values(o)
@@ -145,3 +151,14 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 	}
 	return &t, nil
 }
+
+// List a user's contact methods
+func (c *Client) ListUserContactMethods(id string) (*ListUserContactMethodsResponse, error) {
+	resp, err := c.get("/users/" + id + "/contact_methods")
+	if err != nil {
+		return nil, err
+	}
+	var result ListUserContactMethodsResponse
+	return &result, c.decodeJSON(resp, &result)
+}
+
