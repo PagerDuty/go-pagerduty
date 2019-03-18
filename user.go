@@ -9,12 +9,12 @@ import (
 
 // ContactMethod is a way of contacting the user.
 type ContactMethod struct {
-	ID             string
-	Label          string
-	Address        string
-	Type           string
-	SendShortEmail bool `json:"send_short_email"`
-	Summary        string
+	ID             string `json:"id"`
+	Label          string `json:"label"`
+	Address        string `json:"address"`
+	Type           string `json:"type"`
+	SendShortEmail bool   `json:"send_short_email"`
+	Summary        string `json:"summary"`
 	HTMLUrl        string `json:"html_url"`
 	SendHTMLEmail  bool   `json:"send_html_email"`
 }
