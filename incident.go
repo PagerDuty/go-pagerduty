@@ -9,20 +9,20 @@ import (
 
 // Acknowledgement is the data structure of an acknowledgement of an incident.
 type Acknowledgement struct {
-	At           string		`json:"at,omitempty"`
-	Acknowledger APIObject  `json:"acknowledger,omitempty"`
+	At           string    `json:"at,omitempty"`
+	Acknowledger APIObject `json:"acknowledger,omitempty"`
 }
 
 // PendingAction is the data structure for any pending actions on an incident.
 type PendingAction struct {
-	Type string		`json:"type,omitempty"`
-	At   string		`json:"at,omitempty"`
+	Type string `json:"type,omitempty"`
+	At   string `json:"at,omitempty"`
 }
 
 // Assignment is the data structure for an assignment of an incident
 type Assignment struct {
-	At       string		`json:"at,omitempty"`
-	Assignee APIObject	`json:"assignee,omitempty"`
+	At       string    `json:"at,omitempty"`
+	Assignee APIObject `json:"assignee,omitempty"`
 }
 
 // AlertCounts is the data structure for the alert counts of an incident
@@ -196,15 +196,15 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 
 // IncidentAlert is a alert for the specified incident.
 type IncidentAlert struct {
-	ID        string    `json:"id,omitempty"`
-	Summary	  string    `json:"summary,omitempty"`
-	CreatedAt string    `json:"created_at,omitempty"`
-	AlertKey  string    `json:"alert_key,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Summary   string `json:"summary,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+	AlertKey  string `json:"alert_key,omitempty"`
 }
 
 // ListIncidentAlerts lists existing alerts for the specified incident.
 func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
-	resp, err := c.get("/incidents/"+id+"/alerts")
+	resp, err := c.get("/incidents/" + id + "/alerts")
 	if err != nil {
 		return nil, err
 	}
@@ -222,8 +222,11 @@ func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
 // CreateIncidentNote creates a new note for the specified incident.
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
+	headers := make(map[string]string)
+	headers["From"] = note.User.Summary
+
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data, nil)
+	_, err := c.post("/incidents/"+id+"/notes", data, &headers)
 	return err
 }
 

@@ -161,4 +161,3 @@ func (c *Client) ListUserContactMethods(id string) (*ListUserContactMethodsRespo
 	var result ListUserContactMethodsResponse
 	return &result, c.decodeJSON(resp, &result)
 }
-
