@@ -15,7 +15,7 @@ type ContactMethod struct {
 	Type           string
 	SendShortEmail bool `json:"send_short_email"`
 	Summary        string
-	HTMLUrl        string `json:"hmtl_url"`
+	HTMLUrl        string `json:"html_url"`
 	SendHTMLEmail  bool   `json:"send_html_email"`
 }
 
