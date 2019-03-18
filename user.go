@@ -9,12 +9,14 @@ import (
 
 // ContactMethod is a way of contacting the user.
 type ContactMethod struct {
-	ID             string `json:"id"`
-	Label          string `json:"label"`
-	Address        string `json:"address"`
-	Type           string `json:"type"`
-	Summary        string `json:"summary"`
-	SendShortEmail bool   `json:"send_short_email"`
+	ID             string
+	Label          string
+	Address        string
+	Type           string
+	SendShortEmail bool `json:"send_short_email"`
+	Summary        string
+	HTMLUrl        string `json:"html_url"`
+	SendHTMLEmail  bool   `json:"send_html_email"`
 }
 
 // NotificationRule is a rule for notifying the user.
@@ -44,6 +46,12 @@ type User struct {
 	NotificationRules []NotificationRule `json:"notification_rules"`
 	JobTitle          string             `json:"job_title,omitempty"`
 	Teams             []Team
+}
+
+// ContactMethodResponse is the data structure returned from calling the GetUserContactMethod API endpoint.
+type ContactMethodResponse struct {
+	ContactMethods []ContactMethod `json:"contact_methods"`
+	Total          int
 }
 
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.
@@ -101,6 +109,17 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 	}
 	resp, err := c.get("/users/" + id + "?" + v.Encode())
 	return getUserFromResponse(c, resp, err)
+}
+
+// GetUserContactMethod fetches contact methods of the existing user.
+func (c *Client) GetUserContactMethod(id string) (*ContactMethodResponse, error) {
+	resp, err := c.get("/users/" + id + "/contact_methods")
+	if err != nil {
+		return nil, err
+	}
+
+	var result ContactMethodResponse
+	return &result, c.decodeJSON(resp, &result)
 }
 
 // UpdateUser updates an existing user.
