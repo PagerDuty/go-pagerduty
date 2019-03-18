@@ -44,6 +44,7 @@ type Incident struct {
 	Status               string            `json:"status,omitempty"`
 	Id                   string            `json:"id,omitempty"`
 	Priority             APIObject         `json:"priority,omitempty"`
+	Title                string            `json:"title,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
@@ -176,15 +177,15 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 
 // IncidentAlert is a alert for the specified incident.
 type IncidentAlert struct {
-	ID        string    `json:"id,omitempty"`
-	Summary	  string    `json:"summary,omitempty"`
-	CreatedAt string    `json:"created_at,omitempty"`
-	AlertKey  string    `json:"alert_key,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Summary   string `json:"summary,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+	AlertKey  string `json:"alert_key,omitempty"`
 }
 
 // ListIncidentAlerts lists existing alerts for the specified incident.
 func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
-	resp, err := c.get("/incidents/"+id+"/alerts")
+	resp, err := c.get("/incidents/" + id + "/alerts")
 	if err != nil {
 		return nil, err
 	}
@@ -202,8 +203,11 @@ func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
 // CreateIncidentNote creates a new note for the specified incident.
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
+	headers := make(map[string]string)
+	headers["From"] = note.User.Summary
+
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data, nil)
+	_, err := c.post("/incidents/"+id+"/notes", data, &headers)
 	return err
 }
 
