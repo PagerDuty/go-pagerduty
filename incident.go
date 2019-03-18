@@ -7,22 +7,22 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// Acknowledgement is the data structure of an acknoledgement of an incident.
+// Acknowledgement is the data structure of an acknowledgement of an incident.
 type Acknowledgement struct {
-	At           string
-	Acknowledger APIObject
+	At           string		`json:"at,omitempty"`
+	Acknowledger APIObject  `json:"acknowledger,omitempty"`
 }
 
 // PendingAction is the data structure for any pending actions on an incident.
 type PendingAction struct {
-	Type string
-	At   string
+	Type string		`json:"type,omitempty"`
+	At   string		`json:"at,omitempty"`
 }
 
 // Assignment is the data structure for an assignment of an incident
 type Assignment struct {
-	At       string
-	Assignee APIObject
+	At       string		`json:"at,omitempty"`
+	Assignee APIObject	`json:"assignee,omitempty"`
 }
 
 // AlertCounts is the data structure for the alert counts of an incident
