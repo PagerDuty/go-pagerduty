@@ -59,6 +59,7 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 }
 
 // CreateMaintenanceWindow creates a new maintenance window for the specified services.
+// TODO: Unify with `CreateMaintenanceWindows`.
 func (c *Client) CreateMaintenanceWindow(from string, o CreateMaintenanceWindowOptions) (*MaintenanceWindow, error) {
 	data := make(map[string]CreateMaintenanceWindowOptions)
 	o.Type = "maintenance_window"
@@ -66,6 +67,15 @@ func (c *Client) CreateMaintenanceWindow(from string, o CreateMaintenanceWindowO
 	headers := make(map[string]string)
 	headers["From"] = from
 	resp, err := c.post("/maintenance_windows", data, &headers)
+	return getMaintenanceWindowFromResponse(c, resp, err)
+}
+
+// CreateMaintenanceWindows creates a new maintenance window for the specified services.
+// TODO: Unify with `CreateMaintenanceWindow`.
+func (c *Client) CreateMaintenanceWindows(m MaintenanceWindow) (*MaintenanceWindow, error) {
+	data := make(map[string]MaintenanceWindow)
+	data["maintenance_window"] = m
+	resp, err := c.post("/maintenance_windows", data, nil)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
