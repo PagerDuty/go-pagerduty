@@ -170,7 +170,7 @@ func (c *Client) MergeIncidents(from string, id string, incidents []Incident) er
 	r["source_incidents"] = incidents
 	headers := make(map[string]string)
 	headers["From"] = from
-	_, e := c.put("/incidents/" + id + "/merge", r, &headers)
+	_, e := c.put("/incidents/"+id+"/merge", r, &headers)
 	return e
 }
 
