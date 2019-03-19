@@ -132,8 +132,7 @@ func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	return e
 }
 
-// MergeIncidents
-// Uses Incident to match ManageIncidents
+// MergeIncidents a list of source incidents into a specified incident.
 func (c *Client) MergeIncidents(from string, id string, incidents []Incident) error {
 	r := make(map[string][]Incident)
 	r["source_incidents"] = incidents
