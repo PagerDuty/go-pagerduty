@@ -21,7 +21,6 @@ type ContactMethod struct {
 	HTMLUrl        string `json:"html_url"`
 }
 
-
 // ListContactMethodsResponse is the data structure returned from calling the ListContactMethods API endpoint.
 type ListContactMethodsResponse struct {
 	APIListObject
