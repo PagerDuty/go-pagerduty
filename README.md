@@ -27,7 +27,7 @@ API represented by their own sub commands. For an exhaustive list of sub-command
 
 __Install:__
 ```
-cd $GOPATH/github.com/PagerDuty/go-pagerduty
+cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
 go build -o $GOPATH/bin/pd command/*
 ```
 
