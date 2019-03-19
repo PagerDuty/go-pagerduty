@@ -164,6 +164,16 @@ func (c *Client) ManageIncidents(from string, incidents []Incident) error {
 	return e
 }
 
+// MergeIncidents a list of source incidents into a specified incident.
+func (c *Client) MergeIncidents(from string, id string, incidents []Incident) error {
+	r := make(map[string][]Incident)
+	r["source_incidents"] = incidents
+	headers := make(map[string]string)
+	headers["From"] = from
+	_, e := c.put("/incidents/" + id + "/merge", r, &headers)
+	return e
+}
+
 // GetIncident shows detailed information about an incident.
 func (c *Client) GetIncident(id string) (*Incident, error) {
 	resp, err := c.get("/incidents/" + id)
