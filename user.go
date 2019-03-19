@@ -7,15 +7,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// ContactMethod is a way of contacting the user.
-type ContactMethod struct {
-	ID             string
-	Label          string
-	Address        string
-	Type           string
-	SendShortEmail bool `json:"send_short_email"`
-}
-
 // NotificationRule is a rule for notifying the user.
 type NotificationRule struct {
 	ID                  string
