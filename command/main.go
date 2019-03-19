@@ -26,6 +26,8 @@ func loadCommands() map[string]cli.CommandFactory {
 		"escalation-policy show":   EscalationPolicyShowCommand,
 		"escalation-policy update": EscalationPolicyUpdateCommand,
 
+		"event-v2 manage": EventV2ManageCommand,
+
 		"incident list":        IncidentListCommand,
 		"incident manage":      IncidentManageCommand,
 		"incident show":        IncidentShowCommand,
