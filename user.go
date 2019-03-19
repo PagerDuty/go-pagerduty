@@ -7,18 +7,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// ContactMethod is a way of contacting the user.
-type ContactMethod struct {
-	ID             string `json:"id"`
-	Label          string `json:"label"`
-	Address        string `json:"address"`
-	Type           string `json:"type"`
-	SendShortEmail bool   `json:"send_short_email"`
-	Summary        string `json:"summary"`
-	HTMLUrl        string `json:"html_url"`
-	SendHTMLEmail  bool   `json:"send_html_email"`
-}
-
 // NotificationRule is a rule for notifying the user.
 type NotificationRule struct {
 	ID                  string        `json:"id"`
@@ -153,6 +141,7 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 }
 
 // List a user's contact methods
+// TODO: Unify with `ListContactMethods`.
 func (c *Client) ListUserContactMethods(id string) (*ListUserContactMethodsResponse, error) {
 	resp, err := c.get("/users/" + id + "/contact_methods")
 	if err != nil {
