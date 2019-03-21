@@ -11,7 +11,8 @@ type Agent APIObject
 
 // Channel is the means by which the action was carried out.
 type Channel struct {
-	Type string
+	Type    string
+	Summary string `json:"summary,omitempty"`
 }
 
 // Context are to be included with the trigger such as links to graphs or images.
