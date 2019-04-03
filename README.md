@@ -13,8 +13,8 @@ go get github.com/PagerDuty/go-pagerduty
 
 ### CLI
 
-The CLI requires authentication token, which can be sepcified in `.pd.yml`
-file in home directory of the user, or passed as command line argument.
+The CLI requires an [authentication token](https://v2.developer.pagerduty.com/docs/authentication), which can be sepcified in `.pd.yml`
+file in the home directory of the user, or passed as a command-line argument.
 Example of config file:
 
 ```yaml
@@ -22,15 +22,15 @@ Example of config file:
 authtoken: fooBar
 ```
 
-`pd` command provides a single entrypoint for all the API endpoints, with individual
-API represented by their own sub commands. For an exhaustive list of sub-commands, try:
-
-__Install:__
-```
+#### Install
+```cli
 cd $GOPATH/github.com/PagerDuty/go-pagerduty
 go build -o $GOPATH/bin/pd command/*
 ```
 
+#### Commands
+`pd` command provides a single entrypoint for all the API endpoints, with individual
+API represented by their own sub commands. For an exhaustive list of sub-commands, try:
 ```
 pd --help
 ```
@@ -42,7 +42,7 @@ pd service list
 ```
 
 
-### From golang libraries
+### Client Library
 
 ```go
 package main
@@ -72,9 +72,6 @@ If you need to use your own HTTP client, for doing things like defining your own
 transport settings, you can replace the default HTTP client with your own by
 simply by setting a new value in the `HTTPClient` field.
 
-## License
-[Apache 2](http://www.apache.org/licenses/LICENSE-2.0)
-
 ## Contributing
 
 1. Fork it ( https://github.com/PagerDuty/go-pagerduty/fork )
@@ -82,3 +79,6 @@ simply by setting a new value in the `HTTPClient` field.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+## License
+[Apache 2](http://www.apache.org/licenses/LICENSE-2.0)
