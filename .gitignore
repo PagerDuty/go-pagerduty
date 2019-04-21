@@ -1,2 +1,5 @@
 bin/*
 *.swp
+.idea
+go.mod
+go.sum
