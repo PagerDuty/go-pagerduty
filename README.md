@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/PagerDuty/go-pagerduty)](https://goreportcard.com/report/github.com/PagerDuty/go-pagerduty) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 # go-pagerduty
 
 go-pagerduty is a CLI and [go](https://golang.org/) client library for [PagerDuty v2 API](https://v2.developer.pagerduty.com/v2/page/api-reference).

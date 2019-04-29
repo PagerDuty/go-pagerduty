@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/cli"
 	"gopkg.in/yaml.v2"
-	"strings"
 )
 
 type UserList struct {
@@ -23,8 +24,8 @@ func (c *UserList) Help() string {
 
 	Options:
 
-		 -query     Filter escalation policies with certain name
-		 -team      Filter escalation policies by team id(s)
+		 -query     Filter users with certain name
+		 -team      Filter users by team id(s)
 		 -include   Additional details to include
 
 	`
