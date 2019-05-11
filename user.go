@@ -36,10 +36,20 @@ type User struct {
 	Teams             []Team
 }
 
-// ContactMethodResponse is the data structure returned from calling the GetUserContactMethod API endpoint.
-type ContactMethodResponse struct {
-	ContactMethods []ContactMethod `json:"contact_methods"`
-	Total          int
+// ContactMethod is a way of contacting the user.
+type ContactMethod struct {
+	ID             string `json:"id"`
+	Type           string `json:"type"`
+	Summary        string `json:"summary"`
+	Self           string `json:"self"`
+	Label          string `json:"label"`
+	Address        string `json:"address"`
+	SendShortEmail bool   `json:"send_short_email,omitempty"`
+	SendHTMLEmail  bool   `json:"send_html_email,omitempty"`
+	Blacklisted    bool   `json:"blacklisted,omitempty"`
+	CountryCode    int    `json:"country_code,omitempty"`
+	Enabled        bool   `json:"enabled,omitempty"`
+	HTMLUrl        string `json:"html_url"`
 }
 
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.
@@ -56,15 +66,15 @@ type ListUsersOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// ListContactMethodResponse is the data structure returned from calling the GetUserContactMethod API endpoint.
+type ListContactMethodsResponse struct {
+	APIListObject
+	ContactMethods []ContactMethod `json:"contact_methods"`
+}
+
 // GetUserOptions is the data structure used when calling the GetUser API endpoint.
 type GetUserOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
-}
-
-// ListUserContactMethodsResponse is the data structure returned from calling the ListUserContactMethods API endpoint.
-type ListUserContactMethodsResponse struct {
-	APIListObject
-	ContactMethods []ContactMethod `json:"contact_methods"`
 }
 
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
@@ -105,17 +115,6 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 	return getUserFromResponse(c, resp, err)
 }
 
-// GetUserContactMethod fetches contact methods of the existing user.
-func (c *Client) GetUserContactMethod(id string) (*ContactMethodResponse, error) {
-	resp, err := c.get("/users/" + id + "/contact_methods")
-	if err != nil {
-		return nil, err
-	}
-
-	var result ContactMethodResponse
-	return &result, c.decodeJSON(resp, &result)
-}
-
 // UpdateUser updates an existing user.
 func (c *Client) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
@@ -140,13 +139,34 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 	return &t, nil
 }
 
-// List a user's contact methods
-// TODO: Unify with `ListContactMethods`.
-func (c *Client) ListUserContactMethods(id string) (*ListUserContactMethodsResponse, error) {
-	resp, err := c.get("/users/" + id + "/contact_methods")
+// ListUserContactMethod fetches contact methods of the existing user.
+func (c *Client) ListUserContactMethods(userId string) (*ListContactMethodsResponse, error) {
+	resp, err := c.get("/users/" + userId + "/contact_methods")
 	if err != nil {
 		return nil, err
 	}
-	var result ListUserContactMethodsResponse
+	var result ListContactMethodsResponse
 	return &result, c.decodeJSON(resp, &result)
+}
+
+// GetContactMethod gets details about a contact method.
+func (c *Client) GetUserContactMethod(userID, id string) (*ContactMethod, error) {
+	resp, err := c.get("/users/" + userID + "/contact_methods/" + id)
+	return getContactMethodFromResponse(c, resp, err)
+}
+
+func getContactMethodFromResponse(c *Client, resp *http.Response, err error) (*ContactMethod, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]ContactMethod
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "contact_method"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
 }
