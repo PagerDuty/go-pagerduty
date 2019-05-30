@@ -10,9 +10,14 @@ import (
 type Agent APIObject
 
 // Channel is the means by which the action was carried out.
-type Channel struct {
-	Type string
-}
+//type Channel struct {
+//	Type string
+//}
+
+// Channel is not well defined and uses a variadic type.
+// Making this an interface map makes it possible for the client ot interpret
+// the results instead of eating them.
+type Channel map[string]interface{}
 
 // Context are to be included with the trigger such as links to graphs or images.
 type Context struct {
