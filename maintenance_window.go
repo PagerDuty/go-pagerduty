@@ -7,15 +7,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// CreateMaintenanceWindowOptions is used to create a MaintenanceWindow
-type CreateMaintenanceWindowOptions struct {
-	APIObject
-	StartTime   string      `json:"start_time"`
-	EndTime     string      `json:"end_time"`
-	Description string      `json:"description"`
-	Services    []APIObject `json:"services"`
-}
-
 // MaintenanceWindow is used to temporarily disable one or more services for a set period of time.
 type MaintenanceWindow struct {
 	APIObject
@@ -59,14 +50,22 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 }
 
 // CreateMaintenanceWindow creates a new maintenance window for the specified services.
-func (c *Client) CreateMaintenanceWindow(from string, o CreateMaintenanceWindowOptions) (*MaintenanceWindow, error) {
-	data := make(map[string]CreateMaintenanceWindowOptions)
+func (c *Client) CreateMaintenanceWindow(from string, o MaintenanceWindow) (*MaintenanceWindow, error) {
+	data := make(map[string]MaintenanceWindow)
 	o.Type = "maintenance_window"
 	data["maintenance_window"] = o
 	headers := make(map[string]string)
-	headers["From"] = from
+	if from != "" {
+		headers["From"] = from
+	}
 	resp, err := c.post("/maintenance_windows", data, &headers)
 	return getMaintenanceWindowFromResponse(c, resp, err)
+}
+
+// CreateMaintenanceWindows creates a new maintenance window for the specified services.
+// Deprecated: Use `CreateMaintenanceWindow` instead.
+func (c *Client) CreateMaintenanceWindows(o MaintenanceWindow) (*MaintenanceWindow, error) {
+	return c.CreateMaintenanceWindow("", o)
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
