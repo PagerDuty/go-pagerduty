@@ -95,13 +95,13 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
-	Type             string       `json:"type"`
-	Title            string       `json:"title"`
-	Service          APIReference `json:"service"`
-	Priority         APIReference `json:"priority"`
-	IncidentKey      string       `json:"incident_key"`
-	Body             APIDetails   `json:"body"`
-	EscalationPolicy APIReference `json:"escalation_policy"`
+	Type             string        `json:"type"`
+	Title            string        `json:"title"`
+	Service          *APIReference `json:"service"`
+	Priority         *APIReference `json:"priority,omitempty"`
+	IncidentKey      string        `json:"incident_key,omitempty"`
+	Body             *APIDetails   `json:"body,omitempty"`
+	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
@@ -176,15 +176,15 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 
 // IncidentAlert is a alert for the specified incident.
 type IncidentAlert struct {
-	ID        string    `json:"id,omitempty"`
-	Summary	  string    `json:"summary,omitempty"`
-	CreatedAt string    `json:"created_at,omitempty"`
-	AlertKey  string    `json:"alert_key,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Summary   string `json:"summary,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+	AlertKey  string `json:"alert_key,omitempty"`
 }
 
 // ListIncidentAlerts lists existing alerts for the specified incident.
 func (c *Client) ListIncidentAlerts(id string) ([]IncidentAlert, error) {
-	resp, err := c.get("/incidents/"+id+"/alerts")
+	resp, err := c.get("/incidents/" + id + "/alerts")
 	if err != nil {
 		return nil, err
 	}
