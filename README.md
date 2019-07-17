@@ -5,8 +5,18 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 ## Installation
 
+First, download the source code
 ```
 go get github.com/PagerDuty/go-pagerduty
+```
+
+Next build the application.
+```cli
+cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
+go build -o $GOPATH/bin/pd command/*
+
+# If you do not have the dependencies necessary to build the project, run this in the project root and try again
+go get ./...
 ```
 
 ## Usage
@@ -20,12 +30,6 @@ Example of config file:
 ```yaml
 ---
 authtoken: fooBar
-```
-
-#### Install
-```cli
-cd $GOPATH/github.com/PagerDuty/go-pagerduty
-go build -o $GOPATH/bin/pd command/*
 ```
 
 #### Commands
