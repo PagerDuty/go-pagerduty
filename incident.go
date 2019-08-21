@@ -68,7 +68,7 @@ type Incident struct {
 	FirstTriggerLogEntry APIObject         `json:"first_trigger_log_entry,omitempty"`
 	EscalationPolicy     APIObject         `json:"escalation_policy,omitempty"`
 	Teams                []APIObject       `json:"teams,omitempty"`
-	Priority             Priority          `json:"priority,omitempty"`
+	Priority             *Priority         `json:"priority,omitempty"`
 	Urgency              string            `json:"urgency,omitempty"`
 	Status               string            `json:"status,omitempty"`
 	Id                   string            `json:"id,omitempty"`
