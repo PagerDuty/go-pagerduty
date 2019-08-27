@@ -135,6 +135,8 @@ type CreateIncidentOptions struct {
 func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Incident, error) {
 	headers := make(map[string]string)
 	headers["From"] = from
+	data := make(map[string]*CreateIncidentOptions)
+	data["incident"] = o
 	resp, e := c.post("/incidents", o, &headers)
 	if e != nil {
 		return nil, e
