@@ -181,6 +181,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, e
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("%+v", resp)
 	var result map[string][]Override
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
