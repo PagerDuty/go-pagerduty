@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/PagerDuty/go-pagerduty?status.svg)](http://godoc.org/github.com/PagerDuty/go-pagerduty) [![Go Report Card](https://goreportcard.com/badge/github.com/PagerDuty/go-pagerduty)](https://goreportcard.com/report/github.com/PagerDuty/go-pagerduty) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
+[![GoDoc](https://godoc.org/github.com/pagerduty/go-pagerduty?status.svg)](http://godoc.org/github.com/pagerduty/go-pagerduty) [![Go Report Card](https://goreportcard.com/badge/github.com/pagerduty/go-pagerduty)](https://goreportcard.com/report/github.com/pagerduty/go-pagerduty) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 # go-pagerduty
 
 go-pagerduty is a CLI and [go](https://golang.org/) client library for the [PagerDuty v2 API](https://v2.developer.pagerduty.com/v2/page/api-reference).
@@ -7,12 +7,12 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 First, download the source code
 ```cli
-go get github.com/PagerDuty/go-pagerduty
+go get github.com/pagerduty/go-pagerduty
 ```
 
 Next build the application.
 ```cli
-cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
+cd $GOPATH/src/github.com/pagerduty/go-pagerduty
 go build -o $GOPATH/bin/pd command/*
 ```
 If you do not have the dependencies necessary to build the project, run this in the project root and try again
@@ -55,7 +55,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
+	"github.com/pagerduty/go-pagerduty"
 )
 
 var	authtoken = "" // Set your auth token here
@@ -82,7 +82,7 @@ simply by setting a new value in the `HTTPClient` field.
 
 ## Contributing
 
-1. Fork it ( https://github.com/PagerDuty/go-pagerduty/fork )
+1. Fork it ( https://github.com/pagerduty/go-pagerduty/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
