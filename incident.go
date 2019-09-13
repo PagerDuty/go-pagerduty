@@ -137,7 +137,7 @@ func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Inciden
 	headers["From"] = from
 	data := make(map[string]*CreateIncidentOptions)
 	data["incident"] = o
-	resp, e := c.post("/incidents", o, &headers)
+	resp, e := c.post("/incidents", data, &headers)
 	if e != nil {
 		return nil, e
 	}
