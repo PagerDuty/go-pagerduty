@@ -9,10 +9,12 @@
 # 	go build -o $(BINARY) command/*
 
 .PHONY: build
-build:
-	go get ./...
-	# go test -v -race -cover ./...
-	# go tool vet $(SOURCES)
+build: build-deps
+	go build -mod=vendor -o pd ./command
+build-deps:
+	go get
+	go mod verify
+	go mod vendor
 
 .PHONY: test
 test:
