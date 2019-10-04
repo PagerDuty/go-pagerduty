@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -44,24 +45,35 @@ const v2eventEndPoint = "https://events.pagerduty.com/v2/enqueue"
 
 // ManageEvent handles the trigger, acknowledge, and resolve methods for an event
 func ManageEvent(e V2Event) (*V2EventResponse, error) {
+	return ManageEventWithContext(context.Background(), e)
+}
+
+// ManageEventWithContext is the same as ManageEvent with the addition of
+// the ability to pass a context.
+//
+// Callers can pass a context for use in request cancellation.
+func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, error) {
 	data, err := json.Marshal(e)
 	if err != nil {
 		return nil, err
 	}
-	req, _ := http.NewRequest("POST", v2eventEndPoint, bytes.NewBuffer(data))
+
+	req, err := http.NewRequest(http.MethodPost, v2eventEndPoint, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("User-Agent", "go-pagerduty/"+Version)
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusAccepted {
-		bytes, err := ioutil.ReadAll(resp.Body)
+		msg, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 		}
-		return nil, fmt.Errorf("HTTP Status Code: %d, Message: %s", resp.StatusCode, string(bytes))
+		return nil, fmt.Errorf("HTTP Status Code: %d, Message: %s", resp.StatusCode, string(msg))
 	}
 	var eventResponse V2EventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
