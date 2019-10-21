@@ -62,6 +62,8 @@ type ListUsersResponse struct {
 type ListUsersOptions struct {
 	APIListObject
 	Query    string   `url:"query,omitempty"`
+	Limit    string   `url:"limit,omitempty"`
+	Offset   string   `url:"offset,omitempty"`
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
 	Includes []string `url:"include,omitempty,brackets"`
 }
