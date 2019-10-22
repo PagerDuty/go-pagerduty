@@ -45,8 +45,6 @@ type ListEscalationRulesResponse struct {
 type ListEscalationPoliciesOptions struct {
 	APIListObject
 	Query    string   `url:"query,omitempty"`
-	Limit    string   `url:"limit,omitempty"`
-	Offset   string   `url:"offset,omitempty"`
 	UserIDs  []string `url:"user_ids,omitempty,brackets"`
 	TeamIDs  []string `url:"team_ids,omitempty,brackets"`
 	Includes []string `url:"include,omitempty,brackets"`
