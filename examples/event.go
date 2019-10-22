@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/pagerduty/go-pagerduty"
+	""github.com/PagerDuty/go-pagerduty""
 	"log"
 )
 

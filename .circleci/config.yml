@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/pagerduty/go-pagerduty
+    working_directory: /go/src/"github.com/PagerDuty/go-pagerduty"
     steps:
       - checkout
       - run:
