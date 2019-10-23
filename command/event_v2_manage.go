@@ -3,34 +3,35 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
 	"os"
 	"strings"
+
+	pagerduty "github.com/PagerDuty/go-pagerduty"
+	log "github.com/sirupsen/logrus"
+	"github.com/mitchellh/cli"
 )
 
-type AddonInstall struct {
+type EventV2Manage struct {
 	Meta
 }
 
-func AddonInstallCommand() (cli.Command, error) {
-	return &AddonInstall{}, nil
+func EventV2ManageCommand() (cli.Command, error) {
+	return &EventV2Manage{}, nil
 }
 
-func (c *AddonInstall) Help() string {
+func (c *EventV2Manage) Help() string {
 	helpText := `
-	pd addon install <FILE> Install a new addon
+	pd event-v2 manage <FILE> Manage Events from json file
 	` + c.Meta.Help()
 	return strings.TrimSpace(helpText)
 }
 
-func (c *AddonInstall) Synopsis() string {
-	return "Install a new addon"
+func (c *EventV2Manage) Synopsis() string {
+	return "Create a New V2 Event"
 }
 
-func (c *AddonInstall) Run(args []string) int {
-	flags := c.Meta.FlagSet("addon install")
+func (c *EventV2Manage) Run(args []string) int {
+	flags := c.Meta.FlagSet("event-v2 manage")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
@@ -40,13 +41,12 @@ func (c *AddonInstall) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	client := c.Meta.Client()
-	var a pagerduty.Addon
+	var e pagerduty.V2Event
 	if len(flags.Args()) != 1 {
 		log.Error("Please specify input json file")
 		return -1
 	}
-	log.Info("Input file is:", flags.Arg(0))
+	log.Info("Input file is: ", flags.Arg(0))
 	f, err := os.Open(flags.Arg(0))
 	if err != nil {
 		log.Error(err)
@@ -54,12 +54,12 @@ func (c *AddonInstall) Run(args []string) int {
 	}
 	defer f.Close()
 	decoder := json.NewDecoder(f)
-	if err := decoder.Decode(&a); err != nil {
+	if err := decoder.Decode(&e); err != nil {
 		log.Errorln("Failed to decode json. Error:", err)
 		return -1
 	}
-	log.Debugf("%#v", a)
-	if _, err := client.InstallAddon(a); err != nil {
+	log.Debugf("%#v", e)
+	if _, err := pagerduty.ManageEvent(e); err != nil {
 		log.Error(err)
 		return -1
 	}
