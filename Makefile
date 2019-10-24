@@ -11,7 +11,7 @@
 .PHONY: build
 
 GOPATH?=$(shell go env GOPATH)
-GO111MODULE=on
+GO111MODULE=auto
 
 build: build-deps
 	go build -mod=vendor -o pd ./command
