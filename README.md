@@ -13,12 +13,7 @@ go get github.com/PagerDuty/go-pagerduty
 Next build the application.
 ```cli
 cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
-go build -o $GOPATH/bin/pd command/*
-```
-If you do not have the dependencies necessary to build the project, run this in the project root and try again
-
-```cli
-go get ./...
+make install
 ```
 
 ## Usage
