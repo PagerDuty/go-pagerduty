@@ -24,9 +24,17 @@ func TestAddon_List(t *testing.T) {
 	var opts ListAddonOptions
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	addons, err := client.ListAddons(opts)
+	resp, err := client.ListAddons(opts)
+	want := &ListAddonResponse{
+		APIListObject: listObj,
+		Addons: []Addon{
+			{
+				Name: "Internal Status Page",
+			},
+		},
+	}
 	require.NoError(err)
-	require.Equal(&ListAddonResponse{APIListObject: listObj, Addons: []Addon{{Name: "Internal Status Page"}}}, addons)
+	require.Equal(want, resp)
 }
 
 func TestAddon_Install(t *testing.T) {
