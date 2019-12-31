@@ -126,15 +126,28 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
-	Type             string       `json:"type"`
-	Title            string       `json:"title"`
+	Type             string        `json:"type"`
+	Title            string        `json:"title"`
 	Service          *APIReference `json:"service"`
 	Priority         *APIReference `json:"priority"`
-	Urgency          string       `json:"urgency,omitempty"`
-	IncidentKey      string       `json:"incident_key,omitempty"`
+	Urgency          string        `json:"urgency,omitempty"`
+	IncidentKey      string        `json:"incident_key,omitempty"`
 	Body             *APIDetails   `json:"body,omitempty"`
 	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
-	Assignments      []Assignee   `json:"assignments,omitempty"`
+	Assignments      []Assignee    `json:"assignments,omitempty"`
+}
+
+// ManageIncidentsOptions is the structure used when PUTing updates to incidents to the ManageIncidents func
+type ManageIncidentsOptions struct {
+	ID     string `json:"id"`
+	Type   string `json:"type"`
+	Status string `json:"status"`
+}
+
+// MergeIncidentsOptions is the structure used when merging incidents with MergeIncidents func
+type MergeIncidentsOptions struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
@@ -158,23 +171,33 @@ func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Inciden
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
-func (c *Client) ManageIncidents(from string, incidents []Incident) error {
-	r := make(map[string][]Incident)
+func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
+	data := make(map[string][]ManageIncidentsOptions)
 	headers := make(map[string]string)
 	headers["From"] = from
-	r["incidents"] = incidents
-	_, e := c.put("/incidents", r, &headers)
-	return e
+	data["incidents"] = incidents
+
+	resp, err := c.put("/incidents", data, &headers)
+	if err != nil {
+		return nil, err
+	}
+	var result ListIncidentsResponse
+	return &result, c.decodeJSON(resp, &result)
 }
 
 // MergeIncidents a list of source incidents into a specified incident.
-func (c *Client) MergeIncidents(from string, id string, incidents []Incident) error {
-	r := make(map[string][]Incident)
-	r["source_incidents"] = incidents
+func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeIncidentsOptions) (*Incident, error) {
+	r := make(map[string][]MergeIncidentsOptions)
+	r["source_incidents"] = sourceIncidents
 	headers := make(map[string]string)
 	headers["From"] = from
-	_, e := c.put("/incidents/"+id+"/merge", r, &headers)
-	return e
+
+	resp, err := c.put("/incidents/"+id+"/merge", r, &headers)
+	if err != nil {
+		return nil, err
+	}
+	var result createIncidentResponse
+	return &result.Incident, c.decodeJSON(resp, &result)
 }
 
 // GetIncident shows detailed information about an incident.
@@ -200,6 +223,11 @@ type IncidentNote struct {
 	User      APIObject `json:"user,omitempty"`
 	Content   string    `json:"content,omitempty"`
 	CreatedAt string    `json:"created_at,omitempty"`
+}
+
+// CreateIncidentNoteResponse is returned from the API as a response to creating an incident note.
+type CreateIncidentNoteResponse struct {
+	IncidentNote IncidentNote `json:"note"`
 }
 
 // ListIncidentNotes lists existing notes for the specified incident.
@@ -251,22 +279,41 @@ func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
 }
 
 // CreateIncidentNote creates a new note for the specified incident.
-func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
+func (c *Client) CreateIncidentNote(id string, note IncidentNote) (*IncidentNote, error) {
 	data := make(map[string]IncidentNote)
 	headers := make(map[string]string)
 	headers["From"] = note.User.Summary
 
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data, &headers)
-	return err
+	resp, err := c.post("/incidents/"+id+"/notes", data, &headers)
+	if err != nil {
+		return nil, err
+	}
+	var result CreateIncidentNoteResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result.IncidentNote, nil
 }
 
 // SnoozeIncident sets an incident to not alert for a specified period of time.
-func (c *Client) SnoozeIncident(id string, duration uint) error {
+func (c *Client) SnoozeIncident(id string, duration uint) (*Incident, error) {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post("/incidents/"+id+"/snooze", data, nil)
-	return err
+	resp, err := c.post("/incidents/"+id+"/snooze", data, nil)
+	if err != nil {
+		return nil, err
+	}
+	var result createIncidentResponse
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result.Incident, nil
 }
 
 // ListIncidentLogEntriesResponse is the response structure when calling the ListIncidentLogEntries API endpoint.
