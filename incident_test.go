@@ -239,7 +239,7 @@ func TestIncident_CreateIncidentNote(t *testing.T) {
 		w.Write([]byte(`{"note": {"id": "1","content": "foo"}}`))
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var id string = "1"
+	id := "1"
 	resp, err := client.CreateIncidentNote(id, input)
 
 	want := &IncidentNote{
@@ -266,7 +266,7 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	var duration uint = 3600
-	var id string = "1"
+	id := "1"
 
 	resp, err := client.SnoozeIncident(id, duration)
 
@@ -299,7 +299,7 @@ func TestIncident_ListLogEntries(t *testing.T) {
 	})
 	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var id string = "1"
+	id := "1"
 	var entriesOpts = ListIncidentLogEntriesOptions{
 		APIListObject: listObj,
 		Includes:      []string{},
