@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// ListNotifications
-func TestNotification_List(t *testing.T) {
+// ListMaintenanceWindows
+func TestPriorities_List(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -17,27 +17,24 @@ func TestNotification_List(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 
-	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/priorities", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"notifications": [{"id": "1"}]}`))
+		w.Write([]byte(`{"priorities": [{"id": "1", "summary": "foo"}]}`))
 	})
 
 	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListNotificationOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
-		Filter:        "foo",
-		Since:         "bar",
-		Until:         "baz",
-	}
-	resp, err := client.ListNotifications(opts)
 
-	want := &ListNotificationsResponse{
+	resp, err := client.ListPriorities()
+
+	want := &Priorities{
 		APIListObject: listObj,
-		Notifications: []Notification{
+		Priorities: []PriorityProperty{
 			{
-				ID: "1",
+				APIObject: APIObject{
+					ID:      "1",
+					Summary: "foo",
+				},
 			},
 		},
 	}
