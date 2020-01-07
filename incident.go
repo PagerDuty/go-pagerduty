@@ -278,8 +278,8 @@ func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// CreateIncidentNote creates a new note for the specified incident.
-func (c *Client) CreateIncidentNote(id string, note IncidentNote) (*IncidentNote, error) {
+// CreateIncidentNoteWithResponse creates a new note for the specified incident.
+func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*IncidentNote, error) {
 	data := make(map[string]IncidentNote)
 	headers := make(map[string]string)
 	headers["From"] = note.User.Summary
@@ -299,8 +299,20 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) (*IncidentNote
 	return &result.IncidentNote, nil
 }
 
-// SnoozeIncident sets an incident to not alert for a specified period of time.
-func (c *Client) SnoozeIncident(id string, duration uint) (*Incident, error) {
+// CreateIncidentNote creates a new note for the specified incident.
+// DEPRECATED: please use CreateIncidentNoteWithResponse going forward
+func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
+	data := make(map[string]IncidentNote)
+	headers := make(map[string]string)
+	headers["From"] = note.User.Summary
+
+	data["note"] = note
+	_, err := c.post("/incidents/"+id+"/notes", data, &headers)
+	return err
+}
+
+// SnoozeIncidentSnoozeIncidentWithResponse sets an incident to not alert for a specified period of time.
+func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
 	data := make(map[string]uint)
 	data["duration"] = duration
 	resp, err := c.post("/incidents/"+id+"/snooze", data, nil)
@@ -314,6 +326,15 @@ func (c *Client) SnoozeIncident(id string, duration uint) (*Incident, error) {
 	}
 
 	return &result.Incident, nil
+}
+
+// SnoozeIncident sets an incident to not alert for a specified period of time.
+// DEPRECATED: please use SnoozeIncidentWithResponse going forward
+func (c *Client) SnoozeIncident(id string, duration uint) error {
+	data := make(map[string]uint)
+	data["duration"] = duration
+	_, err := c.post("/incidents/"+id+"/snooze", data, nil)
+	return err
 }
 
 // ListIncidentLogEntriesResponse is the response structure when calling the ListIncidentLogEntries API endpoint.

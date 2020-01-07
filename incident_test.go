@@ -240,7 +240,31 @@ func TestIncident_CreateIncidentNote(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
-	resp, err := client.CreateIncidentNote(id, input)
+	err := client.CreateIncidentNote(id, input)
+
+	require.NoError(err)
+}
+
+// CreateIncidentNoteWithResponse
+func TestIncident_CreateIncidentNoteWithResponse(t *testing.T) {
+	setup()
+	defer teardown()
+
+	require := require.New(t)
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+
+	input := IncidentNote{
+		Content: "foo",
+	}
+
+	mux.HandleFunc("/incidents/1/notes", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"note": {"id": "1","content": "foo"}}`))
+	})
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	id := "1"
+	resp, err := client.CreateIncidentNoteWithResponse(id, input)
 
 	want := &IncidentNote{
 		ID:      "1",
@@ -268,7 +292,29 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 	var duration uint = 3600
 	id := "1"
 
-	resp, err := client.SnoozeIncident(id, duration)
+	err := client.SnoozeIncident(id, duration)
+
+	require.NoError(err)
+}
+
+// SnoozeIncidentWithResponse
+func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
+	setup()
+	defer teardown()
+
+	require := require.New(t)
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+
+	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"incident": {"id": "1", "pending_actions": [{"type": "unacknowledge", "at":"2019-12-31T16:58:35Z"}]}}`))
+	})
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	var duration uint = 3600
+	id := "1"
+
+	resp, err := client.SnoozeIncidentWithResponse(id, duration)
 
 	want := &Incident{
 		Id: "1",
