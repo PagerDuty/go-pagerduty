@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,8 +13,6 @@ func TestTeam_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -51,8 +48,6 @@ func TestTeam_Create(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -82,8 +77,6 @@ func TestTeam_Delete(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -102,8 +95,6 @@ func TestTeam_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -131,8 +122,6 @@ func TestTeam_Update(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -167,8 +156,6 @@ func TestTeam_RemoveEscalationPolicyFromTeam(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -189,8 +176,6 @@ func TestTeam_AddEscalationPolicyToTeam(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -211,8 +196,6 @@ func TestTeam_RemoveUserFromTeam(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -233,8 +216,6 @@ func TestTeam_AddUserToTeam(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/teams/1/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")

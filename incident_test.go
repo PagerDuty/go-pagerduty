@@ -281,8 +281,6 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -303,8 +301,6 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -336,8 +332,6 @@ func TestIncident_ListLogEntries(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/log_entries", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")

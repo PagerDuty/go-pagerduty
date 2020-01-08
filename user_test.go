@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,8 +13,6 @@ func TestUser_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -53,8 +50,6 @@ func TestUser_Create(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -84,8 +79,6 @@ func TestUser_Delete(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -104,8 +97,6 @@ func TestUser_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -136,8 +127,6 @@ func TestUser_Update(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -170,8 +159,6 @@ func TestUser_ListContactMethods(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -203,8 +190,6 @@ func TestUser_GetContactMethod(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")

@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,8 +13,6 @@ func TestService_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -55,8 +52,6 @@ func TestService_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -88,8 +83,6 @@ func TestService_Create(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -119,8 +112,6 @@ func TestService_Update(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -154,8 +145,6 @@ func TestService_Delete(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -174,8 +163,6 @@ func TestService_CreateIntegration(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1/integrations", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -207,8 +194,6 @@ func TestService_GetIntegration(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -241,8 +226,6 @@ func TestService_UpdateIntegration(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -277,8 +260,6 @@ func TestService_DeleteIntegration(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")

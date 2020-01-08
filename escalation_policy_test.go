@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,8 +12,6 @@ func TestEscalationPolicy_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/escalation_policies", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -47,8 +44,6 @@ func TestEscalationPolicy_Create(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 	input := EscalationPolicy{Name: "foo"}
 
 	mux.HandleFunc("/escalation_policies", func(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +69,6 @@ func TestEscalationPolicy_Delete(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -91,8 +84,6 @@ func TestEscalationPolicy_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -117,8 +108,6 @@ func TestEscalationPolicy_Update(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -144,8 +133,6 @@ func TestEscalationPolicy_UpdateTeams(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := &EscalationPolicy{
 		Name: "foo",

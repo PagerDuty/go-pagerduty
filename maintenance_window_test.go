@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,8 +13,6 @@ func TestMaintenanceWindow_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -56,8 +53,6 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := MaintenanceWindow{Description: "foo"}
 	from := "foo@bar.com"
@@ -86,8 +81,6 @@ func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := MaintenanceWindow{Description: "foo"}
 	from := ""
@@ -118,8 +111,6 @@ func TestMaintenanceWindow_Delete(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -137,8 +128,6 @@ func TestMaintenanceWindow_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -167,8 +156,6 @@ func TestMaintenanceWindow_Update(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := MaintenanceWindow{
 		APIObject: APIObject{

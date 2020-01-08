@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,8 +12,6 @@ func TestLogEntry_List(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/log_entries", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -52,8 +49,6 @@ func TestLogEntry_Get(t *testing.T) {
 	defer teardown()
 
 	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/log_entries/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
