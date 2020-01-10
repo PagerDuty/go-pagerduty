@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListMaintenanceWindows
 func TestPriorities_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/priorities", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -22,7 +18,7 @@ func TestPriorities_List(t *testing.T) {
 	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.ListPriorities()
+	res, err := client.ListPriorities()
 
 	want := &Priorities{
 		APIListObject: listObj,
@@ -36,6 +32,8 @@ func TestPriorities_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

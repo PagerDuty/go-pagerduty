@@ -2,19 +2,12 @@ package pagerduty
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestIncident_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -25,7 +18,7 @@ func TestIncident_List(t *testing.T) {
 	var opts ListIncidentsOptions
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.ListIncidents(opts)
+	res, err := client.ListIncidents(opts)
 
 	want := &ListIncidentsResponse{
 		APIListObject: listObj,
@@ -36,16 +29,14 @@ func TestIncident_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 func TestIncident_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := &CreateIncidentOptions{
 		Type:    "incident",
@@ -59,7 +50,7 @@ func TestIncident_Create(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	from := "foo@bar.com"
-	resp, err := client.CreateIncident(from, input)
+	res, err := client.CreateIncident(from, input)
 
 	want := &Incident{
 		Title:   "foo",
@@ -67,17 +58,15 @@ func TestIncident_Create(t *testing.T) {
 		Urgency: "low",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestIncident_Manage(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -105,19 +94,17 @@ func TestIncident_Manage(t *testing.T) {
 			},
 		},
 	}
-	resp, err := client.ManageIncidents(from, input)
+	res, err := client.ManageIncidents(from, input)
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestIncident_Merge(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/merge", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -129,19 +116,17 @@ func TestIncident_Merge(t *testing.T) {
 	input := []MergeIncidentsOptions{{ID: "2", Type: "incident"}}
 	want := &Incident{Id: "1", Title: "foo"}
 
-	resp, err := client.MergeIncidents(from, "1", input)
+	res, err := client.MergeIncidents(from, "1", input)
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestIncident_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -151,21 +136,19 @@ func TestIncident_Get(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	id := "1"
-	resp, err := client.GetIncident(id)
+	res, err := client.GetIncident(id)
 
 	want := &Incident{Id: "1"}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestIncident_ListIncidentNotes(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/notes", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -175,7 +158,7 @@ func TestIncident_ListIncidentNotes(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 
-	resp, err := client.ListIncidentNotes(id)
+	res, err := client.ListIncidentNotes(id)
 
 	want := []IncidentNote{
 		{
@@ -184,16 +167,14 @@ func TestIncident_ListIncidentNotes(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 func TestIncident_ListIncidentAlerts(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/incidents/1/alerts", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -203,7 +184,7 @@ func TestIncident_ListIncidentAlerts(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 
-	resp, err := client.ListIncidentAlerts(id)
+	res, err := client.ListIncidentAlerts(id)
 
 	want := &ListAlertsResponse{
 		APIListObject: listObj,
@@ -217,18 +198,16 @@ func TestIncident_ListIncidentAlerts(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // CreateIncidentNote
 func TestIncident_CreateIncidentNote(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := IncidentNote{
 		Content: "foo",
@@ -242,17 +221,15 @@ func TestIncident_CreateIncidentNote(t *testing.T) {
 	id := "1"
 	err := client.CreateIncidentNote(id, input)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // CreateIncidentNoteWithResponse
 func TestIncident_CreateIncidentNoteWithResponse(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 
 	input := IncidentNote{
 		Content: "foo",
@@ -264,23 +241,23 @@ func TestIncident_CreateIncidentNoteWithResponse(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
-	resp, err := client.CreateIncidentNoteWithResponse(id, input)
+	res, err := client.CreateIncidentNoteWithResponse(id, input)
 
 	want := &IncidentNote{
 		ID:      "1",
 		Content: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // SnoozeIncident
 func TestIncident_SnoozeIncident(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -291,16 +268,15 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 	id := "1"
 
 	err := client.SnoozeIncident(id, duration)
-
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // SnoozeIncidentWithResponse
 func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -310,7 +286,7 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 	var duration uint = 3600
 	id := "1"
 
-	resp, err := client.SnoozeIncidentWithResponse(id, duration)
+	res, err := client.SnoozeIncidentWithResponse(id, duration)
 
 	want := &Incident{
 		Id: "1",
@@ -322,16 +298,16 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // ListIncidentLogEntries
 func TestIncident_ListLogEntries(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/incidents/1/log_entries", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -346,7 +322,7 @@ func TestIncident_ListLogEntries(t *testing.T) {
 		IsOverview:    true,
 		TimeZone:      "UTC",
 	}
-	resp, err := client.ListIncidentLogEntries(id, entriesOpts)
+	res, err := client.ListIncidentLogEntries(id, entriesOpts)
 
 	want := &ListIncidentLogEntriesResponse{
 		APIListObject: listObj,
@@ -360,6 +336,8 @@ func TestIncident_ListLogEntries(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

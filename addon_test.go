@@ -3,15 +3,11 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestAddon_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/addons", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -21,7 +17,7 @@ func TestAddon_List(t *testing.T) {
 	var opts ListAddonOptions
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.ListAddons(opts)
+	res, err := client.ListAddons(opts)
 	want := &ListAddonResponse{
 		APIListObject: listObj,
 		Addons: []Addon{
@@ -30,8 +26,10 @@ func TestAddon_List(t *testing.T) {
 			},
 		},
 	}
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestAddon_Install(t *testing.T) {
@@ -42,8 +40,6 @@ func TestAddon_Install(t *testing.T) {
 		Name: "Internal Status Page",
 	}
 
-	require := require.New(t)
-
 	mux.HandleFunc("/addons", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.WriteHeader(http.StatusCreated)
@@ -52,7 +48,7 @@ func TestAddon_Install(t *testing.T) {
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	addon, err := client.InstallAddon(input)
+	res, err := client.InstallAddon(input)
 
 	want := &Addon{
 		APIObject: APIObject{
@@ -60,15 +56,15 @@ func TestAddon_Install(t *testing.T) {
 		},
 		Name: "Internal Status Page",
 	}
-	require.Equal(want, addon)
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestAddon_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/addons/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -76,23 +72,22 @@ func TestAddon_Get(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	addon, err := client.GetAddon("1")
+	res, err := client.GetAddon("1")
 
 	want := &Addon{
 		APIObject: APIObject{
 			ID: "1",
 		},
 	}
-
-	require.Equal(want, addon)
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestAddon_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/addons/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -104,7 +99,7 @@ func TestAddon_Update(t *testing.T) {
 		Name: "Internal Status Page",
 	}
 
-	addon, err := client.UpdateAddon("1", input)
+	res, err := client.UpdateAddon("1", input)
 
 	want := &Addon{
 		APIObject: APIObject{
@@ -112,16 +107,15 @@ func TestAddon_Update(t *testing.T) {
 		},
 		Name: "Internal Status Page",
 	}
-
-	require.Equal(want, addon)
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestAddon_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/addons/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -130,5 +124,7 @@ func TestAddon_Delete(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	err := client.DeleteAddon("1")
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

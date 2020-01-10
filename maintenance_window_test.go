@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListMaintenanceWindows
 func TestMaintenanceWindow_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -29,7 +25,7 @@ func TestMaintenanceWindow_List(t *testing.T) {
 		ServiceIDs:    []string{},
 		Filter:        "foo",
 	}
-	resp, err := client.ListMaintenanceWindows(opts)
+	res, err := client.ListMaintenanceWindows(opts)
 
 	want := &ListMaintenanceWindowsResponse{
 		APIListObject: listObj,
@@ -43,16 +39,16 @@ func TestMaintenanceWindow_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // CreateMaintenanceWindow
 func TestMaintenanceWindow_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	input := MaintenanceWindow{Description: "foo"}
 	from := "foo@bar.com"
@@ -64,7 +60,7 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.CreateMaintenanceWindow(from, input)
+	res, err := client.CreateMaintenanceWindow(from, input)
 
 	want := &MaintenanceWindow{
 		Description: "foo",
@@ -73,17 +69,17 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 	setup()
 	defer teardown()
 
-	require := require.New(t)
-
 	input := MaintenanceWindow{Description: "foo"}
-	from := ""
+	from := "foo@bar.com"
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -92,7 +88,7 @@ func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.CreateMaintenanceWindow(from, input)
+	res, err := client.CreateMaintenanceWindow(from, input)
 
 	want := &MaintenanceWindow{
 		Description: "foo",
@@ -101,16 +97,16 @@ func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // DeleteMaintenanceWindows
 func TestMaintenanceWindow_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -119,15 +115,15 @@ func TestMaintenanceWindow_Delete(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	err := client.DeleteMaintenanceWindow("1")
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // GetMaintenanceWindow
 func TestMaintenanceWindow_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -137,7 +133,7 @@ func TestMaintenanceWindow_Get(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	opts := GetMaintenanceWindowOptions{Includes: []string{}}
-	resp, err := client.GetMaintenanceWindow(id, opts)
+	res, err := client.GetMaintenanceWindow(id, opts)
 
 	want := &MaintenanceWindow{
 		Description: "foo",
@@ -146,16 +142,16 @@ func TestMaintenanceWindow_Get(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // UpdateMaintenanceWindow
 func TestMaintenanceWindow_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	input := MaintenanceWindow{
 		APIObject: APIObject{
@@ -170,7 +166,7 @@ func TestMaintenanceWindow_Update(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.UpdateMaintenanceWindow(input)
+	res, err := client.UpdateMaintenanceWindow(input)
 
 	want := &MaintenanceWindow{
 		Description: "foo",
@@ -178,6 +174,9 @@ func TestMaintenanceWindow_Update(t *testing.T) {
 			ID: "1",
 		},
 	}
-	require.NoError(err)
-	require.Equal(want, resp)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

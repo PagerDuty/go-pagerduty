@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListOnCalls
 func TestOnCall_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/oncalls", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -32,7 +28,7 @@ func TestOnCall_List(t *testing.T) {
 		Since:               "bar",
 		Until:               "baz",
 	}
-	resp, err := client.ListOnCalls(opts)
+	res, err := client.ListOnCalls(opts)
 
 	want := &ListOnCallsResponse{
 		APIListObject: listObj,
@@ -43,6 +39,8 @@ func TestOnCall_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

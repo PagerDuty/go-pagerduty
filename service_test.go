@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListServices
 func TestService_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -29,7 +25,7 @@ func TestService_List(t *testing.T) {
 		Query:         "baz",
 		Includes:      []string{},
 	}
-	resp, err := client.ListServices(opts)
+	res, err := client.ListServices(opts)
 
 	want := &ListServiceResponse{
 		APIListObject: listObj,
@@ -42,16 +38,16 @@ func TestService_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Get Service
 func TestService_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -64,7 +60,7 @@ func TestService_Get(t *testing.T) {
 	opts := &GetServiceOptions{
 		Includes: []string{},
 	}
-	resp, err := client.GetService(id, opts)
+	res, err := client.GetService(id, opts)
 
 	want := &Service{
 		APIObject: APIObject{
@@ -73,16 +69,16 @@ func TestService_Get(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Create Service
 func TestService_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -93,7 +89,7 @@ func TestService_Create(t *testing.T) {
 	input := Service{
 		Name: "foo",
 	}
-	resp, err := client.CreateService(input)
+	res, err := client.CreateService(input)
 
 	want := &Service{
 		APIObject: APIObject{
@@ -102,16 +98,16 @@ func TestService_Create(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Update Service
 func TestService_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -126,7 +122,7 @@ func TestService_Update(t *testing.T) {
 		},
 		Name: "foo",
 	}
-	resp, err := client.UpdateService(input)
+	res, err := client.UpdateService(input)
 
 	want := &Service{
 		APIObject: APIObject{
@@ -135,16 +131,16 @@ func TestService_Update(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Delete Service
 func TestService_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -154,15 +150,15 @@ func TestService_Delete(t *testing.T) {
 	id := "1"
 	err := client.DeleteService(id)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Create Integration
 func TestService_CreateIntegration(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1/integrations", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -175,7 +171,7 @@ func TestService_CreateIntegration(t *testing.T) {
 	}
 	servID := "1"
 
-	resp, err := client.CreateIntegration(servID, input)
+	res, err := client.CreateIntegration(servID, input)
 
 	want := &Integration{
 		APIObject: APIObject{
@@ -184,16 +180,16 @@ func TestService_CreateIntegration(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Get Integration
 func TestService_GetIntegration(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -207,7 +203,7 @@ func TestService_GetIntegration(t *testing.T) {
 	servID := "1"
 	intID := "1"
 
-	resp, err := client.GetIntegration(servID, intID, input)
+	res, err := client.GetIntegration(servID, intID, input)
 
 	want := &Integration{
 		APIObject: APIObject{
@@ -216,16 +212,16 @@ func TestService_GetIntegration(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Update Integration
 func TestService_UpdateIntegration(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -241,7 +237,7 @@ func TestService_UpdateIntegration(t *testing.T) {
 	}
 	servID := "1"
 
-	resp, err := client.UpdateIntegration(servID, input)
+	res, err := client.UpdateIntegration(servID, input)
 
 	want := &Integration{
 		APIObject: APIObject{
@@ -250,16 +246,16 @@ func TestService_UpdateIntegration(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Delete Integration
 func TestService_DeleteIntegration(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -270,5 +266,7 @@ func TestService_DeleteIntegration(t *testing.T) {
 	intID := "1"
 	err := client.DeleteIntegration(servID, intID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

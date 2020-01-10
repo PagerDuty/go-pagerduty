@@ -3,8 +3,6 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestAbility_ListAbilities(t *testing.T) {
@@ -12,20 +10,20 @@ func TestAbility_ListAbilities(t *testing.T) {
 	setup()
 	defer teardown()
 
-	require := require.New(t)
-
 	mux.HandleFunc("/abilities", func(w http.ResponseWriter, r *http.Request) {
-		require.Equal("GET", r.Method)
+		testMethod(t, r, "GET")
 		w.Write([]byte(`{"abilities": ["sso"]}`))
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	want := &ListAbilityResponse{Abilities: []string{"sso"}}
 
 	res, err := client.ListAbilities()
 
-	want := &ListAbilityResponse{Abilities: []string{"sso"}}
-	require.NoError(err)
-	require.Equal(want, res)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestAbility_ListAbilitiesFailure(t *testing.T) {

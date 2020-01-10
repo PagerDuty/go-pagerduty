@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListUsers
 func TestUser_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -27,7 +23,7 @@ func TestUser_List(t *testing.T) {
 		TeamIDs:       []string{},
 		Includes:      []string{},
 	}
-	resp, err := client.ListUsers(opts)
+	res, err := client.ListUsers(opts)
 
 	want := &ListUsersResponse{
 		APIListObject: listObj,
@@ -40,16 +36,16 @@ func TestUser_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Create User
 func TestUser_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -60,7 +56,7 @@ func TestUser_Create(t *testing.T) {
 	input := User{
 		Email: "foo@bar.com",
 	}
-	resp, err := client.CreateUser(input)
+	res, err := client.CreateUser(input)
 
 	want := &User{
 		APIObject: APIObject{
@@ -69,16 +65,16 @@ func TestUser_Create(t *testing.T) {
 		Email: "foo@bar.com",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Delete User
 func TestUser_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -88,15 +84,15 @@ func TestUser_Delete(t *testing.T) {
 	id := "1"
 	err := client.DeleteUser(id)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Get User
 func TestUser_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -108,7 +104,7 @@ func TestUser_Get(t *testing.T) {
 	opts := GetUserOptions{
 		Includes: []string{},
 	}
-	resp, err := client.GetUser(userID, opts)
+	res, err := client.GetUser(userID, opts)
 
 	want := &User{
 		APIObject: APIObject{
@@ -117,16 +113,16 @@ func TestUser_Get(t *testing.T) {
 		Email: "foo@bar.com",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Update
 func TestUser_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -140,7 +136,7 @@ func TestUser_Update(t *testing.T) {
 		},
 		Email: "foo@bar.com",
 	}
-	resp, err := client.UpdateUser(input)
+	res, err := client.UpdateUser(input)
 
 	want := &User{
 		APIObject: APIObject{
@@ -149,16 +145,16 @@ func TestUser_Update(t *testing.T) {
 		Email: "foo@bar.com",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // List User Contactmethods
 func TestUser_ListContactMethods(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -169,7 +165,7 @@ func TestUser_ListContactMethods(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ID := "1"
 
-	resp, err := client.ListUserContactMethods(ID)
+	res, err := client.ListUserContactMethods(ID)
 
 	want := &ListContactMethodsResponse{
 		APIListObject: listObj,
@@ -180,16 +176,16 @@ func TestUser_ListContactMethods(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Get user ContactMethod
 func TestUser_GetContactMethod(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -200,14 +196,16 @@ func TestUser_GetContactMethod(t *testing.T) {
 	methodID := "1"
 	userID := "1"
 
-	resp, err := client.GetUserContactMethod(userID, methodID)
+	res, err := client.GetUserContactMethod(userID, methodID)
 
 	want := &ContactMethod{
 		ID: "1",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // TODO: Create user ContactMethod

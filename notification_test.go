@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListNotifications
 func TestNotification_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -28,7 +24,7 @@ func TestNotification_List(t *testing.T) {
 		Since:         "bar",
 		Until:         "baz",
 	}
-	resp, err := client.ListNotifications(opts)
+	res, err := client.ListNotifications(opts)
 
 	want := &ListNotificationsResponse{
 		APIListObject: listObj,
@@ -39,6 +35,8 @@ func TestNotification_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

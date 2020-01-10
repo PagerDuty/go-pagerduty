@@ -3,15 +3,11 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestEscalationPolicy_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/escalation_policies", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -22,7 +18,7 @@ func TestEscalationPolicy_List(t *testing.T) {
 	var opts ListEscalationPoliciesOptions
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
-	resp, err := client.ListEscalationPolicies(opts)
+	res, err := client.ListEscalationPolicies(opts)
 
 	want := &ListEscalationPoliciesResponse{
 		APIListObject: listObj,
@@ -34,16 +30,16 @@ func TestEscalationPolicy_List(t *testing.T) {
 			},
 		},
 	}
-
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestEscalationPolicy_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	require := require.New(t)
 	input := EscalationPolicy{Name: "foo"}
 
 	mux.HandleFunc("/escalation_policies", func(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +47,7 @@ func TestEscalationPolicy_Create(t *testing.T) {
 		w.Write([]byte(`{"escalation_policy": {"name": "foo", "id": "1"}}`))
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	resp, err := client.CreateEscalationPolicy(input)
+	res, err := client.CreateEscalationPolicy(input)
 
 	want := &EscalationPolicy{
 		Name: "foo",
@@ -60,15 +56,15 @@ func TestEscalationPolicy_Create(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestEscalationPolicy_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -76,14 +72,14 @@ func TestEscalationPolicy_Delete(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	err := client.DeleteEscalationPolicy("1")
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestEscalationPolicy_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -91,7 +87,7 @@ func TestEscalationPolicy_Get(t *testing.T) {
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	var opts *GetEscalationPolicyOptions
-	resp, err := client.GetEscalationPolicy("1", opts)
+	res, err := client.GetEscalationPolicy("1", opts)
 
 	want := &EscalationPolicy{
 		APIObject: APIObject{
@@ -99,15 +95,15 @@ func TestEscalationPolicy_Get(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestEscalationPolicy_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -122,17 +118,17 @@ func TestEscalationPolicy_Update(t *testing.T) {
 		},
 		Name: "foo",
 	}
-	resp, err := client.UpdateEscalationPolicy("1", input)
+	res, err := client.UpdateEscalationPolicy("1", input)
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestEscalationPolicy_UpdateTeams(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	input := &EscalationPolicy{
 		Name: "foo",
@@ -148,7 +144,7 @@ func TestEscalationPolicy_UpdateTeams(t *testing.T) {
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	resp, err := client.UpdateEscalationPolicy("1", input)
+	res, err := client.UpdateEscalationPolicy("1", input)
 
 	want := &EscalationPolicy{
 		Name: "foo",
@@ -158,6 +154,8 @@ func TestEscalationPolicy_UpdateTeams(t *testing.T) {
 		Teams: []APIReference{},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

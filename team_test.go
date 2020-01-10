@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListTeams
 func TestTeam_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -25,7 +21,7 @@ func TestTeam_List(t *testing.T) {
 		APIListObject: listObj,
 		Query:         "foo",
 	}
-	resp, err := client.ListTeams(opts)
+	res, err := client.ListTeams(opts)
 
 	want := &ListTeamResponse{
 		APIListObject: listObj,
@@ -38,16 +34,16 @@ func TestTeam_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Create Team
 func TestTeam_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -58,7 +54,7 @@ func TestTeam_Create(t *testing.T) {
 	input := &Team{
 		Name: "foo",
 	}
-	resp, err := client.CreateTeam(input)
+	res, err := client.CreateTeam(input)
 
 	want := &Team{
 		APIObject: APIObject{
@@ -67,16 +63,16 @@ func TestTeam_Create(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Delete Team
 func TestTeam_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -86,15 +82,15 @@ func TestTeam_Delete(t *testing.T) {
 	id := "1"
 	err := client.DeleteTeam(id)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Get Team
 func TestTeam_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -103,7 +99,7 @@ func TestTeam_Get(t *testing.T) {
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
-	resp, err := client.GetTeam(id)
+	res, err := client.GetTeam(id)
 
 	want := &Team{
 		APIObject: APIObject{
@@ -112,16 +108,16 @@ func TestTeam_Get(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Update Team
 func TestTeam_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -137,7 +133,7 @@ func TestTeam_Update(t *testing.T) {
 		Name: "foo",
 	}
 	id := "1"
-	resp, err := client.UpdateTeam(id, input)
+	res, err := client.UpdateTeam(id, input)
 
 	want := &Team{
 		APIObject: APIObject{
@@ -146,16 +142,16 @@ func TestTeam_Update(t *testing.T) {
 		Name: "foo",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Remove Escalation Policy from Team
 func TestTeam_RemoveEscalationPolicyFromTeam(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -167,15 +163,15 @@ func TestTeam_RemoveEscalationPolicyFromTeam(t *testing.T) {
 
 	err := client.RemoveEscalationPolicyFromTeam(teamID, epID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Add Escalation Policy to Team
 func TestTeam_AddEscalationPolicyToTeam(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -187,15 +183,15 @@ func TestTeam_AddEscalationPolicyToTeam(t *testing.T) {
 
 	err := client.AddEscalationPolicyToTeam(teamID, epID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Remove User from Team
 func TestTeam_RemoveUserFromTeam(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -207,15 +203,15 @@ func TestTeam_RemoveUserFromTeam(t *testing.T) {
 
 	err := client.RemoveUserFromTeam(teamID, userID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Add User to Team
 func TestTeam_AddUserToTeam(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/teams/1/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -227,5 +223,7 @@ func TestTeam_AddUserToTeam(t *testing.T) {
 
 	err := client.AddUserToTeam(teamID, userID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

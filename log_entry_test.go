@@ -3,15 +3,11 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestLogEntry_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/log_entries", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -26,7 +22,7 @@ func TestLogEntry_List(t *testing.T) {
 		IsOverview:    true,
 		TimeZone:      "UTC",
 	}
-	resp, err := client.ListLogEntries(entriesOpts)
+	res, err := client.ListLogEntries(entriesOpts)
 
 	want := &ListLogEntryResponse{
 		APIListObject: listObj,
@@ -40,15 +36,15 @@ func TestLogEntry_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 func TestLogEntry_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/log_entries/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -58,7 +54,7 @@ func TestLogEntry_Get(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	opts := GetLogEntryOptions{TimeZone: "UTC", Includes: []string{}}
-	resp, err := client.GetLogEntry(id, opts)
+	res, err := client.GetLogEntry(id, opts)
 
 	want := &LogEntry{
 		APIObject: APIObject{
@@ -67,6 +63,8 @@ func TestLogEntry_Get(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

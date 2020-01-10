@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListSchedules
 func TestSchedule_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -25,7 +21,7 @@ func TestSchedule_List(t *testing.T) {
 		APIListObject: listObj,
 		Query:         "foo",
 	}
-	resp, err := client.ListSchedules(opts)
+	res, err := client.ListSchedules(opts)
 
 	want := &ListSchedulesResponse{
 		APIListObject: listObj,
@@ -39,16 +35,16 @@ func TestSchedule_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Create a Schedule
 func TestSchedule_Create(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -62,7 +58,7 @@ func TestSchedule_Create(t *testing.T) {
 			Summary: "foo",
 		},
 	}
-	resp, err := client.CreateSchedule(input)
+	res, err := client.CreateSchedule(input)
 
 	want := &Schedule{
 		APIObject: APIObject{
@@ -71,8 +67,10 @@ func TestSchedule_Create(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // TODO: Preview a schedule -- should this function be changed to actually return a preview?
@@ -82,8 +80,6 @@ func TestSchedule_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	require := require.New(t)
-
 	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 	})
@@ -92,15 +88,15 @@ func TestSchedule_Delete(t *testing.T) {
 	id := "1"
 	err := client.DeleteSchedule(id)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Get a schedule
 func TestSchedule_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -117,7 +113,7 @@ func TestSchedule_Get(t *testing.T) {
 		Since:         "foo",
 		Until:         "bar",
 	}
-	resp, err := client.GetSchedule(input, opts)
+	res, err := client.GetSchedule(input, opts)
 
 	want := &Schedule{
 		APIObject: APIObject{
@@ -126,16 +122,16 @@ func TestSchedule_Get(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Update a schedule
 func TestSchedule_Update(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
@@ -151,7 +147,7 @@ func TestSchedule_Update(t *testing.T) {
 			Summary: "foo",
 		},
 	}
-	resp, err := client.UpdateSchedule(id, sched)
+	res, err := client.UpdateSchedule(id, sched)
 
 	want := &Schedule{
 		APIObject: APIObject{
@@ -160,16 +156,16 @@ func TestSchedule_Update(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // List overrides
 func TestSchedule_ListOverrides(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1/overrides", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -187,7 +183,7 @@ func TestSchedule_ListOverrides(t *testing.T) {
 	}
 	schedID := "1"
 
-	resp, err := client.ListOverrides(schedID, opts)
+	res, err := client.ListOverrides(schedID, opts)
 
 	want := &ListOverridesResponse{
 		APIListObject: listObj,
@@ -198,16 +194,16 @@ func TestSchedule_ListOverrides(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Create an override
 func TestSchedule_CreateOverride(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1/overrides", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -221,7 +217,7 @@ func TestSchedule_CreateOverride(t *testing.T) {
 	}
 	schedID := "1"
 
-	resp, err := client.CreateOverride(schedID, input)
+	res, err := client.CreateOverride(schedID, input)
 
 	want := &Override{
 		ID:    "1",
@@ -229,16 +225,16 @@ func TestSchedule_CreateOverride(t *testing.T) {
 		End:   "bar",
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Delete an override
 func TestSchedule_DeleteOverride(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1/overrides/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
@@ -249,15 +245,15 @@ func TestSchedule_DeleteOverride(t *testing.T) {
 	overID := "1"
 	err := client.DeleteOverride(schedID, overID)
 
-	require.NoError(err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // List users on call
 func TestSchedule_ListOnCallUsers(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/schedules/1/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -273,7 +269,7 @@ func TestSchedule_ListOnCallUsers(t *testing.T) {
 	}
 	schedID := "1"
 
-	resp, err := client.ListOnCallUsers(schedID, opts)
+	res, err := client.ListOnCallUsers(schedID, opts)
 
 	want := []User{
 		{
@@ -283,6 +279,8 @@ func TestSchedule_ListOnCallUsers(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }

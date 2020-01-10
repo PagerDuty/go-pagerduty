@@ -3,16 +3,12 @@ package pagerduty
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // ListVendors
 func TestVendor_List(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/vendors", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -25,7 +21,7 @@ func TestVendor_List(t *testing.T) {
 		APIListObject: listObj,
 		Query:         "foo",
 	}
-	resp, err := client.ListVendors(opts)
+	res, err := client.ListVendors(opts)
 
 	want := &ListVendorResponse{
 		APIListObject: listObj,
@@ -38,16 +34,16 @@ func TestVendor_List(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
 
 // Get Vendor
 func TestVendor_Get(t *testing.T) {
 	setup()
 	defer teardown()
-
-	require := require.New(t)
 
 	mux.HandleFunc("/vendors/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -57,7 +53,7 @@ func TestVendor_Get(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	venID := "1"
 
-	resp, err := client.GetVendor(venID)
+	res, err := client.GetVendor(venID)
 
 	want := &Vendor{
 		APIObject: APIObject{
@@ -65,6 +61,8 @@ func TestVendor_Get(t *testing.T) {
 		},
 	}
 
-	require.NoError(err)
-	require.Equal(want, resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
