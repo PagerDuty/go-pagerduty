@@ -79,6 +79,7 @@ type Incident struct {
 	ResolveReason        ResolveReason     `json:"resolve_reason,omitempty"`
 	AlertCounts          AlertCounts       `json:"alert_counts,omitempty"`
 	Body                 IncidentBody      `json:"body,omitempty"`
+	HtmlUrl              string            `json:"html_url,omitempty"`
 	IsMergeable          bool              `json:"is_mergeable,omitempty"`
 }
 
@@ -126,15 +127,15 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
-	Type             string       `json:"type"`
-	Title            string       `json:"title"`
+	Type             string        `json:"type"`
+	Title            string        `json:"title"`
 	Service          *APIReference `json:"service"`
 	Priority         *APIReference `json:"priority"`
-	Urgency          string       `json:"urgency,omitempty"`
-	IncidentKey      string       `json:"incident_key,omitempty"`
+	Urgency          string        `json:"urgency,omitempty"`
+	IncidentKey      string        `json:"incident_key,omitempty"`
 	Body             *APIDetails   `json:"body,omitempty"`
 	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
-	Assignments      []Assignee   `json:"assignments,omitempty"`
+	Assignments      []Assignee    `json:"assignments,omitempty"`
 }
 
 // CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
