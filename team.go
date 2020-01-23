@@ -138,3 +138,34 @@ func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersR
 	var result ListMembersResponse
 	return &result, c.decodeJSON(resp, &result)
 }
+
+// ListAllMembers gets all members associated with the specified team.
+func (c *Client) ListAllMembers(teamID string) ([]Member, error) {
+	members := make([]Member, 0)
+
+	// Create a handler closure capable of parsing data from the members endpoint
+	// and appending resultant members to the return slice.
+	responseHandler := func(response *http.Response) (APIListObject, error) {
+		var result ListMembersResponse
+		if err := c.decodeJSON(response, &result); err != nil {
+			return APIListObject{}, err
+		}
+
+		members = append(members, result.Members...)
+
+		// Return stats on the current page. Caller can use this information to
+		// adjust for requesting additional pages.
+		return APIListObject{
+			More:   result.More,
+			Offset: result.Offset,
+			Limit:  result.Limit,
+		}, nil
+	}
+
+	// Make call to get all pages associated with the base endpoint.
+	if err := c.pagedGet("/teams/"+teamID+"/members", responseHandler); err != nil {
+		return nil, err
+	}
+
+	return members, nil
+}

@@ -163,3 +163,38 @@ func TestListMembersError(t *testing.T) {
 		t.Fatalf("Expected nil members response, got: %v", members)
 	}
 }
+
+func TestListAllMembersSuccessMultiplePages(t *testing.T) {
+	expectedNumResults := testMaxPageSize*3 + 1
+	currentPage := 0
+	pages := genRespPages(expectedNumResults, testMaxPageSize, genMembersRespPage, t)
+
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	mux.HandleFunc("/teams/"+testValidTeamID+"/members", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, pages[currentPage])
+		currentPage++
+	})
+
+	api := &Client{apiEndpoint: server.URL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+
+	members, err := api.ListAllMembers(testValidTeamID)
+	if err != nil {
+		t.Fatalf("Failed to get members: %v", err)
+	}
+
+	if len(members) != expectedNumResults {
+		t.Fatalf("Expected %d team members, got: %v", expectedNumResults, err)
+	}
+}
+
+func TestListAllMembersError(t *testing.T) {
+	api := &Client{apiEndpoint: testBadURL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+	members, err := api.ListAllMembers(testValidTeamID)
+	if err == nil {
+		t.Fatalf("Expected error, got nil")
+	}
+	if len(members) != 0 {
+		t.Fatalf("Expected 0 members, got: %v", members)
+	}
+}
