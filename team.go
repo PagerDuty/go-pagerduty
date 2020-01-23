@@ -104,3 +104,37 @@ func getTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, erro
 	}
 	return &t, nil
 }
+
+// Member is a team member.
+type Member struct {
+	APIObject struct {
+		APIObject
+	} `json:"user"`
+	Role string `json:"role"`
+}
+
+// ListMembersOptions are the optional parameters for a members request.
+type ListMembersOptions struct {
+	APIListObject
+}
+
+// ListMembersResponse is the response from the members endpoint.
+type ListMembersResponse struct {
+	APIListObject
+	Members []Member `json:"members"`
+}
+
+// ListMembers gets the first page of users associated with the specified team.
+func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersResponse, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.get("/teams/" + teamID + "/members?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
+	var result ListMembersResponse
+	return &result, c.decodeJSON(resp, &result)
+}
