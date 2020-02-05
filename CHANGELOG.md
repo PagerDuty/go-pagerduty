@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.1](https://github.com/PagerDuty/go-pagerduty/tree/1.1.1) (2020-02-05)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.1.0...1.1.1)
+
+**Merged pull requests:**
+
+- Community Contributions -- 05 Feb 2020 [\#194](https://github.com/PagerDuty/go-pagerduty/pull/194) ([stmcallister](https://github.com/stmcallister))
+- Add support for extensions/extension schemas [\#193](https://github.com/PagerDuty/go-pagerduty/pull/193) ([heimweh](https://github.com/heimweh))
+- Added AlertGrouping and AlertGroupingTimeout to Service [\#189](https://github.com/PagerDuty/go-pagerduty/pull/189) ([toneill818](https://github.com/toneill818))
+- Adds oncall to escalation policy [\#183](https://github.com/PagerDuty/go-pagerduty/pull/183) ([ewilde](https://github.com/ewilde))
+- Add ContactMethods operations [\#169](https://github.com/PagerDuty/go-pagerduty/pull/169) ([timlittle](https://github.com/timlittle))
+- return http code with errors [\#134](https://github.com/PagerDuty/go-pagerduty/pull/134) ([yomashExpel](https://github.com/yomashExpel))
+
 ## [1.1.0](https://github.com/PagerDuty/go-pagerduty/tree/1.1.0) (2020-02-03)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.4...1.1.0)
@@ -61,7 +74,6 @@
 - Add ability to list a user's contact methods [\#97](https://github.com/PagerDuty/go-pagerduty/pull/97) ([facundoagriel](https://github.com/facundoagriel))
 - Added json fields to structs [\#93](https://github.com/PagerDuty/go-pagerduty/pull/93) ([bradleyrobinson](https://github.com/bradleyrobinson))
 - Get user's contact methods [\#91](https://github.com/PagerDuty/go-pagerduty/pull/91) ([wvdeutekom](https://github.com/wvdeutekom))
-- Fix pagination for ListOnCalls [\#90](https://github.com/PagerDuty/go-pagerduty/pull/90) ([IainCole](https://github.com/IainCole))
 - Fixed spelling, entires-\>entries [\#78](https://github.com/PagerDuty/go-pagerduty/pull/78) ([lowesoftware](https://github.com/lowesoftware))
 - Updating incident.go [\#75](https://github.com/PagerDuty/go-pagerduty/pull/75) ([domudall](https://github.com/domudall))
 - Adding new fields to Vendor [\#74](https://github.com/PagerDuty/go-pagerduty/pull/74) ([domudall](https://github.com/domudall))
@@ -116,6 +128,7 @@
 
 **Merged pull requests:**
 
+- Fix pagination for ListOnCalls [\#90](https://github.com/PagerDuty/go-pagerduty/pull/90) ([IainCole](https://github.com/IainCole))
 - Revert "Fix inconsistency with some REST Options objects passed by reference …" [\#88](https://github.com/PagerDuty/go-pagerduty/pull/88) ([mimato](https://github.com/mimato))
 - Adding travis config, fixup Makefile [\#87](https://github.com/PagerDuty/go-pagerduty/pull/87) ([mimato](https://github.com/mimato))
 - Fixed invalid JSON descriptor for FirstTriggerLogEntry [\#86](https://github.com/PagerDuty/go-pagerduty/pull/86) ([mwisniewski0](https://github.com/mwisniewski0))
