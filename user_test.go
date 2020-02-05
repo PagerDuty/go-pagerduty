@@ -213,7 +213,7 @@ func TestUser_CreateContactMethod(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/1/contact_methods/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
 	})

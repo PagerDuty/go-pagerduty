@@ -165,7 +165,7 @@ func (c *Client) DeleteUserContactMethod(userID, contactMethodID string) error {
 func (c *Client) CreateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
 	data := make(map[string]ContactMethod)
 	data["contact_method"] = cm
-	resp, err := c.post("/users/"+userID+"/contact_methods/", data, nil)
+	resp, err := c.post("/users/"+userID+"/contact_methods", data, nil)
 	return getContactMethodFromResponse(c, resp, err)
 }
 
