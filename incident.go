@@ -380,4 +380,46 @@ type ListAlertResponse struct {
 	Alerts []Alert `json:"alerts,omitempty"`
 }
 
-/* TODO: Manage Alerts, Get Alert, Create Status Updates, Create Responder Request, */
+// CreateIncidentResponderRequestResponse
+type CreateIncidentResponderRequestResponse struct {
+	ResponderRequest ResponderRequest `json:"responder_request"`
+}
+
+// CreateIncidentResponderRequestOptions defines the input options for the Create Responder function.
+type CreateIncidentResponderRequestOptions struct {
+	From        string
+	Message     string
+	RequesterID string
+	Targets     []APIObject
+}
+
+// ResponderRequest contains the API structure for an incident responder request.
+type ResponderRequest struct {
+	Incident    Incident    `json:"incident"`
+	Requester   User        `json:"user,omitempty"`
+	RequestedAt string      `json:"request_at,omitempty"`
+	Message     string      `json:"message,omitempty"`
+	Targets     []APIObject `json:"responder_request_targets,omitempty"`
+}
+
+// CreateIncidentResponderRequest will submit a request to have a responder join an incident.
+func (c *Client) CreateIncidentResponderRequest(id string, o CreateIncidentResponderRequestOptions) (*CreateIncidentResponderRequestResponse, error) {
+	data := make(map[string]interface{})
+	headers := make(map[string]string)
+	headers["From"] = o.From
+
+	data["message"] = o.Message
+	data["request_id"] = o.RequesterID
+	data["responder_request_targets"] = o.Targets
+
+	resp, err := c.post("/incidents/"+id+"/responder_requests", data, &headers)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &CreateIncidentResponderRequestResponse{}
+	err = json.NewDecoder(resp.Body).Decode(result)
+	return result, err
+}
+
+/* TODO: Manage Alerts, Get Alert, Create Status Updates */

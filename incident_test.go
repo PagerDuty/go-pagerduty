@@ -341,3 +341,38 @@ func TestIncident_ListLogEntries(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestIncident_ResponderRequest(t *testing.T) {
+	setup()
+	defer teardown()
+
+	id := "1"
+	mux.HandleFunc("/incidents/"+id+"/responder_requests", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"requester_id": "PL1JMK5", "message": "Help", "responder_request_targets": [{"responder_request_target":{"id":"PJ25ZYX","type":"user_reference"}}]}`))
+	})
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	from := "foo@bar.com"
+
+	input := CreateIncidentResponderRequestOptions{
+		From:        from,
+		Message:     "help",
+		RequesterID: "PL1JMK5",
+		Targets: []APIObject{
+			APIObject{ID: "PJ25ZYX", Type: "user_reference"},
+		},
+	}
+
+	want := &CreateIncidentResponderRequestResponse{
+		ResponderRequest: ResponderRequest{
+			Incident:  Incident{},
+			Requester: User{},
+		},
+	}
+	res, err := client.CreateIncidentResponderRequest(id, input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
