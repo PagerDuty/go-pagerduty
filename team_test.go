@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"text/template"
 )
@@ -356,11 +355,12 @@ func genRespPages(amount,
 }
 
 func TestListMembersSuccess(t *testing.T) {
+	setup()
+	defer teardown()
+
 	expectedNumResults := testMaxPageSize - 1
 	page := genRespPages(expectedNumResults, testMaxPageSize, genMembersRespPage, t)[0]
 
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 	mux.HandleFunc("/teams/"+testValidTeamID+"/members", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, page)
 	})
@@ -388,12 +388,13 @@ func TestListMembersError(t *testing.T) {
 }
 
 func TestListAllMembersSuccessMultiplePages(t *testing.T) {
+	setup()
+	defer teardown()
+
 	expectedNumResults := testMaxPageSize*3 + 1
 	currentPage := 0
 	pages := genRespPages(expectedNumResults, testMaxPageSize, genMembersRespPage, t)
 
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
 	mux.HandleFunc("/teams/"+testValidTeamID+"/members", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, pages[currentPage])
 		currentPage++
