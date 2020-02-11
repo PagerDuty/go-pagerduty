@@ -66,7 +66,7 @@ type ListUsersOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// ListContactMethodResponse is the data structure returned from calling the GetUserContactMethod API endpoint.
+// ListContactMethodsResponse is the data structure returned from calling the GetUserContactMethod API endpoint.
 type ListContactMethodsResponse struct {
 	APIListObject
 	ContactMethods []ContactMethod `json:"contact_methods"`
@@ -139,9 +139,9 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 	return &t, nil
 }
 
-// ListUserContactMethod fetches contact methods of the existing user.
-func (c *Client) ListUserContactMethods(userId string) (*ListContactMethodsResponse, error) {
-	resp, err := c.get("/users/" + userId + "/contact_methods")
+// ListUserContactMethods fetches contact methods of the existing user.
+func (c *Client) ListUserContactMethods(userID string) (*ListContactMethodsResponse, error) {
+	resp, err := c.get("/users/" + userID + "/contact_methods")
 	if err != nil {
 		return nil, err
 	}
@@ -149,9 +149,31 @@ func (c *Client) ListUserContactMethods(userId string) (*ListContactMethodsRespo
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// GetContactMethod gets details about a contact method.
-func (c *Client) GetUserContactMethod(userID, id string) (*ContactMethod, error) {
-	resp, err := c.get("/users/" + userID + "/contact_methods/" + id)
+// GetUserContactMethod gets details about a contact method.
+func (c *Client) GetUserContactMethod(userID, contactMethodID string) (*ContactMethod, error) {
+	resp, err := c.get("/users/" + userID + "/contact_methods/" + contactMethodID)
+	return getContactMethodFromResponse(c, resp, err)
+}
+
+// DeleteUserContactMethod deletes a user.
+func (c *Client) DeleteUserContactMethod(userID, contactMethodID string) error {
+	_, err := c.delete("/users/" + userID + "/contact_methods/" + contactMethodID)
+	return err
+}
+
+// CreateUserContactMethod creates a new contact method for user.
+func (c *Client) CreateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
+	data := make(map[string]ContactMethod)
+	data["contact_method"] = cm
+	resp, err := c.post("/users/"+userID+"/contact_methods", data, nil)
+	return getContactMethodFromResponse(c, resp, err)
+}
+
+// UpdateUserContactMethod updates an existing user.
+func (c *Client) UpdateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
+	v := make(map[string]ContactMethod)
+	v["contact_method"] = cm
+	resp, err := c.put("/users/"+userID+"/contact_methods/"+cm.ID, v, nil)
 	return getContactMethodFromResponse(c, resp, err)
 }
 

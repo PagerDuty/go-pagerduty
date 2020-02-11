@@ -1,12 +1,115 @@
-# Change Log
+# Changelog
+
+## [1.1.1](https://github.com/PagerDuty/go-pagerduty/tree/1.1.1) (2020-02-05)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.1.0...1.1.1)
+
+**Merged pull requests:**
+
+- Community Contributions -- 05 Feb 2020 [\#194](https://github.com/PagerDuty/go-pagerduty/pull/194) ([stmcallister](https://github.com/stmcallister))
+- Add support for extensions/extension schemas [\#193](https://github.com/PagerDuty/go-pagerduty/pull/193) ([heimweh](https://github.com/heimweh))
+- Added AlertGrouping and AlertGroupingTimeout to Service [\#189](https://github.com/PagerDuty/go-pagerduty/pull/189) ([toneill818](https://github.com/toneill818))
+- Adds oncall to escalation policy [\#183](https://github.com/PagerDuty/go-pagerduty/pull/183) ([ewilde](https://github.com/ewilde))
+- Add ContactMethods operations [\#169](https://github.com/PagerDuty/go-pagerduty/pull/169) ([timlittle](https://github.com/timlittle))
+- return http code with errors [\#134](https://github.com/PagerDuty/go-pagerduty/pull/134) ([yomashExpel](https://github.com/yomashExpel))
+
+## [1.1.0](https://github.com/PagerDuty/go-pagerduty/tree/1.1.0) (2020-02-03)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.4...1.1.0)
+
+**Closed issues:**
+
+- listOverrides result in JSON unmarshall failure [\#180](https://github.com/PagerDuty/go-pagerduty/issues/180)
+- How to create incident via command pd? [\#171](https://github.com/PagerDuty/go-pagerduty/issues/171)
+- Poorly documented, library code broken, please step it up.  [\#170](https://github.com/PagerDuty/go-pagerduty/issues/170)
+- failed to create an incident [\#165](https://github.com/PagerDuty/go-pagerduty/issues/165)
+- I need create incident function, Can we release the latest master? [\#163](https://github.com/PagerDuty/go-pagerduty/issues/163)
+- Update logrus imports to github.com/sirupsen/logrus [\#160](https://github.com/PagerDuty/go-pagerduty/issues/160)
+- build error cannot find package [\#144](https://github.com/PagerDuty/go-pagerduty/issues/144)
+- Missing ListIncidentAlerts [\#141](https://github.com/PagerDuty/go-pagerduty/issues/141)
+- ListIncidentsOptions Example [\#139](https://github.com/PagerDuty/go-pagerduty/issues/139)
+- Support for V2 Event Management in the CLI [\#136](https://github.com/PagerDuty/go-pagerduty/issues/136)
+- Custom connection settings [\#110](https://github.com/PagerDuty/go-pagerduty/issues/110)
+- Missing the "From" parameter in Create note on an incident function [\#107](https://github.com/PagerDuty/go-pagerduty/issues/107)
+- Support V2 events [\#83](https://github.com/PagerDuty/go-pagerduty/issues/83)
+- Support Event Transformer Code? [\#67](https://github.com/PagerDuty/go-pagerduty/issues/67)
+- Fix help flag behavior [\#18](https://github.com/PagerDuty/go-pagerduty/issues/18)
+
+**Merged pull requests:**
+
+- Tests [\#190](https://github.com/PagerDuty/go-pagerduty/pull/190) ([stmcallister](https://github.com/stmcallister))
+- Modify ListOverrides and add ListOverridesResponse [\#185](https://github.com/PagerDuty/go-pagerduty/pull/185) ([dstevensio](https://github.com/dstevensio))
+- client: allow overriding the api endpoint [\#173](https://github.com/PagerDuty/go-pagerduty/pull/173) ([heimweh](https://github.com/heimweh))
+- Change makefiles and readme [\#172](https://github.com/PagerDuty/go-pagerduty/pull/172) ([dineshba](https://github.com/dineshba))
+- Use Go modules [\#168](https://github.com/PagerDuty/go-pagerduty/pull/168) ([nbutton23](https://github.com/nbutton23))
+- escalation\_policy: support clearing teams from an existing escalation policy [\#167](https://github.com/PagerDuty/go-pagerduty/pull/167) ([heimweh](https://github.com/heimweh))
+- Correct JSON payload format for CreateIncident call [\#166](https://github.com/PagerDuty/go-pagerduty/pull/166) ([joepurdy](https://github.com/joepurdy))
+- Use pointer to Priority so don't send an empty priority for incident [\#164](https://github.com/PagerDuty/go-pagerduty/pull/164) ([atomicules](https://github.com/atomicules))
+- Update README.md [\#158](https://github.com/PagerDuty/go-pagerduty/pull/158) ([jonhyman](https://github.com/jonhyman))
+- Fixed typo [\#155](https://github.com/PagerDuty/go-pagerduty/pull/155) ([uthark](https://github.com/uthark))
+- Support Links in V2Event [\#154](https://github.com/PagerDuty/go-pagerduty/pull/154) ([alindeman](https://github.com/alindeman))
+- Add supported fields to POST /incident request. [\#151](https://github.com/PagerDuty/go-pagerduty/pull/151) ([archydragon](https://github.com/archydragon))
+- Consolidated community contributions [\#150](https://github.com/PagerDuty/go-pagerduty/pull/150) ([dobs](https://github.com/dobs))
+- Incident alerts [\#143](https://github.com/PagerDuty/go-pagerduty/pull/143) ([soullivaneuh](https://github.com/soullivaneuh))
+- Incident alerts [\#142](https://github.com/PagerDuty/go-pagerduty/pull/142) ([soullivaneuh](https://github.com/soullivaneuh))
+- Remove useless else from README [\#140](https://github.com/PagerDuty/go-pagerduty/pull/140) ([soullivaneuh](https://github.com/soullivaneuh))
+- Add V2 Event Management to the CLI [\#138](https://github.com/PagerDuty/go-pagerduty/pull/138) ([philnielsen](https://github.com/philnielsen))
+- Fix incident struct to behave as API expects [\#137](https://github.com/PagerDuty/go-pagerduty/pull/137) ([DennyLoko](https://github.com/DennyLoko))
+- Add ListContactMethods and GetContactMethod [\#132](https://github.com/PagerDuty/go-pagerduty/pull/132) ([amencarini](https://github.com/amencarini))
+- Adding fields for incident id and priority [\#131](https://github.com/PagerDuty/go-pagerduty/pull/131) ([davidgibbons](https://github.com/davidgibbons))
+- Add src to cd $GOPATH instruction [\#130](https://github.com/PagerDuty/go-pagerduty/pull/130) ([ryanhall07](https://github.com/ryanhall07))
+- CreateIncident takes CreateIncidentOptions param [\#127](https://github.com/PagerDuty/go-pagerduty/pull/127) ([wdhnl](https://github.com/wdhnl))
+- update CreateMaintenanceWindow [\#126](https://github.com/PagerDuty/go-pagerduty/pull/126) ([wdhnl](https://github.com/wdhnl))
+- Add instructions for actually being able to install the CLI [\#123](https://github.com/PagerDuty/go-pagerduty/pull/123) ([whithajess](https://github.com/whithajess))
+- Create Incident, List Priorities, and headers in POST method support [\#122](https://github.com/PagerDuty/go-pagerduty/pull/122) ([ldelossa](https://github.com/ldelossa))
+- Allow package consumers to provide their own HTTP client [\#121](https://github.com/PagerDuty/go-pagerduty/pull/121) ([theckman](https://github.com/theckman))
+- Add MergeIncidents \(using Incident\) [\#114](https://github.com/PagerDuty/go-pagerduty/pull/114) ([atomicules](https://github.com/atomicules))
+- Updated incident.go to reflect current api documentation [\#113](https://github.com/PagerDuty/go-pagerduty/pull/113) ([averstappen](https://github.com/averstappen))
+- Try out CircleCI. [\#109](https://github.com/PagerDuty/go-pagerduty/pull/109) ([felicianotech](https://github.com/felicianotech))
+- Added From parameter to createNote function [\#108](https://github.com/PagerDuty/go-pagerduty/pull/108) ([Nnoromuche](https://github.com/Nnoromuche))
+- Get a list of alerts for a given incident id. [\#106](https://github.com/PagerDuty/go-pagerduty/pull/106) ([pushkar-engagio](https://github.com/pushkar-engagio))
+- Add oncall details [\#104](https://github.com/PagerDuty/go-pagerduty/pull/104) ([luqasn](https://github.com/luqasn))
+- Add support for v2 ManageEvent api call [\#103](https://github.com/PagerDuty/go-pagerduty/pull/103) ([luqasn](https://github.com/luqasn))
+- Reformatted Apache 2.0 license [\#99](https://github.com/PagerDuty/go-pagerduty/pull/99) ([joshdk](https://github.com/joshdk))
+- Add ability to list a user's contact methods [\#97](https://github.com/PagerDuty/go-pagerduty/pull/97) ([facundoagriel](https://github.com/facundoagriel))
+- Added json fields to structs [\#93](https://github.com/PagerDuty/go-pagerduty/pull/93) ([bradleyrobinson](https://github.com/bradleyrobinson))
+- Get user's contact methods [\#91](https://github.com/PagerDuty/go-pagerduty/pull/91) ([wvdeutekom](https://github.com/wvdeutekom))
+- Fixed spelling, entires-\>entries [\#78](https://github.com/PagerDuty/go-pagerduty/pull/78) ([lowesoftware](https://github.com/lowesoftware))
+- Updating incident.go [\#75](https://github.com/PagerDuty/go-pagerduty/pull/75) ([domudall](https://github.com/domudall))
+- Adding new fields to Vendor [\#74](https://github.com/PagerDuty/go-pagerduty/pull/74) ([domudall](https://github.com/domudall))
+- Vendor CLI [\#73](https://github.com/PagerDuty/go-pagerduty/pull/73) ([domudall](https://github.com/domudall))
+- Fixing structs within user.go [\#72](https://github.com/PagerDuty/go-pagerduty/pull/72) ([domudall](https://github.com/domudall))
+
+## [1.0.4](https://github.com/PagerDuty/go-pagerduty/tree/1.0.4) (2018-05-28)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.3...1.0.4)
+
+## [1.0.3](https://github.com/PagerDuty/go-pagerduty/tree/1.0.3) (2018-05-28)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.2...1.0.3)
+
+## [1.0.2](https://github.com/PagerDuty/go-pagerduty/tree/1.0.2) (2018-05-28)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.1...1.0.2)
+
+**Merged pull requests:**
+
+- Add gorleaser to release [\#118](https://github.com/PagerDuty/go-pagerduty/pull/118) ([mattstratton](https://github.com/mattstratton))
+
+## [1.0.1](https://github.com/PagerDuty/go-pagerduty/tree/1.0.1) (2018-05-28)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.0.0...1.0.1)
 
 ## [1.0.0](https://github.com/PagerDuty/go-pagerduty/tree/1.0.0) (2018-05-28)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/d080263da74613ba3ac237baaf09f5f169b00d72...1.0.0)
+
 **Fixed bugs:**
 
 - Escalation Policy's repeat\_enabled Is Ignored [\#57](https://github.com/PagerDuty/go-pagerduty/issues/57)
 - Problems running freshly built pd utility [\#39](https://github.com/PagerDuty/go-pagerduty/issues/39)
 - Manage Incident gives error [\#32](https://github.com/PagerDuty/go-pagerduty/issues/32)
-- Added missing slash to delete integration method url [\#59](https://github.com/PagerDuty/go-pagerduty/pull/59) ([jescochu](https://github.com/jescochu))
+- Added missing slash to delete integration method url [\#59](https://github.com/PagerDuty/go-pagerduty/pull/59) ([reybard](https://github.com/reybard))
 
 **Closed issues:**
 
@@ -86,4 +189,4 @@
 
 
 
-\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
