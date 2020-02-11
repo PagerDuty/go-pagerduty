@@ -140,6 +140,7 @@ func (c *Client) do(method, path string, body io.Reader, headers *map[string]str
 			req.Header.Set(k, v)
 		}
 	}
+	req.Header.Set("User-Agent", "go-pagerduty")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Token token="+c.authToken)
 
