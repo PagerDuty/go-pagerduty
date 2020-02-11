@@ -349,27 +349,62 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	id := "1"
 	mux.HandleFunc("/incidents/"+id+"/responder_requests", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"requester_id": "PL1JMK5", "message": "Help", "responder_request_targets": [{"responder_request_target":{"id":"PJ25ZYX","type":"user_reference"}}]}`))
+		w.Write([]byte(`{
+	"responder_request": {
+		"requester": {
+			"id": "PL1JMK5",
+			"type": "user_reference"
+		},
+		"message": "Help",
+		"responder_request_targets": {
+			"responder_request_target": {
+				"id": "PJ25ZYX",
+				"type": "user_reference",
+				"incident_responders": {
+					"state": "pending",
+					"user": {
+						"id": "PJ25ZYX"
+					}
+				}
+			}
+		}
+	}
+}`))
+
 	})
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	from := "foo@bar.com"
 
-	input := CreateIncidentResponderRequestOptions{
+	r := ResponderRequestTarget{}
+	r.ID = "PJ25ZYX"
+	r.Type = "user_reference"
+
+	input := ResponderRequestOptions{
 		From:        from,
 		Message:     "help",
 		RequesterID: "PL1JMK5",
-		Targets: []APIObject{
-			APIObject{ID: "PJ25ZYX", Type: "user_reference"},
-		},
+		Targets:     []ResponderRequestTarget{r},
 	}
 
-	want := &CreateIncidentResponderRequestResponse{
+	user := User{}
+	user.ID = "PL1JMK5"
+	user.Type = "user_reference"
+
+	target := ResponderRequestTarget{}
+	target.ID = "PJ25ZYX"
+	target.Type = "user_reference"
+	target.Responders.State = "pending"
+	target.Responders.User.ID = "PJ25ZYX"
+
+	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
-			Requester: User{},
+			Requester: user,
+			Message:   "Help",
+			Targets:   ResponderRequestTargets{target},
 		},
 	}
-	res, err := client.CreateIncidentResponderRequest(id, input)
+	res, err := client.ResponderRequest(id, input)
 
 	if err != nil {
 		t.Fatal(err)

@@ -380,44 +380,61 @@ type ListAlertResponse struct {
 	Alerts []Alert `json:"alerts,omitempty"`
 }
 
-// CreateIncidentResponderRequestResponse
-type CreateIncidentResponderRequestResponse struct {
+// IncidentResponders contains details about responders to an incident.
+type IncidentResponders struct {
+	State       string    `json:"state"`
+	User        APIObject `json:"user"`
+	Incident    APIObject `json:"incident"`
+	UpdatedAt   string    `json:"updated_at"`
+	Message     string    `json:"message"`
+	Requester   APIObject `json:"requester"`
+	RequestedAt string    `json:"requested_at"`
+}
+
+// ResponderRequestResponse
+type ResponderRequestResponse struct {
 	ResponderRequest ResponderRequest `json:"responder_request"`
 }
 
-// CreateIncidentResponderRequestOptions defines the input options for the Create Responder function.
-type CreateIncidentResponderRequestOptions struct {
-	From        string
-	Message     string
-	RequesterID string
-	Targets     []APIObject
+// ResponderRequestTarget specifies an individual target for the responder request.
+type ResponderRequestTarget struct {
+	APIObject
+	Responders IncidentResponders `json:"incident_responders"`
+}
+
+// ResponderRequestTargets is a wrapper for a ResponderRequestTarget.
+type ResponderRequestTargets struct {
+	Target ResponderRequestTarget `json:"responder_request_target"`
+}
+
+// ResponderRequestOptions defines the input options for the Create Responder function.
+type ResponderRequestOptions struct {
+	From        string                   `json:"-"`
+	Message     string                   `json:"message"`
+	RequesterID string                   `json:"request_id"`
+	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
 type ResponderRequest struct {
-	Incident    Incident    `json:"incident"`
-	Requester   User        `json:"user,omitempty"`
-	RequestedAt string      `json:"request_at,omitempty"`
-	Message     string      `json:"message,omitempty"`
-	Targets     []APIObject `json:"responder_request_targets,omitempty"`
+	Incident    Incident                `json:"incident"`
+	Requester   User                    `json:"requester,omitempty"`
+	RequestedAt string                  `json:"request_at,omitempty"`
+	Message     string                  `json:"message,omitempty"`
+	Targets     ResponderRequestTargets `json:"responder_request_targets"`
 }
 
-// CreateIncidentResponderRequest will submit a request to have a responder join an incident.
-func (c *Client) CreateIncidentResponderRequest(id string, o CreateIncidentResponderRequestOptions) (*CreateIncidentResponderRequestResponse, error) {
-	data := make(map[string]interface{})
+// ResponderRequest will submit a request to have a responder join an incident.
+func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*ResponderRequestResponse, error) {
 	headers := make(map[string]string)
 	headers["From"] = o.From
 
-	data["message"] = o.Message
-	data["request_id"] = o.RequesterID
-	data["responder_request_targets"] = o.Targets
-
-	resp, err := c.post("/incidents/"+id+"/responder_requests", data, &headers)
+	resp, err := c.post("/incidents/"+id+"/responder_requests", o, &headers)
 	if err != nil {
 		return nil, err
 	}
 
-	result := &CreateIncidentResponderRequestResponse{}
+	result := &ResponderRequestResponse{}
 	err = json.NewDecoder(resp.Body).Decode(result)
 	return result, err
 }
