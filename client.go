@@ -180,3 +180,38 @@ func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error)
 	}
 	return &s, nil
 }
+
+// responseHandler is capable of parsing a response. At a minimum it must
+// extract the page information for the current page. It can also execute
+// additional necessary handling; for example, if a closure, it has access
+// to the scope in which it was defined, and can be used to append data to
+// a specific slice. The responseHandler is responsible for closing the response.
+type responseHandler func(response *http.Response) (APIListObject, error)
+
+func (c *Client) pagedGet(basePath string, handler responseHandler) error {
+	// Indicates whether there are still additional pages associated with request.
+	var stillMore bool
+
+	// Offset to set for the next page request.
+	var nextOffset uint
+
+	// While there are more pages, keep adjusting the offset to get all results.
+	for stillMore, nextOffset = true, 0; stillMore; {
+		response, err := c.do("GET", fmt.Sprintf("%s?offset=%d", basePath, nextOffset), nil, nil)
+		if err != nil {
+			return err
+		}
+
+		// Call handler to extract page information and execute additional necessary handling.
+		pageInfo, err := handler(response)
+		if err != nil {
+			return err
+		}
+
+		// Bump the offset as necessary and set whether more results exist.
+		nextOffset = pageInfo.Offset + pageInfo.Limit
+		stillMore = pageInfo.More
+	}
+
+	return nil
+}

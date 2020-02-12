@@ -104,3 +104,68 @@ func getTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, erro
 	}
 	return &t, nil
 }
+
+// Member is a team member.
+type Member struct {
+	APIObject struct {
+		APIObject
+	} `json:"user"`
+	Role string `json:"role"`
+}
+
+// ListMembersOptions are the optional parameters for a members request.
+type ListMembersOptions struct {
+	APIListObject
+}
+
+// ListMembersResponse is the response from the members endpoint.
+type ListMembersResponse struct {
+	APIListObject
+	Members []Member `json:"members"`
+}
+
+// ListMembers gets the first page of users associated with the specified team.
+func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersResponse, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.get("/teams/" + teamID + "/members?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
+	var result ListMembersResponse
+	return &result, c.decodeJSON(resp, &result)
+}
+
+// ListAllMembers gets all members associated with the specified team.
+func (c *Client) ListAllMembers(teamID string) ([]Member, error) {
+	members := make([]Member, 0)
+
+	// Create a handler closure capable of parsing data from the members endpoint
+	// and appending resultant members to the return slice.
+	responseHandler := func(response *http.Response) (APIListObject, error) {
+		var result ListMembersResponse
+		if err := c.decodeJSON(response, &result); err != nil {
+			return APIListObject{}, err
+		}
+
+		members = append(members, result.Members...)
+
+		// Return stats on the current page. Caller can use this information to
+		// adjust for requesting additional pages.
+		return APIListObject{
+			More:   result.More,
+			Offset: result.Offset,
+			Limit:  result.Limit,
+		}, nil
+	}
+
+	// Make call to get all pages associated with the base endpoint.
+	if err := c.pagedGet("/teams/"+teamID+"/members", responseHandler); err != nil {
+		return nil, err
+	}
+
+	return members, nil
+}
