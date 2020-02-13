@@ -21,22 +21,13 @@ type EscalationRule struct {
 // EscalationPolicy is a collection of escalation rules.
 type EscalationPolicy struct {
 	APIObject
-	Name            string                   `json:"name,omitempty"`
-	EscalationRules []EscalationRule         `json:"escalation_rules,omitempty"`
-	Services        []APIObject              `json:"services,omitempty"`
-	NumLoops        uint                     `json:"num_loops,omitempty"`
-	Teams           []APIReference           `json:"teams"`
-	OnCall          []EscalationPolicyOnCall `json:"on_call"`
-	Description     string                   `json:"description,omitempty"`
-	RepeatEnabled   bool                     `json:"repeat_enabled,omitempty"`
-}
-
-//
-type EscalationPolicyOnCall struct {
-	Level uint   `json:"level"`
-	Start string `json:"start,omitempty"`
-	End   string `json:"end,omitempty"`
-	User  User   `json:"user,omitempty"`
+	Name            string           `json:"name,omitempty"`
+	EscalationRules []EscalationRule `json:"escalation_rules,omitempty"`
+	Services        []APIObject      `json:"services,omitempty"`
+	NumLoops        uint             `json:"num_loops,omitempty"`
+	Teams           []APIReference   `json:"teams"`
+	Description     string           `json:"description,omitempty"`
+	RepeatEnabled   bool             `json:"repeat_enabled,omitempty"`
 }
 
 // ListEscalationPoliciesResponse is the data structure returned from calling the ListEscalationPolicies API endpoint.

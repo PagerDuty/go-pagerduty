@@ -48,6 +48,7 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 		return nil, err
 	}
 	req, _ := http.NewRequest("POST", v2eventEndPoint, bytes.NewBuffer(data))
+	req.Header.Set("User-Agent", "go-pagerduty/"+Version)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
