@@ -151,6 +151,35 @@ func TestUser_Update(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+// Get Current User
+func TestUser_GetCurrent(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/me", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := GetCurrentUserOptions{
+		Includes: []string{},
+	}
+	res, err := client.GetCurrentUser(opts)
+
+	want := &User{
+		APIObject: APIObject{
+			ID: "1",
+		},
+		Email: "foo@bar.com",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 // List User Contactmethods
 func TestUser_ListContactMethods(t *testing.T) {
 	setup()

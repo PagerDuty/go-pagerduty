@@ -77,6 +77,11 @@ type GetUserOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
+// GetCurrentUserOptions is the data structure used when calling the GetCurrentUser API endpoint.
+type GetCurrentUserOptions struct {
+	Includes [] string `url:"include,omitempty,brackets"`
+}
+
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
 func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 	v, err := query.Values(o)
@@ -120,6 +125,16 @@ func (c *Client) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
 	v["user"] = u
 	resp, err := c.put("/users/"+u.ID, v, nil)
+	return getUserFromResponse(c, resp, err)
+}
+
+// GetCurrentUser gets details about the authenticated user when using a user-level API key or OAuth token
+func (c *Client) GetCurrentUser(o GetCurrentUserOptions) (*User, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get("/users/me?" + v.Encode())
 	return getUserFromResponse(c, resp, err)
 }
 
