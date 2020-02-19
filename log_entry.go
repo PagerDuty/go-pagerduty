@@ -11,7 +11,8 @@ type Agent APIObject
 
 // Channel is the means by which the action was carried out.
 type Channel struct {
-	Type string
+	Type         string
+	Notification Notification
 }
 
 // Context are to be included with the trigger such as links to graphs or images.
@@ -29,11 +30,13 @@ type LogEntry struct {
 	CreatedAt              string `json:"created_at"`
 	Agent                  Agent
 	Channel                Channel
+	Service                Service
 	Incident               Incident
 	Teams                  []Team
 	Contexts               []Context
 	AcknowledgementTimeout int `json:"acknowledgement_timeout"`
 	EventDetails           map[string]string
+	User                   User
 }
 
 // ListLogEntryResponse is the response data when calling the ListLogEntry API endpoint.
