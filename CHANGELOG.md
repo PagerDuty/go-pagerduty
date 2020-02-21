@@ -1,5 +1,36 @@
 # Changelog
 
+## [v1.1.2](https://github.com/PagerDuty/go-pagerduty/tree/v1.1.2) (2020-02-21)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.1.1...v1.1.2)
+
+**Closed issues:**
+
+- EventV2Response doesn't match API response [\#186](https://github.com/PagerDuty/go-pagerduty/issues/186)
+- List escalation policy with current on call members using include `current\_oncall` [\#181](https://github.com/PagerDuty/go-pagerduty/issues/181)
+- Create service extension \(like slack extension\) over API [\#149](https://github.com/PagerDuty/go-pagerduty/issues/149)
+- Mock Client? [\#148](https://github.com/PagerDuty/go-pagerduty/issues/148)
+- Make a release? [\#146](https://github.com/PagerDuty/go-pagerduty/issues/146)
+- Priority field should be optional according to API spec [\#135](https://github.com/PagerDuty/go-pagerduty/issues/135)
+- Missing Services Extensions available over API [\#129](https://github.com/PagerDuty/go-pagerduty/issues/129)
+- Missing ContactMethod operations [\#125](https://github.com/PagerDuty/go-pagerduty/issues/125)
+- Add A CODEOWNERS file for easier review requests. [\#124](https://github.com/PagerDuty/go-pagerduty/issues/124)
+- missing severity in create\_event.json object? [\#100](https://github.com/PagerDuty/go-pagerduty/issues/100)
+- Assignment struct has no json conversion [\#92](https://github.com/PagerDuty/go-pagerduty/issues/92)
+- Publish CLI binaries as releases [\#81](https://github.com/PagerDuty/go-pagerduty/issues/81)
+- Package test coverage is lacking [\#70](https://github.com/PagerDuty/go-pagerduty/issues/70)
+- Create releases with built binaries [\#50](https://github.com/PagerDuty/go-pagerduty/issues/50)
+
+**Merged pull requests:**
+
+- fixing eventV2Response to match API [\#204](https://github.com/PagerDuty/go-pagerduty/pull/204) ([stmcallister](https://github.com/stmcallister))
+- Remove duplicate license link in README [\#202](https://github.com/PagerDuty/go-pagerduty/pull/202) ([ahornace](https://github.com/ahornace))
+- Adding GetCurrentUser method [\#199](https://github.com/PagerDuty/go-pagerduty/pull/199) ([chrisforrette](https://github.com/chrisforrette))
+- Adding User-Agent Headers [\#197](https://github.com/PagerDuty/go-pagerduty/pull/197) ([stmcallister](https://github.com/stmcallister))
+- Implement the Incident endpoint for ResponderRequest [\#196](https://github.com/PagerDuty/go-pagerduty/pull/196) ([CerealBoy](https://github.com/CerealBoy))
+- updating changelog with 1.1.1 [\#195](https://github.com/PagerDuty/go-pagerduty/pull/195) ([stmcallister](https://github.com/stmcallister))
+- List team members, single page or all \(with helper for auto-pagination\) [\#192](https://github.com/PagerDuty/go-pagerduty/pull/192) ([mwhite-ibm](https://github.com/mwhite-ibm))
+
 ## [1.1.1](https://github.com/PagerDuty/go-pagerduty/tree/1.1.1) (2020-02-05)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.1.0...1.1.1)
@@ -10,6 +41,7 @@
 - Add support for extensions/extension schemas [\#193](https://github.com/PagerDuty/go-pagerduty/pull/193) ([heimweh](https://github.com/heimweh))
 - Added AlertGrouping and AlertGroupingTimeout to Service [\#189](https://github.com/PagerDuty/go-pagerduty/pull/189) ([toneill818](https://github.com/toneill818))
 - Adds oncall to escalation policy [\#183](https://github.com/PagerDuty/go-pagerduty/pull/183) ([ewilde](https://github.com/ewilde))
+- client: allow overriding the api endpoint [\#173](https://github.com/PagerDuty/go-pagerduty/pull/173) ([heimweh](https://github.com/heimweh))
 - Add ContactMethods operations [\#169](https://github.com/PagerDuty/go-pagerduty/pull/169) ([timlittle](https://github.com/timlittle))
 - return http code with errors [\#134](https://github.com/PagerDuty/go-pagerduty/pull/134) ([yomashExpel](https://github.com/yomashExpel))
 
@@ -39,7 +71,6 @@
 
 - Tests [\#190](https://github.com/PagerDuty/go-pagerduty/pull/190) ([stmcallister](https://github.com/stmcallister))
 - Modify ListOverrides and add ListOverridesResponse [\#185](https://github.com/PagerDuty/go-pagerduty/pull/185) ([dstevensio](https://github.com/dstevensio))
-- client: allow overriding the api endpoint [\#173](https://github.com/PagerDuty/go-pagerduty/pull/173) ([heimweh](https://github.com/heimweh))
 - Change makefiles and readme [\#172](https://github.com/PagerDuty/go-pagerduty/pull/172) ([dineshba](https://github.com/dineshba))
 - Use Go modules [\#168](https://github.com/PagerDuty/go-pagerduty/pull/168) ([nbutton23](https://github.com/nbutton23))
 - escalation\_policy: support clearing teams from an existing escalation policy [\#167](https://github.com/PagerDuty/go-pagerduty/pull/167) ([heimweh](https://github.com/heimweh))
