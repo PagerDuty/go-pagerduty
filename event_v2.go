@@ -34,9 +34,10 @@ type V2Payload struct {
 
 // Response is the json response body for an event
 type V2EventResponse struct {
-	Status   string `json:"status,omitempty"`
-	DedupKey string `json:"dedup_key,omitempty"`
-	Message  string `json:"message,omitempty"`
+	Status   string   `json:"status,omitempty"`
+	DedupKey string   `json:"dedup_key,omitempty"`
+	Message  string   `json:"message,omitempty"`
+	Errors   []string `json:"errors,omitempty"`
 }
 
 const v2eventEndPoint = "https://events.pagerduty.com/v2/enqueue"
