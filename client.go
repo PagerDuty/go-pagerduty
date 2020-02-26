@@ -44,10 +44,14 @@ type APIDetails struct {
 	Details string `json:"details,omitempty"`
 }
 
-type errorObject struct {
+type APIError struct {
 	Code    int         `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Errors  interface{} `json:"errors,omitempty"`
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("Failed to call API endpoint. Error: %v", e)
 }
 
 func newDefaultHTTPClient() *http.Client {
@@ -158,18 +162,18 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
 	}
 	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
-		var eo *errorObject
+		var eo *APIError
 		var getErr error
 		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
 			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
 		}
-		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
+		return resp, eo
 	}
 	return resp, nil
 }
 
-func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {
-	var result map[string]errorObject
+func (c *Client) getErrorFromResponse(resp *http.Response) (*APIError, error) {
+	var result map[string]APIError
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
 	}
