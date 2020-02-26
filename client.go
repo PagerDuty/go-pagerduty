@@ -50,6 +50,10 @@ type errorObject struct {
 	Errors  interface{} `json:"errors,omitempty"`
 }
 
+func (e *errorObject) Error() string {
+	return fmt.Sprintf("Failed to call API endpoint. Error: %v", e)
+}
+
 func newDefaultHTTPClient() *http.Client {
 	return &http.Client{
 		Transport: &http.Transport{
@@ -163,7 +167,7 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
 			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
 		}
-		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
+		return resp, eo
 	}
 	return resp, nil
 }
