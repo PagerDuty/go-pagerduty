@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/go-querystring/query"
@@ -12,6 +13,7 @@ type Agent APIObject
 // Channel is the means by which the action was carried out.
 type Channel struct {
 	Type string
+	Raw  map[string]interface{}
 }
 
 // Context are to be included with the trigger such as links to graphs or images.
@@ -45,7 +47,7 @@ type ListLogEntryResponse struct {
 // ListLogEntriesOptions is the data structure used when calling the ListLogEntry API endpoint.
 type ListLogEntriesOptions struct {
 	APIListObject
-	TimeZone   string   `url:"time_zone"`
+	TimeZone   string   `url:"time_zone,omitempty"`
 	Since      string   `url:"since,omitempty"`
 	Until      string   `url:"until,omitempty"`
 	IsOverview bool     `url:"is_overview,omitempty"`
@@ -63,7 +65,10 @@ func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse,
 		return nil, err
 	}
 	var result ListLogEntryResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
 // GetLogEntryOptions is the data structure used when calling the GetLogEntry API endpoint.
@@ -83,12 +88,30 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 		return nil, err
 	}
 	var result map[string]LogEntry
+
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
+
 	le, ok := result["log_entry"]
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have log_entry field")
 	}
 	return &le, nil
+}
+
+// UnmarshalJSON Expands the LogEntry.Channel object to parse out a raw value
+func (c *Channel) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	ct, ok := raw["type"]
+	if ok {
+		c.Type = ct.(string)
+		c.Raw = raw
+	}
+
+	return nil
 }
