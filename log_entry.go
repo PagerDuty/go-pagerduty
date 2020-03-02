@@ -68,16 +68,6 @@ func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse,
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
-	// setting Channel.Raw to provide access to each of the channel fields objects
-	for _, le := range result.LogEntries {
-		les, err := json.Marshal(le)
-		if err != nil {
-			return nil, err
-		}
-		if err := le.Channel.UnmarshalJSON([]byte(les)); err != nil {
-			return nil, err
-		}
-	}
 	return &result, err
 }
 
@@ -106,15 +96,6 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	le, ok := result["log_entry"]
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have log_entry field")
-	}
-
-	// setting Channel.Raw to provide access to each of the channel object fields
-	les, err := json.Marshal(result)
-	if err != nil {
-		return nil, err
-	}
-	if err := le.Channel.UnmarshalJSON([]byte(les)); err != nil {
-		return nil, err
 	}
 	return &le, nil
 }
