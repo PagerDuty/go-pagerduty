@@ -28,6 +28,7 @@ type IncidentDetails struct {
 	ResolveReason        *string           `json:"resolve_reason"`
 	AlertCounts          AlertCounts       `json:"alert_counts"`
 	Metadata             interface{}       `json:"metadata"`
+	Description          string            `json:"description"`
 }
 
 // WebhookPayloadMessages is the wrapper around the Webhook payloads. The Array may contain multiple message elements if webhook firing actions occurred in quick succession
