@@ -118,6 +118,17 @@ func NewClient(authToken string) *Client {
 	}
 }
 
+// NewClientWithAPIEndpoint creates an API client using an account/user API token
+// and a custom apiEndpoint value
+func NewClientWithAPIEndpoint(authToken, apiEndpoint string) *Client {
+	return &Client{
+		authToken:   authToken,
+		apiEndpoint: apiEndpoint,
+		authType:    apiToken,
+		HTTPClient:  defaultHTTPClient,
+	}
+}
+
 // NewOAuthClient creates an API client using an OAuth token
 func NewOAuthClient(authToken string) *Client {
 	return &Client{
