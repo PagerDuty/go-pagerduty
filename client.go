@@ -129,19 +129,6 @@ func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
 	return NewClient(authToken, WithOAuth())
 }
 
-// func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
-// 	client := Client{
-// 		authToken:   authToken,
-// 		apiEndpoint: apiEndpoint,
-// 		authType:    oauthToken,
-// 		HTTPClient:  defaultHTTPClient,
-// 	}
-// 	for _, opt := range options {
-// 		opt(&client)
-// 	}
-// 	return &client
-// }
-
 // ClientOptions allows for options to be passed into the Client for customization
 type ClientOptions func(*Client)
 
