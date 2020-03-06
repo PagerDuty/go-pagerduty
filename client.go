@@ -109,33 +109,42 @@ type Client struct {
 }
 
 // NewClient creates an API client using an account/user API token
-func NewClient(authToken string) *Client {
-	return &Client{
+func NewClient(authToken string, options ...ClientOptions) *Client {
+	client := Client{
 		authToken:   authToken,
 		apiEndpoint: apiEndpoint,
 		authType:    apiToken,
 		HTTPClient:  defaultHTTPClient,
 	}
-}
 
-// NewClientWithAPIEndpoint creates an API client using an account/user API token
-// and a custom apiEndpoint value
-func NewClientWithAPIEndpoint(authToken, apiEndpoint string) *Client {
-	return &Client{
-		authToken:   authToken,
-		apiEndpoint: apiEndpoint,
-		authType:    apiToken,
-		HTTPClient:  defaultHTTPClient,
+	for _, opt := range options {
+		opt(&client)
 	}
+
+	return &client
 }
 
 // NewOAuthClient creates an API client using an OAuth token
-func NewOAuthClient(authToken string) *Client {
-	return &Client{
+func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
+	client := Client{
 		authToken:   authToken,
 		apiEndpoint: apiEndpoint,
 		authType:    oauthToken,
 		HTTPClient:  defaultHTTPClient,
+	}
+	for _, opt := range options {
+		opt(&client)
+	}
+	return &client
+}
+
+// ClientOptions allows for options to be passed into the Client for customization
+type ClientOptions func(*Client)
+
+// WithAPIEndpoint allows for a custom API endpoint to be passed into the the client
+func WithAPIEndpoint(endpoint string) ClientOptions {
+	return func(c *Client) {
+		c.apiEndpoint = endpoint
 	}
 }
 
