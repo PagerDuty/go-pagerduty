@@ -9,24 +9,19 @@
 # 	go build -o $(BINARY) command/*
 
 .PHONY: build
-
-GOPATH?=$(shell go env GOPATH)
-GO111MODULE=auto
-
 build: build-deps
-	go build -mod=vendor -o pd ./command
+	go build -mod=vendor -o $(GOROOT)/bin/pd ./command
+
+.PHONY: build-deps
 build-deps:
 	go get
 	go mod verify
 	go mod vendor
 
-install: build
-	cp pd $(GOPATH)/bin
-
 .PHONY: test
 test:
 	go test ./...
 
+.PHONY: deploy
 deploy:
 	- curl -sL https://git.io/goreleaser | bash
-
