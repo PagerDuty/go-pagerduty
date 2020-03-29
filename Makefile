@@ -10,13 +10,17 @@
 
 .PHONY: build
 build: build-deps
-	go build -mod=vendor -o $(GOROOT)/bin/pd ./command
+	go build -mod=vendor -o pd ./command
 
 .PHONY: build-deps
 build-deps:
 	go get
 	go mod verify
 	go mod vendor
+
+.PHONY: install
+install: build
+	cp pd $(GOROOT)/bin
 
 .PHONY: test
 test:
