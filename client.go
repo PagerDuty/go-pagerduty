@@ -55,10 +55,25 @@ type APIDetails struct {
 	Details string `json:"details,omitempty"`
 }
 
-type errorObject struct {
+// APIErrorObject are the fields returned by the API when an API call fails.
+type APIErrorObject struct {
 	Code    int         `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Errors  interface{} `json:"errors,omitempty"`
+}
+
+// ClientError is return by this client on a failed API call.
+type ClientError struct {
+	StatusCode int
+	Reason     string
+	ApiError   *APIErrorObject
+}
+
+func (e* ClientError) Error() string {
+	if e.ApiError == nil {
+		return fmt.Sprintf("Failed call API endpoint. HTTP response code: %v. Reason: %s", e.StatusCode, e.Reason)
+	}
+	return fmt.Sprintf("Failed call API endpoint. HTTP response code: %v. Reason: %s. ApiError: %s", e.StatusCode, e.Reason, *e.ApiError)
 }
 
 func newDefaultHTTPClient() *http.Client {
@@ -208,18 +223,22 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
 	}
 	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
-		var eo *errorObject
-		var getErr error
-		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
-			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
+		var aeo *APIErrorObject
+		aeo, _ = c.getErrorFromResponse(resp)
+
+		e := ClientError{
+			ApiError: aeo,
+			Reason: resp.Status,
+			StatusCode: resp.StatusCode,
 		}
-		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
+
+		return resp, &e
 	}
 	return resp, nil
 }
 
-func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {
-	var result map[string]errorObject
+func (c *Client) getErrorFromResponse(resp *http.Response) (*APIErrorObject, error) {
+	var result map[string]APIErrorObject
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
 	}
