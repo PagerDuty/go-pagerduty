@@ -89,6 +89,14 @@ func (c *Client) AddUserToTeam(teamID, userID string) error {
 	return err
 }
 
+// AddUserToTeam adds a user with custom role to a team.
+func (c *Client) AddUserRoleToTeam(teamID, userID string, role string) error {
+	v := make(map[string]string)
+	v["role"] = role
+	_, err := c.put("/teams/"+teamID+"/users/"+userID, v, nil)
+	return err
+}
+
 func getTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, error) {
 	if err != nil {
 		return nil, err
