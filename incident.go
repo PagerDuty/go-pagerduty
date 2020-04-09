@@ -267,9 +267,21 @@ type ListAlertsResponse struct {
 	Alerts []IncidentAlert `json:"alerts,omitempty"`
 }
 
+// ListIncidentAlertsOptions is the structure used when passing parameters to the ListIncidentAlerts API endpoint.
+type ListIncidentAlertsOptions struct {
+	APIListObject
+	Statuses []string `url:"statuses,omitempty,brackets"`
+	SortBy   string   `url:"sort_by,omitempty"`
+	Includes []string `url:"include,omitempty,brackets"`
+}
+
 // ListIncidentAlerts lists existing alerts for the specified incident.
-func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
-	resp, err := c.get("/incidents/" + id + "/alerts")
+func (c *Client) ListIncidentAlerts(id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get("/incidents/" + id + "/alerts?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}

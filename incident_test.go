@@ -184,7 +184,13 @@ func TestIncident_ListIncidentAlerts(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 
-	res, err := client.ListIncidentAlerts(id)
+	var alertOpts = ListIncidentAlertsOptions{
+		APIListObject: listObj,
+		Includes:      []string{},
+	}
+
+
+	res, err := client.ListIncidentAlerts(id, alertOpts)
 
 	want := &ListAlertsResponse{
 		APIListObject: listObj,
