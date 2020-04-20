@@ -204,7 +204,7 @@ func TestTeam_RemoveUserFromTeam(t *testing.T) {
 	teamID := "1"
 	userID := "1"
 
-	err := client.RemoveUserFromTeam(teamID, userID)
+	err := client.RemoveTeamMember(teamID, userID)
 
 	if err != nil {
 		t.Fatal(err)
