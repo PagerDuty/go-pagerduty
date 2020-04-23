@@ -313,3 +313,152 @@ func TestUser_UpdateContactMethod(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+// Get user NotificationRule
+func TestUser_GetUserNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	ruleID := "1"
+	userID := "1"
+
+	res, err := client.GetUserNotificationRule(userID, ruleID)
+
+	want := &NotificationRule{
+		ID:                  "1",
+		StartDelayInMinutes: uint(1),
+		Urgency:             "low",
+		ContactMethod: ContactMethod{
+			ID: "1",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Create user NotificationRule
+func TestUser_CreateUserNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/notification_rules", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	userID := "1"
+	rule := NotificationRule{
+		Type: "email_contact_method",
+	}
+	res, err := client.CreateUserNotificationRule(userID, rule)
+
+	want := &NotificationRule{
+		ID:                  "1",
+		StartDelayInMinutes: uint(1),
+		Urgency:             "low",
+		ContactMethod: ContactMethod{
+			ID: "1",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// List User NotificationRules
+func TestUser_ListUserNotificationRules(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/notification_rules", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"notification_rules": [{"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}]}`))
+	})
+
+	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	ID := "1"
+
+	res, err := client.ListUserNotificationRules(ID)
+
+	want := &ListUserNotificationRulesResponse{
+		APIListObject: listObj,
+		NotificationRules: []NotificationRule{
+			{
+				ID:                  "1",
+				StartDelayInMinutes: uint(1),
+				Urgency:             "low",
+				ContactMethod: ContactMethod{
+					ID: "1",
+				},
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Update user NotificationRule
+func TestUser_UpdateUserNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	userID := "1"
+	rule := NotificationRule{
+		ID:   "1",
+		Type: "email_contact_method",
+	}
+	res, err := client.UpdateUserNotificationRule(userID, rule)
+
+	want := &NotificationRule{
+		ID:                  "1",
+		StartDelayInMinutes: uint(1),
+		Urgency:             "low",
+		ContactMethod: ContactMethod{
+			ID: "1",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Delete user NotificationRule
+func TestUser_DeleteUserNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+	userID := "1"
+	ruleID := "1"
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	if err := client.DeleteUserNotificationRule(userID, ruleID); err != nil {
+		t.Fatal(err)
+	}
+}
