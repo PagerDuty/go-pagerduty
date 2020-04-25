@@ -17,7 +17,7 @@ type Integration struct {
 	Type             string            `json:"type,omitempty"`
 	IntegrationKey   string            `json:"integration_key,omitempty"`
 	IntegrationEmail string            `json:"integration_email,omitempty"`
-	Config           IntegrationConfig `json:"config,omitempty"`
+	Config           *IntegrationConfig `json:"config,omitempty"`
 }
 
 type Field struct {
