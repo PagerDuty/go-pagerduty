@@ -276,7 +276,12 @@ type ListIncidentAlertsOptions struct {
 }
 
 // ListIncidentAlerts lists existing alerts for the specified incident.
-func (c *Client) ListIncidentAlerts(id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
+func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
+	return c.ListIncidentAlertsWithOpts(id, ListIncidentAlertsOptions{})
+}
+
+// ListIncidentAlertsWithOpts lists existing alerts for the specified incident.
+func (c *Client) ListIncidentAlertsWithOpts(id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
