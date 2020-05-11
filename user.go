@@ -72,6 +72,12 @@ type ListContactMethodsResponse struct {
 	ContactMethods []ContactMethod `json:"contact_methods"`
 }
 
+// ListUserNotificationRulesResponse the data structure returned from calling the ListNotificationRules API endpoint.
+type ListUserNotificationRulesResponse struct {
+	APIListObject
+	NotificationRules []NotificationRule `json:"notification_rules"`
+}
+
 // GetUserOptions is the data structure used when calling the GetUser API endpoint.
 type GetUserOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
@@ -79,7 +85,7 @@ type GetUserOptions struct {
 
 // GetCurrentUserOptions is the data structure used when calling the GetCurrentUser API endpoint.
 type GetCurrentUserOptions struct {
-	Includes [] string `url:"include,omitempty,brackets"`
+	Includes []string `url:"include,omitempty,brackets"`
 }
 
 // ListUsers lists users of your PagerDuty account, optionally filtered by a search query.
@@ -201,6 +207,60 @@ func getContactMethodFromResponse(c *Client, resp *http.Response, err error) (*C
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "contact_method"
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+	return &t, nil
+}
+
+// GetUserNotificationRule gets details about a notification rule.
+func (c *Client) GetUserNotificationRule(userID, ruleID string) (*NotificationRule, error) {
+	resp, err := c.get("/users/" + userID + "/notification_rules/" + ruleID)
+	return getUserNotificationRuleFromResponse(c, resp, err)
+}
+
+// CreateUserNotificationRule creates a new notification rule for a user.
+func (c *Client) CreateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
+	data := make(map[string]NotificationRule)
+	data["notification_rule"] = rule
+	resp, err := c.post("/users/"+userID+"/notification_rules", data, nil)
+	return getUserNotificationRuleFromResponse(c, resp, err)
+}
+
+// UpdateUserNotificationRule updates a notification rule for a user.
+func (c *Client) UpdateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
+	data := make(map[string]NotificationRule)
+	data["notification_rule"] = rule
+	resp, err := c.put("/users/"+userID+"/notification_rules/"+rule.ID, data, nil)
+	return getUserNotificationRuleFromResponse(c, resp, err)
+}
+
+// DeleteUserNotificationRule deletes a notification rule for a user.
+func (c *Client) DeleteUserNotificationRule(userID, ruleID string) error {
+	_, err := c.delete("/users/" + userID + "/notification_rules/" + ruleID)
+	return err
+}
+
+// ListUserNotificationRules fetches notification rules of the existing user.
+func (c *Client) ListUserNotificationRules(userID string) (*ListUserNotificationRulesResponse, error) {
+	resp, err := c.get("/users/" + userID + "/notification_rules")
+	if err != nil {
+		return nil, err
+	}
+	var result ListUserNotificationRulesResponse
+	return &result, c.decodeJSON(resp, &result)
+}
+
+func getUserNotificationRuleFromResponse(c *Client, resp *http.Response, err error) (*NotificationRule, error) {
+	if err != nil {
+		return nil, err
+	}
+	var target map[string]NotificationRule
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+	rootNode := "notification_rule"
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
 		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)

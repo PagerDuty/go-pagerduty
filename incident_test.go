@@ -342,6 +342,46 @@ func TestIncident_ListLogEntries(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+// ListIncidentLogEntriesSinceUntil
+func TestIncident_ListLogEntriesSinceUntil(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/log_entries", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"log_entries": [{"id": "1","summary":"foo"}]}`))
+	})
+	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	id := "1"
+	var entriesOpts = ListIncidentLogEntriesOptions{
+		APIListObject: listObj,
+		Includes:      []string{},
+		IsOverview:    true,
+		TimeZone:      "UTC",
+		Since:         "2020-03-27T22:40:00-0700",
+		Until:         "2020-03-28T22:50:00-0700",
+	}
+	res, err := client.ListIncidentLogEntries(id, entriesOpts)
+
+	want := &ListIncidentLogEntriesResponse{
+		APIListObject: listObj,
+		LogEntries: []LogEntry{
+			{
+				APIObject: APIObject{
+					ID:      "1",
+					Summary: "foo",
+				},
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 func TestIncident_ResponderRequest(t *testing.T) {
 	setup()
 	defer teardown()

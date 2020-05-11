@@ -137,7 +137,12 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 
 // UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) (*Service, error) {
-	resp, err := c.put("/services/"+s.ID, s, nil)
+	body := struct {
+		Service `json:"service,omitempty"`
+	}{
+		s,
+	}
+	resp, err := c.put("/services/"+s.ID, body, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
