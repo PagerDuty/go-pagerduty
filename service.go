@@ -79,7 +79,7 @@ type Service struct {
 	Teams                  []Team               `json:"teams,omitempty"`
 	IncidentUrgencyRule    *IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
 	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
-	ScheduledActions       []ScheduledAction    `json:"scheduled_actions,omitempty"`
+	ScheduledActions       *[]ScheduledAction    `json:"scheduled_actions,omitempty"`
 	AlertCreation          string               `json:"alert_creation,omitempty"`
 	AlertGrouping          string               `json:"alert_grouping,omitempty"`
 	AlertGroupingTimeout   *uint                `json:"alert_grouping_timeout,omitempty"`
