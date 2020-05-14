@@ -49,7 +49,10 @@ func CreateEventWithHTTPClient(e Event, client HTTPClient) (*EventResponse, erro
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		return &EventResponse{HttpStatus: resp.StatusCode}, err
+		if resp != nil {
+			return &EventResponse{HttpStatus: resp.StatusCode}, err
+		}
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
