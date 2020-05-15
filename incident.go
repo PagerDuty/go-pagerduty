@@ -413,7 +413,7 @@ type ResponderRequestTargets struct {
 type ResponderRequestOptions struct {
 	From        string                   `json:"-"`
 	Message     string                   `json:"message"`
-	RequesterID string                   `json:"request_id"`
+	RequesterID string                   `json:"requester_id"`
 	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
 }
 
