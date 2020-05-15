@@ -64,7 +64,7 @@ func TestIncident_Create(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-func TestIncident_Manage(t *testing.T) {
+func TestIncident_Manage_status(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -91,6 +91,116 @@ func TestIncident_Manage(t *testing.T) {
 				Id:     "1",
 				Title:  "foo",
 				Status: "acknowledged",
+			},
+		},
+	}
+	res, err := client.ManageIncidents(from, input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_Manage_priority(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "priority": {"id": "PRIORITY_ID_HERE", "type": "priority_reference"}}]}`))
+	})
+	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	from := "foo@bar.com"
+
+	input := []ManageIncidentsOptions{
+		{
+			ID:   "1",
+			Type: "incident",
+			Priority: &APIReference{
+				ID:   "PRIORITY_ID_HERE",
+				Type: "priority_reference",
+			},
+		},
+	}
+
+	want := &ListIncidentsResponse{
+		APIListObject: listObj,
+		Incidents: []Incident{
+			{
+				Id:    "1",
+				Title: "foo",
+				Priority: &Priority{
+					APIObject: APIObject{
+						ID:   "PRIORITY_ID_HERE",
+						Type: "priority_reference",
+					},
+				},
+			},
+		},
+	}
+	res, err := client.ManageIncidents(from, input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_Manage_assignments(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "assignments": [{"assignee":{"id": "ASSIGNEE_ONE", "type": "user_reference"}},{"assignee":{"id": "ASSIGNEE_TWO", "type": "user_reference"}}]}]}`))
+	})
+	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	from := "foo@bar.com"
+
+	input := []ManageIncidentsOptions{
+		{
+			ID:   "1",
+			Type: "incident",
+			Assignments: []Assignee{
+				{
+					Assignee: APIObject{
+						ID:   "ASSIGNEE_ONE",
+						Type: "user_reference",
+					},
+				},
+				{
+					Assignee: APIObject{
+						ID:   "ASSIGNEE_TWO",
+						Type: "user_reference",
+					},
+				},
+			},
+		},
+	}
+
+	want := &ListIncidentsResponse{
+		APIListObject: listObj,
+		Incidents: []Incident{
+			{
+				Id:    "1",
+				Title: "foo",
+				Assignments: []Assignment{
+					{
+						Assignee: APIObject{
+							ID:   "ASSIGNEE_ONE",
+							Type: "user_reference",
+						},
+					},
+					{
+						Assignee: APIObject{
+							ID:   "ASSIGNEE_TWO",
+							Type: "user_reference",
+						},
+					},
+				},
 			},
 		},
 	}

@@ -139,9 +139,11 @@ type CreateIncidentOptions struct {
 
 // ManageIncidentsOptions is the structure used when PUTing updates to incidents to the ManageIncidents func
 type ManageIncidentsOptions struct {
-	ID     string `json:"id"`
-	Type   string `json:"type"`
-	Status string `json:"status"`
+	ID          string        `json:"id"`
+	Type        string        `json:"type"`
+	Status      string        `json:"status,omitempty"`
+	Priority    *APIReference `json:"priority,omitempty"`
+	Assignments []Assignee    `json:"assignments,omitempty"`
 }
 
 // MergeIncidentsOptions is the structure used when merging incidents with MergeIncidents func
