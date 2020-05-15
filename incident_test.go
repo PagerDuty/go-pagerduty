@@ -313,6 +313,42 @@ func TestIncident_ListIncidentAlerts(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+func TestIncident_ListIncidentAlertsWithOpts(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/alerts", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"alerts": [{"id": "1","summary":"foo"}]}`))
+	})
+	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	id := "1"
+
+	var alertOpts = ListIncidentAlertsOptions{
+		APIListObject: listObj,
+		Includes:      []string{},
+	}
+
+	res, err := client.ListIncidentAlertsWithOpts(id, alertOpts)
+
+	want := &ListAlertsResponse{
+		APIListObject: listObj,
+		Alerts: []IncidentAlert{
+			{
+				APIObject: APIObject{
+					ID:      "1",
+					Summary: "foo",
+				},
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
 
 // CreateIncidentNote
 func TestIncident_CreateIncidentNote(t *testing.T) {
