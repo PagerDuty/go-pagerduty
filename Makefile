@@ -25,7 +25,7 @@ install: build
 
 .PHONY: test
 test:
-	go test ./...
+	go test -v ./...
 
 deploy:
 	- curl -sL https://git.io/goreleaser | bash

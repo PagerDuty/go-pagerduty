@@ -1,5 +1,33 @@
 # Changelog
 
+## [v1.2.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.2.0) (2020-06-04)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.1.2...v1.2.0)
+
+**Closed issues:**
+
+- Allowing custom API endpoint in NewClient config [\#198](https://github.com/PagerDuty/go-pagerduty/issues/198)
+- service: SupportHours creation not supported [\#188](https://github.com/PagerDuty/go-pagerduty/issues/188)
+- The "Channel" field doesn't expose all possible data fields [\#153](https://github.com/PagerDuty/go-pagerduty/issues/153)
+
+**Merged pull requests:**
+
+- Adding Rulesets and Ruleset Rules [\#226](https://github.com/PagerDuty/go-pagerduty/pull/226) ([stmcallister](https://github.com/stmcallister))
+- Fix UpdateService [\#220](https://github.com/PagerDuty/go-pagerduty/pull/220) ([n-apalm](https://github.com/n-apalm))
+- Add support for modifying an incident status and assignees [\#219](https://github.com/PagerDuty/go-pagerduty/pull/219) ([raidancampbell](https://github.com/raidancampbell))
+- This should be requester\_id according to pagerduty docs [\#217](https://github.com/PagerDuty/go-pagerduty/pull/217) ([michael-bud](https://github.com/michael-bud))
+- adding since and until to incident logentry options [\#216](https://github.com/PagerDuty/go-pagerduty/pull/216) ([stmcallister](https://github.com/stmcallister))
+- User notification rules [\#215](https://github.com/PagerDuty/go-pagerduty/pull/215) ([heimweh](https://github.com/heimweh))
+- List incident alerts [\#214](https://github.com/PagerDuty/go-pagerduty/pull/214) ([kilianw](https://github.com/kilianw))
+- Bump golang to v1.14 [\#212](https://github.com/PagerDuty/go-pagerduty/pull/212) ([chenrui333](https://github.com/chenrui333))
+- adding NewClientWithAPIEndpoint function [\#210](https://github.com/PagerDuty/go-pagerduty/pull/210) ([stmcallister](https://github.com/stmcallister))
+- Webhook conforms to v2 struct [\#209](https://github.com/PagerDuty/go-pagerduty/pull/209) ([nbutton23](https://github.com/nbutton23))
+- Add Teams to Schedule [\#208](https://github.com/PagerDuty/go-pagerduty/pull/208) ([miekg](https://github.com/miekg))
+- adding Raw to LogEntry.Channel object [\#207](https://github.com/PagerDuty/go-pagerduty/pull/207) ([stmcallister](https://github.com/stmcallister))
+- Updating the Version constant to v1.1.2 [\#206](https://github.com/PagerDuty/go-pagerduty/pull/206) ([stmcallister](https://github.com/stmcallister))
+- updating changelog to v1.1.2 [\#205](https://github.com/PagerDuty/go-pagerduty/pull/205) ([stmcallister](https://github.com/stmcallister))
+- Adding OAuth token support [\#203](https://github.com/PagerDuty/go-pagerduty/pull/203) ([chrisforrette](https://github.com/chrisforrette))
+
 ## [v1.1.2](https://github.com/PagerDuty/go-pagerduty/tree/v1.1.2) (2020-02-21)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/1.1.1...v1.1.2)
@@ -41,7 +69,6 @@
 - Add support for extensions/extension schemas [\#193](https://github.com/PagerDuty/go-pagerduty/pull/193) ([heimweh](https://github.com/heimweh))
 - Added AlertGrouping and AlertGroupingTimeout to Service [\#189](https://github.com/PagerDuty/go-pagerduty/pull/189) ([toneill818](https://github.com/toneill818))
 - Adds oncall to escalation policy [\#183](https://github.com/PagerDuty/go-pagerduty/pull/183) ([ewilde](https://github.com/ewilde))
-- client: allow overriding the api endpoint [\#173](https://github.com/PagerDuty/go-pagerduty/pull/173) ([heimweh](https://github.com/heimweh))
 - Add ContactMethods operations [\#169](https://github.com/PagerDuty/go-pagerduty/pull/169) ([timlittle](https://github.com/timlittle))
 - return http code with errors [\#134](https://github.com/PagerDuty/go-pagerduty/pull/134) ([yomashExpel](https://github.com/yomashExpel))
 
@@ -71,6 +98,7 @@
 
 - Tests [\#190](https://github.com/PagerDuty/go-pagerduty/pull/190) ([stmcallister](https://github.com/stmcallister))
 - Modify ListOverrides and add ListOverridesResponse [\#185](https://github.com/PagerDuty/go-pagerduty/pull/185) ([dstevensio](https://github.com/dstevensio))
+- client: allow overriding the api endpoint [\#173](https://github.com/PagerDuty/go-pagerduty/pull/173) ([heimweh](https://github.com/heimweh))
 - Change makefiles and readme [\#172](https://github.com/PagerDuty/go-pagerduty/pull/172) ([dineshba](https://github.com/dineshba))
 - Use Go modules [\#168](https://github.com/PagerDuty/go-pagerduty/pull/168) ([nbutton23](https://github.com/nbutton23))
 - escalation\_policy: support clearing teams from an existing escalation policy [\#167](https://github.com/PagerDuty/go-pagerduty/pull/167) ([heimweh](https://github.com/heimweh))
