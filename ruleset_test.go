@@ -5,258 +5,52 @@ import (
 	"testing"
 )
 
-// ListUsers
-func TestUser_List(t *testing.T) {
+// List Rulesets
+func TestRuleset_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/rulesets/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"users": [{"id": "1"}]}`))
+		w.Write([]byte(`{"rulesets": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListUsersOptions{
-		APIListObject: listObj,
-		Query:         "foo",
-		TeamIDs:       []string{},
-		Includes:      []string{},
-	}
-	res, err := client.ListUsers(opts)
 
-	want := &ListUsersResponse{
-		APIListObject: listObj,
-		Users: []User{
-			{
-				APIObject: APIObject{
-					ID: "1",
-				},
-			},
-		},
-	}
-
+	res, err := client.ListRulesets()
 	if err != nil {
 		t.Fatal(err)
 	}
-	testEqual(t, want, res)
-}
-
-// Create User
-func TestUser_Create(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "POST")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	input := User{
-		Email: "foo@bar.com",
-	}
-	res, err := client.CreateUser(input)
-
-	want := &User{
-		APIObject: APIObject{
-			ID: "1",
-		},
-		Email: "foo@bar.com",
-	}
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEqual(t, want, res)
-}
-
-// Delete User
-func TestUser_Delete(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "DELETE")
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	id := "1"
-	err := client.DeleteUser(id)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-// Get User
-func TestUser_Get(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	userID := "1"
-	opts := GetUserOptions{
-		Includes: []string{},
-	}
-	res, err := client.GetUser(userID, opts)
-
-	want := &User{
-		APIObject: APIObject{
-			ID: "1",
-		},
-		Email: "foo@bar.com",
-	}
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEqual(t, want, res)
-}
-
-// Update
-func TestUser_Update(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	input := User{
-		APIObject: APIObject{
-			ID: "1",
-		},
-		Email: "foo@bar.com",
-	}
-	res, err := client.UpdateUser(input)
-
-	want := &User{
-		APIObject: APIObject{
-			ID: "1",
-		},
-		Email: "foo@bar.com",
-	}
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEqual(t, want, res)
-}
-
-// Get Current User
-func TestUser_GetCurrent(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/me", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	opts := GetCurrentUserOptions{
-		Includes: []string{},
-	}
-	res, err := client.GetCurrentUser(opts)
-
-	want := &User{
-		APIObject: APIObject{
-			ID: "1",
-		},
-		Email: "foo@bar.com",
-	}
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEqual(t, want, res)
-}
-
-// List User Contactmethods
-func TestUser_ListContactMethods(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		w.Write([]byte(`{"contact_methods": [{"id": "1"}]}`))
-	})
-
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	ID := "1"
-
-	res, err := client.ListUserContactMethods(ID)
-
-	want := &ListContactMethodsResponse{
-		APIListObject: listObj,
-		ContactMethods: []ContactMethod{
+	want := &ListRulesetsResponse{
+		Rulesets: []*Ruleset{
 			{
 				ID: "1",
 			},
 		},
 	}
 
-	if err != nil {
-		t.Fatal(err)
-	}
 	testEqual(t, want, res)
 }
 
-// Get user ContactMethod
-func TestUser_GetContactMethod(t *testing.T) {
+// Create Ruleset
+func TestUser_Ruleset(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		w.Write([]byte(`{"contact_method": {"id": "1"}}`))
-	})
-
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	methodID := "1"
-	userID := "1"
-
-	res, err := client.GetUserContactMethod(userID, methodID)
-
-	want := &ContactMethod{
-		ID: "1",
-	}
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEqual(t, want, res)
-}
-
-// Create user ContactMethod
-func TestUser_CreateContactMethod(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/rulesets", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
+		w.Write([]byte(`{"ruleset": {"id": "1", "name": "foo"}}`))
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	userID := "1"
-	contactMethod := ContactMethod{
-		Type: "email_contact_method",
+	input := &Ruleset{
+		Name: "foo",
 	}
-	res, err := client.CreateUserContactMethod(userID, contactMethod)
+	res, _, err := client.CreateRuleset(input)
 
-	want := &ContactMethod{
+	want := &Ruleset{
 		ID:   "1",
-		Type: "email_contact_method",
+		Name: "foo",
 	}
 
 	if err != nil {
@@ -265,51 +59,200 @@ func TestUser_CreateContactMethod(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-// Delete User Contactmethod
-func TestUser_DeleteContactMethod(t *testing.T) {
+// Get Ruleset
+func TestRuleset_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/rulesets/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	ruleSetID := "1"
+
+	res, _, err := client.GetRuleset(ruleSetID)
+
+	want := &Ruleset{
+		ID:   "1",
+		Name: "foo",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Update Ruleset
+func TestRuleset_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := &Ruleset{
+		ID:   "1",
+		Name: "foo",
+	}
+	res, _, err := client.UpdateRuleset(input)
+
+	want := &Ruleset{
+		ID:   "1",
+		Name: "foo",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Delete Ruleset
+func TestRuleset_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	userID := "1"
-	contactMethodID := "1"
-
-	err := client.DeleteUserContactMethod(userID, contactMethodID)
+	id := "1"
+	err := client.DeleteRuleset(id)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-// Update User ContactMethod
-func TestUser_UpdateContactMethod(t *testing.T) {
+// List Ruleset Rules
+func TestRuleset_ListRules(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
+	mux.HandleFunc("/rulesets/1/rules", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"rules": [{"id": "1"}]}`))
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	userID := "1"
-	contactMethod := ContactMethod{
-		ID:   "1",
-		Type: "email_contact_method",
-	}
-	res, err := client.UpdateUserContactMethod(userID, contactMethod)
 
-	want := &ContactMethod{
-		ID:   "1",
-		Type: "email_contact_method",
+	rulesetID := "1"
+	res, err := client.ListRulesetRules(rulesetID)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	want := &ListRulesetRulesResponse{
+		Rules: []*RulesetRule{
+			{
+				ID: "1",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
+
+// Get Ruleset Rule
+func TestRuleset_GetRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	rulesetID := "1"
+	ruleID := "1"
+	res, _, err := client.GetRulesetRule(rulesetID, ruleID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &RulesetRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Create Ruleset Rule
+func TestRuleset_CreateRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1/rules/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	rulesetID := "1"
+	rule := &RulesetRule{}
+
+	res, _, err := client.CreateRulesetRule(rulesetID, rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &RulesetRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Update Ruleset Rule
+func TestRuleset_UpdateRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	rulesetID := "1"
+	ruleID := "1"
+	rule := &RulesetRule{}
+
+	res, _, err := client.UpdateRulesetRule(rulesetID, ruleID, rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &RulesetRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Delete Ruleset Rule
+func TestRuleset_DeleteRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	ruleID := "1"
+	rulesetID := "1"
+
+	err := client.DeleteRulesetRule(rulesetID, ruleID)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	testEqual(t, want, res)
 }

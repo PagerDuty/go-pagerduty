@@ -29,24 +29,24 @@ type RulesetPayload struct {
 
 // ListRulesetsResponse represents a list response of rulesets.
 type ListRulesetsResponse struct {
-	Total    int        `json:"total,omitempty"`
+	Total    uint       `json:"total,omitempty"`
 	Rulesets []*Ruleset `json:"rulesets,omitempty"`
-	Offset   int        `json:"offset,omitempty"`
+	Offset   uint       `json:"offset,omitempty"`
 	More     bool       `json:"more,omitempty"`
-	Limit    int        `json:"limit,omitempty"`
+	Limit    uint       `json:"limit,omitempty"`
 }
 
 // RulesetRule represents a Ruleset rule
 type RulesetRule struct {
-	ID         string            `json:"id,omitempty"`
-	Position   int               `json:"position,omitempty"`
-	Disabled   bool              `json:"disabled,omitempty"`
-	Conditions *RuleConditions   `json:"conditions,omitempty"`
-	Actions    *RuleActions      `json:"actions,omitempty"`
-	Ruleset    *RulesetReference `json:"ruleset,omitempty"`
-	Self       string            `json:"self,omitempty"`
-	CatchAll   bool              `json:"catch_all,omitempty"`
-	TimeFrame  *RuleTimeFrame    `json:"time_frame,omitempty"`
+	ID         string          `json:"id,omitempty"`
+	Position   int             `json:"position,omitempty"`
+	Disabled   bool            `json:"disabled,omitempty"`
+	Conditions *RuleConditions `json:"conditions,omitempty"`
+	Actions    *RuleActions    `json:"actions,omitempty"`
+	Ruleset    *APIObject      `json:"ruleset,omitempty"`
+	Self       string          `json:"self,omitempty"`
+	CatchAll   bool            `json:"catch_all,omitempty"`
+	TimeFrame  *RuleTimeFrame  `json:"time_frame,omitempty"`
 }
 
 // RulesetRulePayload represents a payload for ruleset rules
@@ -94,11 +94,11 @@ type ActiveBetween struct {
 
 // ListRulesetRulesResponse represents a list of rules in a ruleset
 type ListRulesetRulesResponse struct {
-	Total  int            `json:"total,omitempty"`
+	Total  uint           `json:"total,omitempty"`
 	Rules  []*RulesetRule `json:"rules,omitempty"`
-	Offset int            `json:"offset,omitempty"`
+	Offset uint           `json:"offset,omitempty"`
 	More   bool           `json:"more,omitempty"`
-	Limit  int            `json:"limit,omitempty"`
+	Limit  uint           `json:"limit,omitempty"`
 }
 
 // RuleActions represents a rule action
@@ -132,23 +132,10 @@ type RuleActionExtraction struct {
 	Regex  string `json:"regex,omitempty"`
 }
 
-// ListRulesets lists the first page of rulesets of your PagerDuty account.
-func (c *Client) ListRulesets() (*ListRulesetsResponse, *http.Response, error) {
-	// v, err := query.Values(o)
-	// if err != nil {
-	// 	return nil, nil, err
-	// }
-	resp, err := c.get("/rulesets")
-	if err != nil {
-		return nil, nil, err
-	}
-	var result ListRulesetsResponse
-	return &result, resp, c.decodeJSON(resp, &result)
-}
-
-// ListAllRulesets gets all rulesets.
-func (c *Client) ListAllRulesets() ([]Ruleset, error) {
-	rulesets := make([]Ruleset, 0)
+// ListRulesets gets all rulesets.
+func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
+	rulesetResponse := new(ListRulesetsResponse)
+	rulesets := make([]*Ruleset, 0)
 
 	// Create a handler closure capable of parsing data from the rulesets endpoint
 	// and appending resultant rulesets to the return slice.
@@ -173,13 +160,14 @@ func (c *Client) ListAllRulesets() ([]Ruleset, error) {
 	if err := c.pagedGet("/rulesets/", responseHandler); err != nil {
 		return nil, err
 	}
+	rulesetResponse.Rulesets = rulesets
 
-	return rulesets, nil
+	return rulesetResponse, nil
 }
 
 // CreateRuleset creates a new user.
-func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *Response, error) {
-	data := make(map[string]Ruleset)
+func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
+	data := make(map[string]*Ruleset)
 	data["ruleset"] = r
 	resp, err := c.post("/rulesets", data, nil)
 	return getRulesetFromResponse(c, resp, err)
@@ -192,52 +180,44 @@ func (c *Client) DeleteRuleset(id string) error {
 }
 
 // GetRuleset gets details about a ruleset.
-func (c *Client) GetRuleset(id string) (*User, *Response, error) {
+func (c *Client) GetRuleset(id string) (*Ruleset, *http.Response, error) {
 	resp, err := c.get("/rulesets/" + id)
 	return getRulesetFromResponse(c, resp, err)
 }
 
 // UpdateRuleset updates a ruleset.
-func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, *Response, error) {
-	v := make(map[string]Ruleset)
+func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
+	v := make(map[string]*Ruleset)
 	v["ruleset"] = r
 	resp, err := c.put("/rulesets/"+r.ID, v, nil)
 	return getRulesetFromResponse(c, resp, err)
 }
 
-func getRulesetFromResponse(c *Client, resp *http.Response, err error) (*User, *Response, error) {
+func getRulesetFromResponse(c *Client, resp *http.Response, err error) (*Ruleset, *http.Response, error) {
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var target map[string]User
+	var target map[string]Ruleset
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	t, nodeOK := target["ruleset"]
 	if !nodeOK {
-		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return nil, nil, fmt.Errorf("JSON response does not have ruleset field")
 	}
 	return &t, resp, nil
 }
 
-// ListRulesetRules fetches rules of ruleset.
-func (c *Client) ListRulesetRules(rulesetID string) (*ListRulesetRulesResponse, *Response, error) {
-	resp, err := c.get("/rulesets/" + rulesetID + "/rules")
-	if err != nil {
-		return nil, err
-	}
-	var result ListRulesetRulesResponse
-	return &result, resp, c.decodeJSON(resp, &result)
-}
-
-// ListAllRulesetRules gets all rules for a ruleset.
-func (c *Client) ListAllRulesetRules(rulesetID) ([]RulesetRule, error) {
-	rules := make([]RulesetRule, 0)
+// ListRulesetRules gets all rules for a ruleset.
+func (c *Client) ListRulesetRules(rulesetID string) (*ListRulesetRulesResponse, error) {
+	rulesResponse := new(ListRulesetRulesResponse)
+	rules := make([]*RulesetRule, 0)
 
 	// Create a handler closure capable of parsing data from the ruleset rules endpoint
 	// and appending resultant ruleset rules to the return slice.
 	responseHandler := func(response *http.Response) (APIListObject, error) {
 		var result ListRulesetRulesResponse
+
 		if err := c.decodeJSON(response, &result); err != nil {
 			return APIListObject{}, err
 		}
@@ -254,53 +234,54 @@ func (c *Client) ListAllRulesetRules(rulesetID) ([]RulesetRule, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/rulesets/", responseHandler); err != nil {
+	if err := c.pagedGet("/rulesets/"+rulesetID+"/rules", responseHandler); err != nil {
 		return nil, err
 	}
+	rulesResponse.Rules = rules
 
-	return rulesets, nil
+	return rulesResponse, nil
 }
 
 // GetRulesetRule gets an event rule
-func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, *Response, error) {
+func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, *http.Response, error) {
 	resp, err := c.get("/rulesets/" + rulesetID + "/rules/" + ruleID)
 	return getRuleFromResponse(c, resp, err)
 }
 
 // DeleteRulesetRule deletes a rule.
 func (c *Client) DeleteRulesetRule(rulesetID, ruleID string) error {
-	_, err := c.get("/rulesets/" + rulesetID + "/rules/" + ruleID)
+	_, err := c.delete("/rulesets/" + rulesetID + "/rules/" + ruleID)
 	return err
 }
 
 // CreateRulesetRule creates a new rule for a ruleset.
-func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, *Response, error) {
-	data := make(map[string]RulesetRule)
+func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, *http.Response, error) {
+	data := make(map[string]*RulesetRule)
 	data["rule"] = rule
 	resp, err := c.post("/rulesets/"+rulesetID+"/rules/", data, nil)
 	return getRuleFromResponse(c, resp, err)
 }
 
 // UpdateRulesetRule updates a rule.
-func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *Response, error) {
-	v := make(map[string]RulesetRule)
+func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *http.Response, error) {
+	v := make(map[string]*RulesetRule)
 	v["rule"] = r
 	resp, err := c.put("/rulesets/"+rulesetID+"/rules/"+ruleID, v, nil)
 	return getRuleFromResponse(c, resp, err)
 }
 
-func getRuleFromResponse(c *Client, resp *http.Response, err error) (*RulesetRule, *Response, error) {
+func getRuleFromResponse(c *Client, resp *http.Response, err error) (*RulesetRule, *http.Response, error) {
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	var target map[string]RulesetRule
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 	rootNode := "rule"
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
 	return &t, resp, nil
 }
