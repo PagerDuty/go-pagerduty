@@ -33,7 +33,7 @@ func TestRuleset_List(t *testing.T) {
 }
 
 // Create Ruleset
-func TestUser_Ruleset(t *testing.T) {
+func TestRuleset_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
