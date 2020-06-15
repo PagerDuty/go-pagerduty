@@ -173,7 +173,7 @@ func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	return getRulesetFromResponse(c, resp, err)
 }
 
-// DeleteRuleset deletes a user.
+// DeleteRuleset deletes a ruleset.
 func (c *Client) DeleteRuleset(id string) error {
 	_, err := c.delete("/rulesets/" + id)
 	return err
