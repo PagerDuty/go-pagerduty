@@ -25,17 +25,22 @@ type Context struct {
 	Type string
 }
 
+// CommonLogEntryField is the list of shared log entry between Incident and LogEntry
+type CommonLogEntryField struct {
+	APIObject
+	CreatedAt              string            `json:"created_at,omitempty"`
+	Agent                  Agent             `json:"agent,omitempty"`
+	Channel                Channel           `json:"channel,omitempty"`
+	Teams                  []Team            `json:"teams,omitempty"`
+	Contexts               []Context         `json:"contexts,omitempty"`
+	AcknowledgementTimeout int               `json:"acknowledgement_timeout"`
+	EventDetails           map[string]string `json:"event_details,omitempty"`
+}
+
 // LogEntry is a list of all of the events that happened to an incident.
 type LogEntry struct {
-	APIObject
-	CreatedAt              string `json:"created_at"`
-	Agent                  Agent
-	Channel                Channel
-	Incident               Incident
-	Teams                  []Team
-	Contexts               []Context
-	AcknowledgementTimeout int `json:"acknowledgement_timeout"`
-	EventDetails           map[string]string
+	CommonLogEntryField
+	Incident Incident
 }
 
 // ListLogEntryResponse is the response data when calling the ListLogEntry API endpoint.
