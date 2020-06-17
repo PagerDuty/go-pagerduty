@@ -32,6 +32,35 @@ func TestRuleset_List(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+// List Rulesets
+func TestRuleset_List_WithOpts(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/rulesets/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testEqual(t, "limit=5&offset=3", r.URL.RawQuery)
+		w.Write([]byte(`{"rulesets": [{"id": "1"}]}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	o := APIListObject{Limit: 5, Offset: 3}
+	res, err := client.ListRulesetsWithOpts(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListRulesetsResponse{
+		Rulesets: []*Ruleset{
+			{
+				ID: "1",
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
+
 // Create Ruleset
 func TestRuleset_Create(t *testing.T) {
 	setup()

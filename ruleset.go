@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"fmt"
+	"github.com/google/go-querystring/query"
 	"net/http"
 )
 
@@ -132,37 +133,24 @@ type RuleActionExtraction struct {
 	Regex  string `json:"regex,omitempty"`
 }
 
-// ListRulesets gets all rulesets.
-func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
-	rulesetResponse := new(ListRulesetsResponse)
-	rulesets := make([]*Ruleset, 0)
-
-	// Create a handler closure capable of parsing data from the rulesets endpoint
-	// and appending resultant rulesets to the return slice.
-	responseHandler := func(response *http.Response) (APIListObject, error) {
-		var result ListRulesetsResponse
-		if err := c.decodeJSON(response, &result); err != nil {
-			return APIListObject{}, err
-		}
-
-		rulesets = append(rulesets, result.Rulesets...)
-
-		// Return stats on the current page. Caller can use this information to
-		// adjust for requesting additional pages.
-		return APIListObject{
-			More:   result.More,
-			Offset: result.Offset,
-			Limit:  result.Limit,
-		}, nil
-	}
-
-	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/rulesets/", responseHandler); err != nil {
+// ListRulesetsWithOpts get all rulesets with options
+func (c *Client) ListRulesetsWithOpts(o APIListObject) (*ListRulesetsResponse, error) {
+	v, err := query.Values(o)
+	if err != nil {
 		return nil, err
 	}
-	rulesetResponse.Rulesets = rulesets
+	resp, err := c.get("/rulesets?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
 
-	return rulesetResponse, nil
+	var result ListRulesetsResponse
+	return &result, c.decodeJSON(resp, &result)
+}
+
+// ListRulesets gets all rulesets.
+func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
+	return c.ListRulesetsWithOpts(APIListObject{})
 }
 
 // CreateRuleset creates a new user.
