@@ -3,6 +3,7 @@ package pagerduty
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -80,6 +81,7 @@ type Incident struct {
 	AlertCounts          AlertCounts       `json:"alert_counts,omitempty"`
 	Body                 IncidentBody      `json:"body,omitempty"`
 	IsMergeable          bool              `json:"is_mergeable,omitempty"`
+	ConferenceBridge     *ConferenceBridge `json:"conference_bridge,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
@@ -103,6 +105,12 @@ type ListIncidentsOptions struct {
 	TimeZone    string   `url:"time_zone,omitempty"`
 	SortBy      string   `url:"sort_by,omitempty"`
 	Includes    []string `url:"include,omitempty,brackets"`
+}
+
+// ConferenceBridge is a struct for the conference_bridge object on an incident
+type ConferenceBridge struct {
+	ConferenceNumber string `json:"conference_number,omitempty"`
+	ConferenceURL    string `json:"conference_url,omitempty"`
 }
 
 // ListIncidents lists existing incidents.
@@ -263,6 +271,16 @@ type IncidentAlert struct {
 	Integration APIObject              `json:"integration,omitempty"`
 }
 
+// IncidentAlertResponse is the response of a sincle incident alert
+type IncidentAlertResponse struct {
+	IncidentAlert *IncidentAlert `json:"alert,omitempty"`
+}
+
+// IncidentAlertList is the generic structure of a list of alerts
+type IncidentAlertList struct {
+	Alerts []IncidentAlert `json:"alerts,omitempty"`
+}
+
 // ListAlertsResponse is the response structure when calling the ListAlert API endpoint.
 type ListAlertsResponse struct {
 	APIListObject
@@ -386,21 +404,6 @@ func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptio
 	return &result, c.decodeJSON(resp, &result)
 }
 
-// Alert is a list of all of the alerts that happened to an incident.
-type Alert struct {
-	APIObject
-	Service   APIObject `json:"service,omitempty"`
-	CreatedAt string    `json:"created_at,omitempty"`
-	Status    string    `json:"status,omitempty"`
-	AlertKey  string    `json:"alert_key,omitempty"`
-	Incident  APIObject `json:"incident,omitempty"`
-}
-
-type ListAlertResponse struct {
-	APIListObject
-	Alerts []Alert `json:"alerts,omitempty"`
-}
-
 // IncidentResponders contains details about responders to an incident.
 type IncidentResponders struct {
 	State       string    `json:"state"`
@@ -460,4 +463,28 @@ func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*Respon
 	return result, err
 }
 
-/* TODO: Manage Alerts, Get Alert, Create Status Updates */
+// GetIncidentAlert
+func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
+	resp, err := c.get("/incidents/" + incidentID + "/alerts/" + alertID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := &IncidentAlertResponse{}
+	err = json.NewDecoder(resp.Body).Decode(result)
+	return result, resp, err
+}
+
+// ManageIncidentAlerts
+func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
+	headers := make(map[string]string)
+
+	resp, err := c.put("/incidents/"+incidentID+"/alerts/", alerts, &headers)
+	if err != nil {
+		return nil, nil, err
+	}
+	var result ListAlertsResponse
+	return &result, resp, c.decodeJSON(resp, &result)
+}
+
+/* TODO: Create Status Updates */

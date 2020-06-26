@@ -597,3 +597,71 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestIncident_GetAlert(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/alerts/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"alert": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	incidentID := "1"
+	alertID := "1"
+	res, _, err := client.GetIncidentAlert(incidentID, alertID)
+
+	want := &IncidentAlertResponse{
+		IncidentAlert: &IncidentAlert{
+			APIObject: APIObject{
+				ID: "1",
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+func TestIncident_ManageAlerts(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/alerts/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"alerts": [{"id": "1"}]}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	incidentID := "1"
+
+	input := &IncidentAlertList{
+		Alerts: []IncidentAlert{
+			{
+				APIObject: APIObject{
+					ID: "1",
+				},
+			},
+		},
+	}
+	res, _, err := client.ManageIncidentAlerts(incidentID, input)
+
+	want := &ListAlertsResponse{
+		Alerts: []IncidentAlert{
+			{
+				APIObject: APIObject{
+					ID: "1",
+				},
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
