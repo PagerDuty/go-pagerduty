@@ -474,9 +474,11 @@ func TestIncident_ListLogEntries(t *testing.T) {
 		APIListObject: listObj,
 		LogEntries: []LogEntry{
 			{
-				APIObject: APIObject{
-					ID:      "1",
-					Summary: "foo",
+				CommonLogEntryField: CommonLogEntryField{
+					APIObject: APIObject{
+						ID:      "1",
+						Summary: "foo",
+					},
 				},
 			},
 		},
@@ -514,9 +516,11 @@ func TestIncident_ListLogEntriesSinceUntil(t *testing.T) {
 		APIListObject: listObj,
 		LogEntries: []LogEntry{
 			{
-				APIObject: APIObject{
-					ID:      "1",
-					Summary: "foo",
+				CommonLogEntryField: CommonLogEntryField{
+					APIObject: APIObject{
+						ID:      "1",
+						Summary: "foo",
+					},
 				},
 			},
 		},

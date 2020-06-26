@@ -28,9 +28,11 @@ func TestLogEntry_List(t *testing.T) {
 		APIListObject: listObj,
 		LogEntries: []LogEntry{
 			{
-				APIObject: APIObject{
-					ID:      "1",
-					Summary: "foo",
+				CommonLogEntryField: CommonLogEntryField{
+					APIObject: APIObject{
+						ID:      "1",
+						Summary: "foo",
+					},
 				},
 			},
 		},
@@ -57,9 +59,11 @@ func TestLogEntry_Get(t *testing.T) {
 	res, err := client.GetLogEntry(id, opts)
 
 	want := &LogEntry{
-		APIObject: APIObject{
-			ID:      "1",
-			Summary: "foo",
+		CommonLogEntryField: CommonLogEntryField{
+			APIObject: APIObject{
+				ID:      "1",
+				Summary: "foo",
+			},
 		},
 	}
 
