@@ -392,8 +392,8 @@ type ListIncidentLogEntriesOptions struct {
 	Includes   []string `url:"include,omitempty,brackets"`
 	IsOverview bool     `url:"is_overview,omitempty"`
 	TimeZone   string   `url:"time_zone,omitempty"`
-	Since      string   `url:since,omitempty`
-	Until      string   `url:until,omitempty`
+	Since      string   `url:"since,omitempty"`
+	Until      string   `url:"until,omitempty"`
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.
@@ -439,19 +439,19 @@ type ResponderRequestTargets struct {
 
 // ResponderRequestOptions defines the input options for the Create Responder function.
 type ResponderRequestOptions struct {
-	From        string                   `json:"-"`
-	Message     string                   `json:"message"`
-	RequesterID string                   `json:"requester_id"`
-	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
+	From        string                    `json:"-"`
+	Message     string                    `json:"message"`
+	RequesterID string                    `json:"requester_id"`
+	Targets     []ResponderRequestTargets `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
 type ResponderRequest struct {
-	Incident    Incident                `json:"incident"`
-	Requester   User                    `json:"requester,omitempty"`
-	RequestedAt string                  `json:"request_at,omitempty"`
-	Message     string                  `json:"message,omitempty"`
-	Targets     ResponderRequestTargets `json:"responder_request_targets"`
+	Incident    Incident                  `json:"incident"`
+	Requester   User                      `json:"requester,omitempty"`
+	RequestedAt string                    `json:"request_at,omitempty"`
+	Message     string                    `json:"message,omitempty"`
+	Targets     []ResponderRequestTargets `json:"responder_request_targets"`
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.

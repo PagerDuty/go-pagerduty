@@ -27,6 +27,7 @@ type IncidentDetails struct {
 	Urgency              string            `json:"urgency"`
 	ResolveReason        *string           `json:"resolve_reason"`
 	AlertCounts          AlertCounts       `json:"alert_counts"`
+	Alerts               []WebhookAlert    `json:"alerts"`
 	Metadata             interface{}       `json:"metadata"`
 	Description          string            `json:"description"`
 }
@@ -40,9 +41,14 @@ type WebhookPayloadMessages struct {
 type WebhookPayload struct {
 	ID         string          `json:"id"`
 	Event      string          `json:"event"`
-	CreatedOn  time.Time       `json:"created_on`
+	CreatedOn  time.Time       `json:"created_on"`
 	Incident   IncidentDetails `json:"incident"`
 	LogEntries []LogEntry      `json:"log_entries"`
+}
+
+// WebhookAlert describes the alert of the incident
+type WebhookAlert struct {
+	AlertKey string `json:"alert_key"`
 }
 
 // DecodeWebhook decodes a webhook from a response object.

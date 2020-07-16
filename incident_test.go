@@ -573,7 +573,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 		From:        from,
 		Message:     "help",
 		RequesterID: "PL1JMK5",
-		Targets:     []ResponderRequestTarget{r},
+		Targets:     []ResponderRequestTargets{{r}},
 	}
 
 	user := User{}
@@ -591,7 +591,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   ResponderRequestTargets{target},
+			Targets:   []ResponderRequestTargets{{target}},
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
