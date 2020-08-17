@@ -74,6 +74,7 @@ type Service struct {
 	AlertCreation          string               `json:"alert_creation,omitempty"`
 	AlertGrouping          string               `json:"alert_grouping,omitempty"`
 	AlertGroupingTimeout   *uint                `json:"alert_grouping_timeout,omitempty"`
+	Metadata               interface{}          `json:"metadata,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
