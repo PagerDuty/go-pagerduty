@@ -39,7 +39,7 @@ type ListRulesetsResponse struct {
 // RulesetRule represents a Ruleset rule
 type RulesetRule struct {
 	ID         string          `json:"id,omitempty"`
-	Position   int             `json:"position,omitempty"`
+	Position   *int            `json:"position,omitempty"`
 	Disabled   bool            `json:"disabled,omitempty"`
 	Conditions *RuleConditions `json:"conditions,omitempty"`
 	Actions    *RuleActions    `json:"actions,omitempty"`
