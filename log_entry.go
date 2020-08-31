@@ -35,6 +35,7 @@ type CommonLogEntryField struct {
 	Contexts               []Context         `json:"contexts,omitempty"`
 	AcknowledgementTimeout int               `json:"acknowledgement_timeout"`
 	EventDetails           map[string]string `json:"event_details,omitempty"`
+	Assignees              []APIObject       `json:"assignees,omitempty"`
 }
 
 // LogEntry is a list of all of the events that happened to an incident.
