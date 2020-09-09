@@ -1,5 +1,22 @@
 # Changelog
 
+## [v1.3.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.3.0) (2020-09-08)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.2.0...v1.3.0)
+
+**Closed issues:**
+
+- `ListIncidents` pagination [\#238](https://github.com/PagerDuty/go-pagerduty/issues/238)
+
+**Merged pull requests:**
+
+- Fix ruleset rule not respecting position "0" [\#236](https://github.com/PagerDuty/go-pagerduty/pull/236) ([zane-deg](https://github.com/zane-deg))
+- Adding Get Incident Alert and Manage Incident Alert endpoints [\#231](https://github.com/PagerDuty/go-pagerduty/pull/231) ([stmcallister](https://github.com/stmcallister))
+- Add FirstTriggerLogEntry and CommonLogEntryField fields and json tags [\#230](https://github.com/PagerDuty/go-pagerduty/pull/230) ([afarbos](https://github.com/afarbos))
+- adding business_service and service_dependency [\#228](https://github.com/PagerDuty/go-pagerduty/pull/228) ([stmcallister](https://github.com/stmcallister))
+- update changelog for v1.2.0 [\#227](https://github.com/PagerDuty/go-pagerduty/pull/227) ([stmcallister](https://github.com/stmcallister))
+
+
 ## [v1.2.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.2.0) (2020-06-04)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.1.2...v1.2.0)
