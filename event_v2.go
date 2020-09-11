@@ -71,13 +71,13 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 }
 
 // ManageEvent handles the trigger, acknowledge, and resolve methods for an event
-func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, *http.Response, error) {
+func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
 	headers := make(map[string]string)
-	resp, err := c.put("/v2/enqueue", e, &headers)
+	resp, err := c.post("/v2/enqueue", e, &headers)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	result := &V2EventResponse{}
 	err = json.NewDecoder(resp.Body).Decode(result)
-	return result, resp, err
+	return result, err
 }
