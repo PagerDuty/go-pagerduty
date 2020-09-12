@@ -40,7 +40,7 @@ type Priority struct {
 	Description string `json:"description,omitempty"`
 }
 
-// Resolve reason is the data structure describing the reason an incident was resolved
+// ResolveReason is the data structure describing the reason an incident was resolved
 type ResolveReason struct {
 	Type     string    `json:"type,omitempty"`
 	Incident APIObject `json:"incident"`
@@ -52,6 +52,7 @@ type IncidentBody struct {
 	Details string `json:"details,omitempty"`
 }
 
+// Assignee is the datastructure containing data describing the assignee.
 type Assignee struct {
 	Assignee APIObject `json:"assignee"`
 }
@@ -354,7 +355,7 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	return err
 }
 
-// SnoozeIncidentSnoozeIncidentWithResponse sets an incident to not alert for a specified period of time.
+// SnoozeIncidentWithResponse sets an incident to not alert for a specified period of time.
 func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
 	data := make(map[string]uint)
 	data["duration"] = duration
@@ -392,8 +393,8 @@ type ListIncidentLogEntriesOptions struct {
 	Includes   []string `url:"include,omitempty,brackets"`
 	IsOverview bool     `url:"is_overview,omitempty"`
 	TimeZone   string   `url:"time_zone,omitempty"`
-	Since      string   `url:since,omitempty`
-	Until      string   `url:until,omitempty`
+	Since      string   `url:"since,omitempty"`
+	Until      string   `url:"until,omitempty"`
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.

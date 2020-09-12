@@ -40,7 +40,7 @@ type WebhookPayloadMessages struct {
 type WebhookPayload struct {
 	ID         string          `json:"id"`
 	Event      string          `json:"event"`
-	CreatedOn  time.Time       `json:"created_on`
+	CreatedOn  time.Time       `json:"created_on"`
 	Incident   IncidentDetails `json:"incident"`
 	LogEntries []LogEntry      `json:"log_entries"`
 }
