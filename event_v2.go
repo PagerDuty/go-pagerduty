@@ -73,7 +73,12 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 // ManageEvent handles the trigger, acknowledge, and resolve methods for an event
 func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
 	headers := make(map[string]string)
-	resp, err := c.post("/v2/enqueue", e, &headers)
+
+	data, err := json.Marshal(e)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.doWithEndpoint(c.v2EventsAPIEndpoint, "POST", "/v2/enqueue", false, bytes.NewBuffer(data), &headers)
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,7 @@ func TestEventV2_ManageEvent(t *testing.T) {
 		testMethod(t, r, "POST")
 		w.Write([]byte(`{"status": "ok", "dedup_key": "yes", "message": "ok"}`))
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	var client = &Client{v2EventsAPIEndpoint: server.URL, apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	evt := &V2Event{
 		RoutingKey: "abc123",
 	}
