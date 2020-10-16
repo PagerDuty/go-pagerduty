@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	apiEndpoint = "https://api.pagerduty.com"
+	apiEndpoint         = "https://api.pagerduty.com"
+	v2EventsAPIEndpoint = "https://events.pagerduty.com"
 )
 
 // The type of authentication to use with the API client
@@ -96,8 +97,9 @@ var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
 // Client wraps http client
 type Client struct {
-	authToken   string
-	apiEndpoint string
+	authToken           string
+	apiEndpoint         string
+	v2EventsAPIEndpoint string
 
 	// Authentication type to use for API
 	authType authType
@@ -111,10 +113,11 @@ type Client struct {
 // NewClient creates an API client using an account/user API token
 func NewClient(authToken string, options ...ClientOptions) *Client {
 	client := Client{
-		authToken:   authToken,
-		apiEndpoint: apiEndpoint,
-		authType:    apiToken,
-		HTTPClient:  defaultHTTPClient,
+		authToken:           authToken,
+		apiEndpoint:         apiEndpoint,
+		v2EventsAPIEndpoint: v2EventsAPIEndpoint,
+		authType:            apiToken,
+		HTTPClient:          defaultHTTPClient,
 	}
 
 	for _, opt := range options {
@@ -136,6 +139,13 @@ type ClientOptions func(*Client)
 func WithAPIEndpoint(endpoint string) ClientOptions {
 	return func(c *Client) {
 		c.apiEndpoint = endpoint
+	}
+}
+
+// WithV2EventsAPIEndpoint allows for a custom V2 Events API endpoint to be passed into the client
+func WithV2EventsAPIEndpoint(endpoint string) ClientOptions {
+	return func(c *Client) {
+		c.v2EventsAPIEndpoint = endpoint
 	}
 }
 
@@ -174,27 +184,34 @@ func (c *Client) get(path string) (*http.Response, error) {
 	return c.do("GET", path, nil, nil)
 }
 
-func (c *Client) do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
-	endpoint := c.apiEndpoint + path
-	req, _ := http.NewRequest(method, endpoint, body)
+// needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
+func (c *Client) doWithEndpoint(endpoint, method, path string, authRequired bool, body io.Reader, headers *map[string]string) (*http.Response, error) {
+	req, _ := http.NewRequest(method, endpoint+path, body)
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
 	if headers != nil {
 		for k, v := range *headers {
 			req.Header.Set(k, v)
 		}
 	}
+
+	if authRequired {
+		switch c.authType {
+		case oauthToken:
+			req.Header.Set("Authorization", "Bearer "+c.authToken)
+		default:
+			req.Header.Set("Authorization", "Token token="+c.authToken)
+		}
+	}
+
 	req.Header.Set("User-Agent", "go-pagerduty/"+Version)
 	req.Header.Set("Content-Type", "application/json")
 
-	switch c.authType {
-	case oauthToken:
-		req.Header.Set("Authorization", "Bearer "+c.authToken)
-	default:
-		req.Header.Set("Authorization", "Token token="+c.authToken)
-	}
-
 	resp, err := c.HTTPClient.Do(req)
 	return c.checkResponse(resp, err)
+}
+
+func (c *Client) do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
+	return c.doWithEndpoint(c.apiEndpoint, method, path, true, body, headers)
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
