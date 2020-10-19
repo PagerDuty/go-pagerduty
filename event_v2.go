@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// Event includes the incident/alert details
+// V2Event includes the incident/alert details
 type V2Event struct {
 	RoutingKey string        `json:"routing_key"`
 	Action     string        `json:"event_action"`
@@ -20,7 +20,7 @@ type V2Event struct {
 	Payload    *V2Payload    `json:"payload,omitempty"`
 }
 
-// Payload represents the individual event details for an event
+// V2Payload represents the individual event details for an event
 type V2Payload struct {
 	Summary   string      `json:"summary"`
 	Source    string      `json:"source"`
@@ -32,7 +32,7 @@ type V2Payload struct {
 	Details   interface{} `json:"custom_details,omitempty"`
 }
 
-// Response is the json response body for an event
+// V2EventResponse is the json response body for an event
 type V2EventResponse struct {
 	Status   string   `json:"status,omitempty"`
 	DedupKey string   `json:"dedup_key,omitempty"`
@@ -68,4 +68,21 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 		return nil, err
 	}
 	return &eventResponse, nil
+}
+
+// ManageEvent handles the trigger, acknowledge, and resolve methods for an event
+func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
+	headers := make(map[string]string)
+
+	data, err := json.Marshal(e)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.doWithEndpoint(c.v2EventsAPIEndpoint, "POST", "/v2/enqueue", false, bytes.NewBuffer(data), &headers)
+	if err != nil {
+		return nil, err
+	}
+	result := &V2EventResponse{}
+	err = json.NewDecoder(resp.Body).Decode(result)
+	return result, err
 }
