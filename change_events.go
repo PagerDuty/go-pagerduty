@@ -19,10 +19,10 @@ type ChangeEvent struct {
 // Payload ChangeEvent Payload
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#example-request-payload
 type Payload struct {
-	Source        string      `json:"source"`
-	Summary       string      `json:"summary"`
-	Timestamp     string      `json:"timestamp"`
-	CustomDetails interface{} `json:"custom_details"`
+	Source        string                 `json:"source"`
+	Summary       string                 `json:"summary"`
+	Timestamp     string                 `json:"timestamp"`
+	CustomDetails map[string]interface{} `json:"custom_details"`
 }
 
 // Link represents a single link in a ChangeEvent

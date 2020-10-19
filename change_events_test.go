@@ -38,7 +38,7 @@ func TestChangeEvent_Create(t *testing.T) {
 		Message: "Change event processed",
 	}
 
-	eventDetails := map[string]string{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
+	eventDetails := map[string]interface{}{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
 	ce := ChangeEvent{
 		RoutingKey: "a0000000aa0000a0a000aa0a0a0aa000",
 		Payload: Payload{
@@ -89,7 +89,7 @@ func TestChangeEvent_CreateWithPayloadVerification(t *testing.T) {
 		HTTPClient:          defaultHTTPClient,
 	}
 
-	eventDetails := map[string]string{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
+	eventDetails := map[string]interface{}{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
 	ce := ChangeEvent{
 		RoutingKey: "a0000000aa0000a0a000aa0a0a0aa000",
 		Payload: Payload{
