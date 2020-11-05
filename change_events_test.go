@@ -41,13 +41,13 @@ func TestChangeEvent_Create(t *testing.T) {
 	eventDetails := map[string]interface{}{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
 	ce := ChangeEvent{
 		RoutingKey: "a0000000aa0000a0a000aa0a0a0aa000",
-		Payload: Payload{
+		Payload: ChangeEventPayload{
 			Source:        "Test runner",
 			Summary:       "Summary can't be blank",
 			Timestamp:     "2020-10-19T03:06:16.318Z",
 			CustomDetails: eventDetails,
 		},
-		Links: []Link{
+		Links: []ChangeEventLink{
 			{
 				Href: "https://acme.pagerduty.dev/build/2",
 				Text: "View more details in Acme!",
@@ -92,13 +92,13 @@ func TestChangeEvent_CreateWithPayloadVerification(t *testing.T) {
 	eventDetails := map[string]interface{}{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
 	ce := ChangeEvent{
 		RoutingKey: "a0000000aa0000a0a000aa0a0a0aa000",
-		Payload: Payload{
+		Payload: ChangeEventPayload{
 			Source:        "Test runner",
 			Summary:       "Summary can't be blank",
 			Timestamp:     "2020-10-19T03:06:16.318Z",
 			CustomDetails: eventDetails,
 		},
-		Links: []Link{
+		Links: []ChangeEventLink{
 			{
 				Href: "https://acme.pagerduty.dev/build/2",
 				Text: "View more details in Acme!",

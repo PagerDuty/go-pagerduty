@@ -6,28 +6,28 @@ import (
 	"errors"
 )
 
-const ChangeEventPath = "/v2/change/enqueue"
+const changeEventPath = "/v2/change/enqueue"
 
 // ChangeEvent represents a ChangeEvent's request parameters
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#parameters
 type ChangeEvent struct {
-	RoutingKey string  `json:"routing_key"`
-	Payload    Payload `json:"payload"`
-	Links      []Link  `json:"links"`
+	RoutingKey string             `json:"routing_key"`
+	Payload    ChangeEventPayload `json:"payload"`
+	Links      []ChangeEventLink  `json:"links"`
 }
 
-// Payload ChangeEvent Payload
+// ChangeEventPayload ChangeEvent ChangeEventPayload
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#example-request-payload
-type Payload struct {
+type ChangeEventPayload struct {
 	Source        string                 `json:"source"`
 	Summary       string                 `json:"summary"`
 	Timestamp     string                 `json:"timestamp"`
 	CustomDetails map[string]interface{} `json:"custom_details"`
 }
 
-// Link represents a single link in a ChangeEvent
+// ChangeEventLink represents a single link in a ChangeEvent
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#the-links-property
-type Link struct {
+type ChangeEventLink struct {
 	Href string `json:"href"`
 	Text string `json:"text"`
 }
@@ -57,7 +57,7 @@ func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) 
 	resp, err := c.doWithEndpoint(
 		c.v2EventsAPIEndpoint,
 		"POST",
-		ChangeEventPath,
+		changeEventPath,
 		false,
 		bytes.NewBuffer(data),
 		&headers,
