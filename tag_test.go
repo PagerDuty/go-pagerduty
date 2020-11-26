@@ -12,7 +12,7 @@ func TestTag_List(t *testing.T) {
 
 	mux.HandleFunc("/tags/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"tags": [{"id": "1"}]}`))
+		w.Write([]byte(`{"tags": [{"id": "1","label":"MyTag"}]}`))
 	})
 
 	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
@@ -30,6 +30,7 @@ func TestTag_List(t *testing.T) {
 				APIObject: APIObject{
 					ID: "1",
 				},
+				Label: "MyTag",
 			},
 		},
 	}
@@ -44,12 +45,12 @@ func TestTag_Create(t *testing.T) {
 
 	mux.HandleFunc("/tags", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"tag": {"id": "1","name":"foo"}}`))
+		w.Write([]byte(`{"tag": {"id": "1","Label":"foo"}}`))
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &Tag{
-		Name: "foo",
+		Label: "foo",
 	}
 	res, _, err := client.CreateTag(input)
 
@@ -57,7 +58,7 @@ func TestTag_Create(t *testing.T) {
 		APIObject: APIObject{
 			ID: "1",
 		},
-		Name: "foo",
+		Label: "foo",
 	}
 
 	if err != nil {
@@ -91,7 +92,7 @@ func TestTag_Get(t *testing.T) {
 
 	mux.HandleFunc("/tags/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"tag": {"id": "1","name":"foo"}}`))
+		w.Write([]byte(`{"tag": {"id": "1","label":"foo"}}`))
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
@@ -102,7 +103,7 @@ func TestTag_Get(t *testing.T) {
 		APIObject: APIObject{
 			ID: "1",
 		},
-		Name: "foo",
+		Label: "foo",
 	}
 
 	if err != nil {

@@ -10,8 +10,7 @@ import (
 // Tag is a way to label user, team and escalation policies in PagerDuty
 type Tag struct {
 	APIObject
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Label string `json:"label,omitempty"`
 }
 
 // ListTagResponse is the structure used when calling the ListTags API endpoint.
