@@ -540,25 +540,27 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	mux.HandleFunc("/incidents/"+id+"/responder_requests", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.Write([]byte(`{
-	"responder_request": {
-		"requester": {
-			"id": "PL1JMK5",
-			"type": "user_reference"
-		},
-		"message": "Help",
-		"responder_request_targets": {
-			"responder_request_target": {
-				"id": "PJ25ZYX",
-				"type": "user_reference",
-				"incident_responders": {
-					"state": "pending",
-					"user": {
-						"id": "PJ25ZYX"
-					}
-				}
-			}
-		}
-	}
+  "responder_request": {
+    "requester": {
+      "id": "PL1JMK5",
+      "type": "user_reference"
+    },
+    "message": "Help",
+    "responder_request_targets": [
+      {
+        "responder_request_target": {
+          "id": "PJ25ZYX",
+          "type": "user_reference",
+          "incident_responders": {
+            "state": "pending",
+            "user": {
+              "id": "PJ25ZYX"
+            }
+          }
+        }
+      }
+    ]
+  }
 }`))
 
 	})
@@ -591,7 +593,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   ResponderRequestTargets{target},
+			Targets:   []ResponderRequestTargets{{Target: target}},
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
