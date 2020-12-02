@@ -106,8 +106,10 @@ func (c *Client) DeleteBusinessService(ID string) error {
 // UpdateBusinessService updates a business_service.
 func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
 	v := make(map[string]*BusinessService)
+	id := b.ID
+	b.ID = ""
 	v["business_service"] = b
-	resp, err := c.put("/business_services/"+b.ID, v, nil)
+	resp, err := c.put("/business_services/"+id, v, nil)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
