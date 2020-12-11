@@ -45,9 +45,7 @@ func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServic
 
 // AssociateServiceDependencies Create new dependencies between two services.
 func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	data := make(map[string]*ListServiceDependencies)
-	data["relationships"] = dependencies
-	resp, err := c.post("/service_dependencies/associate", data, nil)
+	resp, err := c.post("/service_dependencies/associate", dependencies, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -57,9 +55,7 @@ func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependenc
 
 // DisassociateServiceDependencies Disassociate dependencies between two services.
 func (c *Client) DisassociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	data := make(map[string]*ListServiceDependencies)
-	data["relationships"] = dependencies
-	resp, err := c.post("/service_dependencies/disassociate", data, nil)
+	resp, err := c.post("/service_dependencies/disassociate", dependencies, nil)
 	if err != nil {
 		return nil, nil, err
 	}
