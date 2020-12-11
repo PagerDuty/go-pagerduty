@@ -107,7 +107,7 @@ type RuleActions struct {
 	Annotate    *RuleActionParameter    `json:"annotate,omitempty"`
 	Severity    *RuleActionParameter    `json:"severity,omitempty"`
 	Priority    *RuleActionParameter    `json:"priority,omitempty"`
-	Route       *RuleActionParameter    `json:"route,omitempty"`
+	Route       *RuleActionParameter    `json:"route"`
 	EventAction *RuleActionParameter    `json:"event_action,omitempty"`
 	Extractions []*RuleActionExtraction `json:"extractions,omitempty"`
 }
