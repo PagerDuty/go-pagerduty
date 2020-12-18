@@ -58,22 +58,36 @@ type IncidentUrgencyRule struct {
 // Service represents something you monitor (like a web service, email service, or database service).
 type Service struct {
 	APIObject
-	Name                   string               `json:"name,omitempty"`
-	Description            string               `json:"description,omitempty"`
-	AutoResolveTimeout     *uint                `json:"auto_resolve_timeout"`
-	AcknowledgementTimeout *uint                `json:"acknowledgement_timeout"`
-	CreateAt               string               `json:"created_at,omitempty"`
-	Status                 string               `json:"status,omitempty"`
-	LastIncidentTimestamp  string               `json:"last_incident_timestamp,omitempty"`
-	Integrations           []Integration        `json:"integrations,omitempty"`
-	EscalationPolicy       EscalationPolicy     `json:"escalation_policy,omitempty"`
-	Teams                  []Team               `json:"teams,omitempty"`
-	IncidentUrgencyRule    *IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
-	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
-	ScheduledActions       []ScheduledAction    `json:"scheduled_actions"`
-	AlertCreation          string               `json:"alert_creation,omitempty"`
-	AlertGrouping          string               `json:"alert_grouping,omitempty"`
-	AlertGroupingTimeout   *uint                `json:"alert_grouping_timeout,omitempty"`
+	Name                    string                   `json:"name,omitempty"`
+	Description             string                   `json:"description,omitempty"`
+	AutoResolveTimeout      *uint                    `json:"auto_resolve_timeout"`
+	AcknowledgementTimeout  *uint                    `json:"acknowledgement_timeout"`
+	CreateAt                string                   `json:"created_at,omitempty"`
+	Status                  string                   `json:"status,omitempty"`
+	LastIncidentTimestamp   string                   `json:"last_incident_timestamp,omitempty"`
+	Integrations            []Integration            `json:"integrations,omitempty"`
+	EscalationPolicy        EscalationPolicy         `json:"escalation_policy,omitempty"`
+	Teams                   []Team                   `json:"teams,omitempty"`
+	IncidentUrgencyRule     *IncidentUrgencyRule     `json:"incident_urgency_rule,omitempty"`
+	SupportHours            *SupportHours            `json:"support_hours,omitempty"`
+	ScheduledActions        []ScheduledAction        `json:"scheduled_actions"`
+	AlertCreation           string                   `json:"alert_creation,omitempty"`
+	AlertGrouping           string                   `json:"alert_grouping,omitempty"`
+	AlertGroupingTimeout    *uint                    `json:"alert_grouping_timeout,omitempty"`
+	AlertGroupingParameters *AlertGroupingParameters `json:"alert_grouping_parameters,omitempty"`
+}
+
+// AlertGroupingParameters defines how alerts on the servicewill be automatically grouped into incidents
+type AlertGroupingParameters struct {
+	Type   string                 `json:"type"`
+	Config AlertGroupParamsConfig `json:"config"`
+}
+
+// AlertGroupParamsConfig is the config object on alert_grouping_parameters
+type AlertGroupParamsConfig struct {
+	Timeout   uint     `json:"timeout,omitempty"`
+	Aggregate string   `json:"aggregate,omitempty"`
+	Fields    []string `json:"fields,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
