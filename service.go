@@ -69,7 +69,7 @@ type Service struct {
 	EscalationPolicy        EscalationPolicy         `json:"escalation_policy,omitempty"`
 	Teams                   []Team                   `json:"teams,omitempty"`
 	IncidentUrgencyRule     *IncidentUrgencyRule     `json:"incident_urgency_rule,omitempty"`
-	SupportHours            *SupportHours            `json:"support_hours,omitempty"`
+	SupportHours            *SupportHours            `json:"support_hours"`
 	ScheduledActions        []ScheduledAction        `json:"scheduled_actions"`
 	AlertCreation           string                   `json:"alert_creation,omitempty"`
 	AlertGrouping           string                   `json:"alert_grouping,omitempty"`
