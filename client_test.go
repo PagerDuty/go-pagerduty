@@ -42,20 +42,20 @@ func testEqual(t *testing.T, expected interface{}, actual interface{}) {
 }
 
 func TestGetBasePrefix(t *testing.T) {
-  var testTable = []struct {
-      in string
-      out string
-  }{
-      {"base.com/noparams", "base.com/noparams?"},
-      {"base.com/?/noparams", "base.com/?/noparams?"},
-      {"base.com/params?value=1", "base.com/params?value=1&"},
-      {"base.com/?/params?value=1", "base.com/?/params?value=1&"},
-      {"noslashes", "noslashes?"}, // this is what it will do... tbd what it should actually do
-  }
-  for _, tt := range testTable {
-    s := getBasePrefix(tt.in)
-    if s != tt.out {
-      t.Errorf("got %q, want %q", s, tt.out)
-    }
-  }
+	var testTable = []struct {
+		in  string
+		out string
+	}{
+		{"base.com/noparams", "base.com/noparams?"},
+		{"base.com/?/noparams", "base.com/?/noparams?"},
+		{"base.com/params?value=1", "base.com/params?value=1&"},
+		{"base.com/?/params?value=1", "base.com/?/params?value=1&"},
+		{"noslashes", "noslashes?"}, // this is what it will do... tbd what it should actually do
+	}
+	for _, tt := range testTable {
+		s := getBasePrefix(tt.in)
+		if s != tt.out {
+			t.Errorf("got %q, want %q", s, tt.out)
+		}
+	}
 }
