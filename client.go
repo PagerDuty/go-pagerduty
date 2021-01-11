@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+  "regexp"
 	"io"
 	"net"
 	"net/http"
@@ -247,6 +248,19 @@ func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error)
 	return &s, nil
 }
 
+// Helper function to determine wither additional parameters should use ? or & to append args
+func getBasePrefix(basePath string) string {
+ var conjunction string
+  // check to see if there are already arguments in basePath (look for ? in path)
+  re := regexp.MustCompile(".*/[^/]*\\?[^/]*$")
+  if re.Match([]byte(basePath)) {
+    conjunction = "&"
+  } else {
+    conjunction = "?"
+  }
+  return fmt.Sprintf("%s%s", basePath, conjunction)
+}
+
 // responseHandler is capable of parsing a response. At a minimum it must
 // extract the page information for the current page. It can also execute
 // additional necessary handling; for example, if a closure, it has access
@@ -261,9 +275,10 @@ func (c *Client) pagedGet(basePath string, handler responseHandler) error {
 	// Offset to set for the next page request.
 	var nextOffset uint
 
+  basePrefix := getBasePrefix(basePath)
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
-		response, err := c.do("GET", fmt.Sprintf("%s?offset=%d", basePath, nextOffset), nil, nil)
+		response, err := c.do("GET", fmt.Sprintf("%soffset=%d", basePrefix, nextOffset), nil, nil)
 		if err != nil {
 			return err
 		}

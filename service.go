@@ -120,6 +120,34 @@ func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error
 	return &result, c.decodeJSON(resp, &result)
 }
 
+// ListServices lists existing services processing paginated responses
+func (c *Client) ListServicesPaginated(o ListServiceOptions) ([]Service, error) {
+  services := make([]Service, 0)
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+  responseHandler := func(response *http.Response) (APIListObject, error) {
+    var result ListServiceResponse
+    if err := c.decodeJSON(response, &result); err != nil {
+      return APIListObject{}, err
+    }
+
+    services = append(services, result.Services...)
+
+    return APIListObject {
+        More: result.More,
+        Offset: result.Offset,
+        Limit: result.Limit,
+    }, nil
+  }
+	if err := c.pagedGet("/services?" + v.Encode(), responseHandler); err != nil {
+		return nil, err
+	}
+	return services, nil
+}
+
+
 // GetServiceOptions is the data structure used when calling the GetService API endpoint.
 type GetServiceOptions struct {
 	Includes []string `url:"include,brackets,omitempty"`
