@@ -26,6 +26,13 @@ type ListTeamOptions struct {
 	Query string `url:"query,omitempty"`
 }
 
+// AddUserToTeamOptions are the input parameters used when calling the AddUserToTeam API endpoint.
+type AddUserToTeamOptions struct {
+	TeamID string `json:"-"`
+	UserID string `json:"-"`
+	Role   string `json:"role,omitempty"`
+}
+
 // ListTeams lists teams of your PagerDuty account, optionally filtered by a search query.
 func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 	v, err := query.Values(o)
@@ -84,8 +91,8 @@ func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
 }
 
 // AddUserToTeam adds a user to a team.
-func (c *Client) AddUserToTeam(teamID, userID string) error {
-	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil, nil)
+func (c *Client) AddUserToTeam(options AddUserToTeamOptions) error {
+	_, err := c.put("/teams/"+options.TeamID+"/users/"+options.UserID, options, nil)
 	return err
 }
 

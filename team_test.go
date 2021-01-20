@@ -221,10 +221,11 @@ func TestTeam_AddUserToTeam(t *testing.T) {
 	})
 
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	teamID := "1"
-	userID := "1"
 
-	err := client.AddUserToTeam(teamID, userID)
+	err := client.AddUserToTeam(AddUserToTeamOptions{
+		TeamID: "1",
+		UserID: "1",
+	})
 
 	if err != nil {
 		t.Fatal(err)
