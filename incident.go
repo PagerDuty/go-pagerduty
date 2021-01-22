@@ -186,6 +186,25 @@ func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Inciden
 	return &ii.Incident, nil
 }
 
+// UpdateIncident updates an existing incident.
+func (c *Client) UpdateIncident(id string, i Incident) (*Incident, error) {
+	v := make(map[string]Incident)
+	v["incident"] = i
+	resp, e := c.put("/incidents/"+id, v, nil)
+
+	if e != nil {
+		return nil, e
+	}
+
+	var ii createIncidentResponse
+	e = json.NewDecoder(resp.Body).Decode(&ii)
+	if e != nil {
+		return nil, e
+	}
+
+	return &ii.Incident, nil
+}
+
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
 func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
 	data := make(map[string][]ManageIncidentsOptions)

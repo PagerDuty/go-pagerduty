@@ -64,6 +64,32 @@ func TestIncident_Create(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+func TestIncident_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"incident": {"title": "bar", "id": "1", "urgency": "low"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := &Incident{
+		Title: "bar",
+	}
+	want := &Incident{
+		Title:   "bar",
+		Id:      "1",
+		Urgency: "low",
+	}
+	res, err := client.UpdateIncident("1", *input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 func TestIncident_Manage_status(t *testing.T) {
 	setup()
 	defer teardown()
