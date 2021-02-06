@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -33,7 +34,7 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 		return nil, err
 	}
 
-	resp, err := c.get("/teams?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/teams?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -43,49 +44,49 @@ func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 
 // CreateTeam creates a new team.
 func (c *Client) CreateTeam(t *Team) (*Team, error) {
-	resp, err := c.post("/teams", t, nil)
+	resp, err := c.post(context.TODO(), "/teams", t, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 
 // DeleteTeam removes an existing team.
 func (c *Client) DeleteTeam(id string) error {
-	_, err := c.delete("/teams/" + id)
+	_, err := c.delete(context.TODO(), "/teams/"+id)
 	return err
 }
 
 // GetTeam gets details about an existing team.
 func (c *Client) GetTeam(id string) (*Team, error) {
-	resp, err := c.get("/teams/" + id)
+	resp, err := c.get(context.TODO(), "/teams/"+id)
 	return getTeamFromResponse(c, resp, err)
 }
 
 // UpdateTeam updates an existing team.
 func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
-	resp, err := c.put("/teams/"+id, t, nil)
+	resp, err := c.put(context.TODO(), "/teams/"+id, t, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 
 // RemoveEscalationPolicyFromTeam removes an escalation policy from a team.
 func (c *Client) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
-	_, err := c.delete("/teams/" + teamID + "/escalation_policies/" + epID)
+	_, err := c.delete(context.TODO(), "/teams/"+teamID+"/escalation_policies/"+epID)
 	return err
 }
 
 // AddEscalationPolicyToTeam adds an escalation policy to a team.
 func (c *Client) AddEscalationPolicyToTeam(teamID, epID string) error {
-	_, err := c.put("/teams/"+teamID+"/escalation_policies/"+epID, nil, nil)
+	_, err := c.put(context.TODO(), "/teams/"+teamID+"/escalation_policies/"+epID, nil, nil)
 	return err
 }
 
 // RemoveUserFromTeam removes a user from a team.
 func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
-	_, err := c.delete("/teams/" + teamID + "/users/" + userID)
+	_, err := c.delete(context.TODO(), "/teams/"+teamID+"/users/"+userID)
 	return err
 }
 
 // AddUserToTeam adds a user to a team.
 func (c *Client) AddUserToTeam(teamID, userID string) error {
-	_, err := c.put("/teams/"+teamID+"/users/"+userID, nil, nil)
+	_, err := c.put(context.TODO(), "/teams/"+teamID+"/users/"+userID, nil, nil)
 	return err
 }
 
@@ -131,7 +132,7 @@ func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersR
 		return nil, err
 	}
 
-	resp, err := c.get("/teams/" + teamID + "/members?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/teams/"+teamID+"/members?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +164,7 @@ func (c *Client) ListAllMembers(teamID string) ([]Member, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/teams/"+teamID+"/members", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/teams/"+teamID+"/members", responseHandler); err != nil {
 		return nil, err
 	}
 

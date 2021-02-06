@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -65,7 +66,7 @@ func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse,
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/log_entries?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -88,12 +89,12 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/log_entries/"+id+"?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
-	var result map[string]LogEntry
 
+	var result map[string]LogEntry
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
@@ -108,7 +109,6 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 // UnmarshalJSON Expands the LogEntry.Channel object to parse out a raw value
 func (c *Channel) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
-
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}

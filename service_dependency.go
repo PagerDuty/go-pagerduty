@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"net/http"
 )
 
@@ -25,7 +26,7 @@ type ListServiceDependencies struct {
 
 // ListBusinessServiceDependencies lists dependencies of a business service.
 func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.get("/service_dependencies/business_services/" + businessServiceID)
+	resp, err := c.get(context.TODO(), "/service_dependencies/business_services/"+businessServiceID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -35,7 +36,7 @@ func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*Lis
 
 // ListTechnicalServiceDependencies lists dependencies of a technical service.
 func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.get("/service_dependencies/technical_services/" + serviceID)
+	resp, err := c.get(context.TODO(), "/service_dependencies/technical_services/"+serviceID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -45,7 +46,7 @@ func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServic
 
 // AssociateServiceDependencies Create new dependencies between two services.
 func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.post("/service_dependencies/associate", dependencies, nil)
+	resp, err := c.post(context.TODO(), "/service_dependencies/associate", dependencies, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -55,7 +56,7 @@ func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependenc
 
 // DisassociateServiceDependencies Disassociate dependencies between two services.
 func (c *Client) DisassociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.post("/service_dependencies/disassociate", dependencies, nil)
+	resp, err := c.post(context.TODO(), "/service_dependencies/disassociate", dependencies, nil)
 	if err != nil {
 		return nil, nil, err
 	}

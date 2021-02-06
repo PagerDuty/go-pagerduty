@@ -1,6 +1,8 @@
 package pagerduty
 
 import (
+	"context"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -35,7 +37,7 @@ func (c *Client) ListNotifications(o ListNotificationOptions) (*ListNotification
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/notifications?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/notifications?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}

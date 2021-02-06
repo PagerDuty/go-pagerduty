@@ -2,8 +2,10 @@ package pagerduty
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 )
 
 const changeEventPath = "/v2/change/enqueue"
@@ -55,8 +57,9 @@ func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) 
 	}
 
 	resp, err := c.doWithEndpoint(
+		context.TODO(),
 		c.v2EventsAPIEndpoint,
-		"POST",
+		http.MethodPost,
 		changeEventPath,
 		false,
 		bytes.NewBuffer(data),

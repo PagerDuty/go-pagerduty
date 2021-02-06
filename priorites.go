@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -18,15 +19,17 @@ type Priorities struct {
 
 // ListPriorities lists existing priorities
 func (c *Client) ListPriorities() (*Priorities, error) {
-	resp, e := c.get("/priorities")
-	if e != nil {
-		return nil, e
+	resp, err := c.get(context.TODO(), "/priorities")
+	if err != nil {
+		return nil, err
 	}
 
+	// TODO(theckman): make sure we close the resp.Body here
+
 	var p Priorities
-	e = json.NewDecoder(resp.Body).Decode(&p)
-	if e != nil {
-		return nil, e
+	err = json.NewDecoder(resp.Body).Decode(&p)
+	if err != nil {
+		return nil, err
 	}
 
 	return &p, nil

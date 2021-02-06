@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -156,37 +157,40 @@ func WithOAuth() ClientOptions {
 	}
 }
 
-func (c *Client) delete(path string) (*http.Response, error) {
-	return c.do("DELETE", path, nil, nil)
+func (c *Client) delete(ctx context.Context, path string) (*http.Response, error) {
+	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
 
-func (c *Client) put(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
-
+func (c *Client) put(ctx context.Context, path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
 	if payload != nil {
 		data, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		return c.do("PUT", path, bytes.NewBuffer(data), headers)
+		return c.do(ctx, http.MethodPut, path, bytes.NewBuffer(data), headers)
 	}
-	return c.do("PUT", path, nil, headers)
+	return c.do(ctx, http.MethodPut, path, nil, headers)
 }
 
-func (c *Client) post(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
+func (c *Client) post(ctx context.Context, path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	return c.do("POST", path, bytes.NewBuffer(data), headers)
+	return c.do(ctx, http.MethodPost, path, bytes.NewBuffer(data), headers)
 }
 
-func (c *Client) get(path string) (*http.Response, error) {
-	return c.do("GET", path, nil, nil)
+func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, path, nil, nil)
 }
 
 // needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
-func (c *Client) doWithEndpoint(endpoint, method, path string, authRequired bool, body io.Reader, headers *map[string]string) (*http.Response, error) {
-	req, _ := http.NewRequest(method, endpoint+path, body)
+func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers *map[string]string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build request: %w", err)
+	}
+
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
 	if headers != nil {
 		for k, v := range *headers {
@@ -210,8 +214,8 @@ func (c *Client) doWithEndpoint(endpoint, method, path string, authRequired bool
 	return c.checkResponse(resp, err)
 }
 
-func (c *Client) do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
-	return c.doWithEndpoint(c.apiEndpoint, method, path, true, body, headers)
+func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
+	return c.doWithEndpoint(ctx, c.apiEndpoint, method, path, true, body, headers)
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
@@ -254,7 +258,7 @@ func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error)
 // a specific slice. The responseHandler is responsible for closing the response.
 type responseHandler func(response *http.Response) (APIListObject, error)
 
-func (c *Client) pagedGet(basePath string, handler responseHandler) error {
+func (c *Client) pagedGet(ctx context.Context, basePath string, handler responseHandler) error {
 	// Indicates whether there are still additional pages associated with request.
 	var stillMore bool
 
@@ -263,7 +267,7 @@ func (c *Client) pagedGet(basePath string, handler responseHandler) error {
 
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
-		response, err := c.do("GET", fmt.Sprintf("%s?offset=%d", basePath, nextOffset), nil, nil)
+		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%s?offset=%d", basePath, nextOffset), nil, nil)
 		if err != nil {
 			return err
 		}

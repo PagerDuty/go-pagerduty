@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -41,7 +42,7 @@ func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListM
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/maintenance_windows?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/maintenance_windows?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (c *Client) CreateMaintenanceWindow(from string, o MaintenanceWindow) (*Mai
 	if from != "" {
 		headers["From"] = from
 	}
-	resp, err := c.post("/maintenance_windows", data, &headers)
+	resp, err := c.post(context.TODO(), "/maintenance_windows", data, &headers)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
@@ -70,7 +71,7 @@ func (c *Client) CreateMaintenanceWindows(o MaintenanceWindow) (*MaintenanceWind
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the future, or ends it if it's currently on-going.
 func (c *Client) DeleteMaintenanceWindow(id string) error {
-	_, err := c.delete("/maintenance_windows/" + id)
+	_, err := c.delete(context.TODO(), "/maintenance_windows/"+id)
 	return err
 }
 
@@ -85,13 +86,13 @@ func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/maintenance_windows/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/maintenance_windows/"+id+"?"+v.Encode())
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
 // UpdateMaintenanceWindow updates an existing maintenance window.
 func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
-	resp, err := c.put("/maintenance_windows/"+m.ID, m, nil)
+	resp, err := c.put(context.TODO(), "/maintenance_windows/"+m.ID, m, nil)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 

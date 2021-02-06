@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -125,7 +126,7 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/incidents?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/incidents?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +173,7 @@ func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Inciden
 	headers["From"] = from
 	data := make(map[string]*CreateIncidentOptions)
 	data["incident"] = o
-	resp, e := c.post("/incidents", data, &headers)
+	resp, e := c.post(context.TODO(), "/incidents", data, &headers)
 	if e != nil {
 		return nil, e
 	}
@@ -193,7 +194,7 @@ func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions
 	headers["From"] = from
 	data["incidents"] = incidents
 
-	resp, err := c.put("/incidents", data, &headers)
+	resp, err := c.put(context.TODO(), "/incidents", data, &headers)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +209,7 @@ func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeI
 	headers := make(map[string]string)
 	headers["From"] = from
 
-	resp, err := c.put("/incidents/"+id+"/merge", r, &headers)
+	resp, err := c.put(context.TODO(), "/incidents/"+id+"/merge", r, &headers)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +219,7 @@ func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeI
 
 // GetIncident shows detailed information about an incident.
 func (c *Client) GetIncident(id string) (*Incident, error) {
-	resp, err := c.get("/incidents/" + id)
+	resp, err := c.get(context.TODO(), "/incidents/"+id)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +249,7 @@ type CreateIncidentNoteResponse struct {
 
 // ListIncidentNotes lists existing notes for the specified incident.
 func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
-	resp, err := c.get("/incidents/" + id + "/notes")
+	resp, err := c.get(context.TODO(), "/incidents/"+id+"/notes")
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +313,7 @@ func (c *Client) ListIncidentAlertsWithOpts(id string, o ListIncidentAlertsOptio
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/incidents/" + id + "/alerts?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/incidents/"+id+"/alerts?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -328,7 +329,7 @@ func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*
 	headers["From"] = note.User.Summary
 
 	data["note"] = note
-	resp, err := c.post("/incidents/"+id+"/notes", data, &headers)
+	resp, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, &headers)
 	if err != nil {
 		return nil, err
 	}
@@ -348,9 +349,8 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	headers := make(map[string]string)
 	headers["From"] = note.User.Summary
-
 	data["note"] = note
-	_, err := c.post("/incidents/"+id+"/notes", data, &headers)
+	_, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, &headers)
 	return err
 }
 
@@ -358,7 +358,7 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	resp, err := c.post("/incidents/"+id+"/snooze", data, nil)
+	resp, err := c.post(context.TODO(), "/incidents/"+id+"/snooze", data, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +376,7 @@ func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident
 func (c *Client) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post("/incidents/"+id+"/snooze", data, nil)
+	_, err := c.post(context.TODO(), "/incidents/"+id+"/snooze", data, nil)
 	return err
 }
 
@@ -402,7 +402,7 @@ func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptio
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/incidents/" + id + "/log_entries?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/incidents/"+id+"/log_entries?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +459,7 @@ func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*Respon
 	headers := make(map[string]string)
 	headers["From"] = o.From
 
-	resp, err := c.post("/incidents/"+id+"/responder_requests", o, &headers)
+	resp, err := c.post(context.TODO(), "/incidents/"+id+"/responder_requests", o, &headers)
 	if err != nil {
 		return nil, err
 	}
@@ -471,7 +471,7 @@ func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*Respon
 
 // GetIncidentAlert
 func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
-	resp, err := c.get("/incidents/" + incidentID + "/alerts/" + alertID)
+	resp, err := c.get(context.TODO(), "/incidents/"+incidentID+"/alerts/"+alertID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -485,7 +485,7 @@ func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertRes
 func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
 	headers := make(map[string]string)
 
-	resp, err := c.put("/incidents/"+incidentID+"/alerts/", alerts, &headers)
+	resp, err := c.put(context.TODO(), "/incidents/"+incidentID+"/alerts/", alerts, &headers)
 	if err != nil {
 		return nil, nil, err
 	}
