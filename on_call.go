@@ -1,6 +1,8 @@
 package pagerduty
 
 import (
+	"context"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -39,7 +41,7 @@ func (c *Client) ListOnCalls(o ListOnCallOptions) (*ListOnCallsResponse, error) 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/oncalls?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/oncalls?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}

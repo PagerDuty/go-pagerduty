@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -94,7 +95,7 @@ func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/users?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/users?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +107,13 @@ func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 func (c *Client) CreateUser(u User) (*User, error) {
 	data := make(map[string]User)
 	data["user"] = u
-	resp, err := c.post("/users", data, nil)
+	resp, err := c.post(context.TODO(), "/users", data, nil)
 	return getUserFromResponse(c, resp, err)
 }
 
 // DeleteUser deletes a user.
 func (c *Client) DeleteUser(id string) error {
-	_, err := c.delete("/users/" + id)
+	_, err := c.delete(context.TODO(), "/users/"+id)
 	return err
 }
 
@@ -122,7 +123,7 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/users/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/users/"+id+"?"+v.Encode())
 	return getUserFromResponse(c, resp, err)
 }
 
@@ -130,7 +131,7 @@ func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 func (c *Client) UpdateUser(u User) (*User, error) {
 	v := make(map[string]User)
 	v["user"] = u
-	resp, err := c.put("/users/"+u.ID, v, nil)
+	resp, err := c.put(context.TODO(), "/users/"+u.ID, v, nil)
 	return getUserFromResponse(c, resp, err)
 }
 
@@ -140,7 +141,7 @@ func (c *Client) GetCurrentUser(o GetCurrentUserOptions) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/users/me?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/users/me?"+v.Encode())
 	return getUserFromResponse(c, resp, err)
 }
 
@@ -162,7 +163,7 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 
 // ListUserContactMethods fetches contact methods of the existing user.
 func (c *Client) ListUserContactMethods(userID string) (*ListContactMethodsResponse, error) {
-	resp, err := c.get("/users/" + userID + "/contact_methods")
+	resp, err := c.get(context.TODO(), "/users/"+userID+"/contact_methods")
 	if err != nil {
 		return nil, err
 	}
@@ -172,13 +173,13 @@ func (c *Client) ListUserContactMethods(userID string) (*ListContactMethodsRespo
 
 // GetUserContactMethod gets details about a contact method.
 func (c *Client) GetUserContactMethod(userID, contactMethodID string) (*ContactMethod, error) {
-	resp, err := c.get("/users/" + userID + "/contact_methods/" + contactMethodID)
+	resp, err := c.get(context.TODO(), "/users/"+userID+"/contact_methods/"+contactMethodID)
 	return getContactMethodFromResponse(c, resp, err)
 }
 
 // DeleteUserContactMethod deletes a user.
 func (c *Client) DeleteUserContactMethod(userID, contactMethodID string) error {
-	_, err := c.delete("/users/" + userID + "/contact_methods/" + contactMethodID)
+	_, err := c.delete(context.TODO(), "/users/"+userID+"/contact_methods/"+contactMethodID)
 	return err
 }
 
@@ -186,7 +187,7 @@ func (c *Client) DeleteUserContactMethod(userID, contactMethodID string) error {
 func (c *Client) CreateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
 	data := make(map[string]ContactMethod)
 	data["contact_method"] = cm
-	resp, err := c.post("/users/"+userID+"/contact_methods", data, nil)
+	resp, err := c.post(context.TODO(), "/users/"+userID+"/contact_methods", data, nil)
 	return getContactMethodFromResponse(c, resp, err)
 }
 
@@ -194,7 +195,7 @@ func (c *Client) CreateUserContactMethod(userID string, cm ContactMethod) (*Cont
 func (c *Client) UpdateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
 	v := make(map[string]ContactMethod)
 	v["contact_method"] = cm
-	resp, err := c.put("/users/"+userID+"/contact_methods/"+cm.ID, v, nil)
+	resp, err := c.put(context.TODO(), "/users/"+userID+"/contact_methods/"+cm.ID, v, nil)
 	return getContactMethodFromResponse(c, resp, err)
 }
 
@@ -216,7 +217,7 @@ func getContactMethodFromResponse(c *Client, resp *http.Response, err error) (*C
 
 // GetUserNotificationRule gets details about a notification rule.
 func (c *Client) GetUserNotificationRule(userID, ruleID string) (*NotificationRule, error) {
-	resp, err := c.get("/users/" + userID + "/notification_rules/" + ruleID)
+	resp, err := c.get(context.TODO(), "/users/"+userID+"/notification_rules/"+ruleID)
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
@@ -224,7 +225,7 @@ func (c *Client) GetUserNotificationRule(userID, ruleID string) (*NotificationRu
 func (c *Client) CreateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
 	data := make(map[string]NotificationRule)
 	data["notification_rule"] = rule
-	resp, err := c.post("/users/"+userID+"/notification_rules", data, nil)
+	resp, err := c.post(context.TODO(), "/users/"+userID+"/notification_rules", data, nil)
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
@@ -232,19 +233,19 @@ func (c *Client) CreateUserNotificationRule(userID string, rule NotificationRule
 func (c *Client) UpdateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
 	data := make(map[string]NotificationRule)
 	data["notification_rule"] = rule
-	resp, err := c.put("/users/"+userID+"/notification_rules/"+rule.ID, data, nil)
+	resp, err := c.put(context.TODO(), "/users/"+userID+"/notification_rules/"+rule.ID, data, nil)
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
 // DeleteUserNotificationRule deletes a notification rule for a user.
 func (c *Client) DeleteUserNotificationRule(userID, ruleID string) error {
-	_, err := c.delete("/users/" + userID + "/notification_rules/" + ruleID)
+	_, err := c.delete(context.TODO(), "/users/"+userID+"/notification_rules/"+ruleID)
 	return err
 }
 
 // ListUserNotificationRules fetches notification rules of the existing user.
 func (c *Client) ListUserNotificationRules(userID string) (*ListUserNotificationRulesResponse, error) {
-	resp, err := c.get("/users/" + userID + "/notification_rules")
+	resp, err := c.get(context.TODO(), "/users/"+userID+"/notification_rules")
 	if err != nil {
 		return nil, err
 	}
