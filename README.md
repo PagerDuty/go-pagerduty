@@ -73,6 +73,46 @@ If you need to use your own HTTP client, for doing things like defining your own
 transport settings, you can replace the default HTTP client with your own by
 simply by setting a new value in the `HTTPClient` field.
 
+#### API Error Responses
+
+For cases where your request results in an error from the API, you can use the
+`errors.As()` function from the standard library to extract the
+`pagerduty.APIError` error value and inspect more details about the error,
+including the HTTP response code and PagerDuty API Error Code.
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/PagerDuty/go-pagerduty"
+)
+
+var	authtoken = "" // Set your auth token here
+
+func main() {
+	client := pagerduty.NewClient(authtoken)
+	user, err := client.GetUser("NOTREAL", pagerduty.GetUserOptions{})
+	if err != nil {
+		var aerr pagerduty.APIError
+
+		if errors.As(err, &aerr) {
+			if aerr.RateLimited() {
+				fmt.Println("rate limited")
+				return
+			}
+
+			fmt.Println("unknown status code:", aerr.StatusCode)
+
+			return
+		}
+
+		panic(err)
+	}
+	fmt.Println(user)
+}
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/PagerDuty/go-pagerduty/fork )
