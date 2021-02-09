@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -57,10 +58,73 @@ type APIDetails struct {
 	Details string `json:"details,omitempty"`
 }
 
-type errorObject struct {
-	Code    int         `json:"code,omitempty"`
-	Message string      `json:"message,omitempty"`
-	Errors  interface{} `json:"errors,omitempty"`
+// APIErrorObject represents the object returned by the API when an error
+// occurs. This includes messages that should hopefully provide useful context
+// to the end user.
+type APIErrorObject struct {
+	Code    int      `json:"code,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
+}
+
+// APIError represents the error response received when an API call fails. The
+// HTTP response code is set inside of the StatusCode field, with the APIError
+// field being the structured JSON error object returned from the API.
+//
+// This type also provides some helper methods like .RateLimited(), .NotFound(),
+// and .Temporary() to help callers reason about how to handle the error.
+//
+// You can read more about the HTTP status codes and API error codes returned
+// from the API here: https://developer.pagerduty.com/docs/rest-api-v2/errors/
+type APIError struct {
+	// StatusCode is the HTTP response status code
+	StatusCode int `json:"-"`
+
+	// APIError represents the object returned by the API when an error occurs.
+	// If the response has no error object present, this will be nil.
+	//
+	// This includes messages that should hopefully provide useful context to
+	// the end user.
+	APIError *APIErrorObject `json:"error"`
+
+	message string
+}
+
+// Error satisfies the error interface, and should contain the StatusCode,
+// APIErrorObject.Message, and APIErrorObject.Code.
+func (a APIError) Error() string {
+	if len(a.message) > 0 {
+		return a.message
+	}
+
+	if a.APIError == nil {
+		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
+	}
+
+	return fmt.Sprintf(
+		"HTTP response failed with status code %d, message: %s (code: %d)",
+		a.StatusCode, a.APIError.Message, a.APIError.Code,
+	)
+}
+
+// RateLimited returns whether the response had a status of 429, and as such the
+// client is rate limited. The PagerDuty rate limits should reset once per
+// minute, and for the REST API they are an account-wide rate limit (not per
+// API key or IP).
+func (a APIError) RateLimited() bool {
+	return a.StatusCode == http.StatusTooManyRequests
+}
+
+// Temporary returns whether it was a temporary error, one of which is a
+// RateLimited error.
+func (a APIError) Temporary() bool {
+	return a.RateLimited() || (a.StatusCode >= 500 && a.StatusCode < 600)
+}
+
+// NotFound returns whether this was an error where it seems like the resource
+// was not found.
+func (a APIError) NotFound() bool {
+	return a.StatusCode == http.StatusNotFound || a.APIError.Code == 2100
 }
 
 func newDefaultHTTPClient() *http.Client {
@@ -228,27 +292,40 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 	if err != nil {
 		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
 	}
-	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
-		var eo *errorObject
-		var getErr error
-		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
-			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
-		}
-		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return resp, c.getErrorFromResponse(resp)
 	}
+
 	return resp, nil
 }
 
-func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {
-	var result map[string]errorObject
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
+func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
+	// check whether the error response is declared as JSON
+	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {
+		aerr := APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code %d does not contain Content-Type: application/json", resp.StatusCode),
+		}
+
+		return aerr
 	}
-	s, ok := result["error"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have error field")
+
+	var document APIError
+
+	// because of above check this probably won't fail, but it's possible...
+	if err := c.decodeJSON(resp, &document); err != nil {
+		aerr := APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code %d, JSON error object decode failed: %s", resp.StatusCode, err),
+		}
+
+		return aerr
 	}
-	return &s, nil
+
+	document.StatusCode = resp.StatusCode
+
+	return document
 }
 
 // responseHandler is capable of parsing a response. At a minimum it must
