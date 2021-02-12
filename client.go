@@ -124,7 +124,7 @@ func (a APIError) Temporary() bool {
 // NotFound returns whether this was an error where it seems like the resource
 // was not found.
 func (a APIError) NotFound() bool {
-	return a.StatusCode == http.StatusNotFound || a.APIError.Code == 2100
+	return a.StatusCode == http.StatusNotFound || (a.APIError != nil && a.APIError.Code == 2100)
 }
 
 func newDefaultHTTPClient() *http.Client {
