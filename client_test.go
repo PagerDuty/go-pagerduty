@@ -104,10 +104,13 @@ func TestAPIError_RateLimited(t *testing.T) {
 			name: "rate_limited",
 			a: APIError{
 				StatusCode: http.StatusTooManyRequests,
-				APIError: &APIErrorObject{
-					Code:    420,
-					Message: "Enhance Your Calm",
-					Errors:  []string{"Enhance Your Calm"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
 				},
 			},
 			want: true,
@@ -116,10 +119,13 @@ func TestAPIError_RateLimited(t *testing.T) {
 			name: "not_found",
 			a: APIError{
 				StatusCode: http.StatusNotFound,
-				APIError: &APIErrorObject{
-					Code:    2100,
-					Message: "Not Found",
-					Errors:  []string{"Not Found"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
 				},
 			},
 			want: false,
@@ -147,10 +153,13 @@ func TestAPIError_Temporary(t *testing.T) {
 			name: "rate_limited",
 			a: APIError{
 				StatusCode: http.StatusTooManyRequests,
-				APIError: &APIErrorObject{
-					Code:    420,
-					Message: "Enhance Your Calm",
-					Errors:  []string{"Enhance Your Calm"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
 				},
 			},
 			want: true,
@@ -159,10 +168,13 @@ func TestAPIError_Temporary(t *testing.T) {
 			name: "not_found",
 			a: APIError{
 				StatusCode: http.StatusNotFound,
-				APIError: &APIErrorObject{
-					Code:    2100,
-					Message: "Not Found",
-					Errors:  []string{"Not Found"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
 				},
 			},
 			want: false,
@@ -204,10 +216,13 @@ func TestAPIError_NotFound(t *testing.T) {
 			name: "rate_limited",
 			a: APIError{
 				StatusCode: http.StatusTooManyRequests,
-				APIError: &APIErrorObject{
-					Code:    420,
-					Message: "Enhance Your Calm",
-					Errors:  []string{"Enhance Your Calm"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
 				},
 			},
 			want: false,
@@ -216,10 +231,13 @@ func TestAPIError_NotFound(t *testing.T) {
 			name: "not_found",
 			a: APIError{
 				StatusCode: http.StatusNotFound,
-				APIError: &APIErrorObject{
-					Code:    2100,
-					Message: "Not Found",
-					Errors:  []string{"Not Found"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
 				},
 			},
 			want: true,
@@ -228,10 +246,13 @@ func TestAPIError_NotFound(t *testing.T) {
 			name: "not_found_weird_status",
 			a: APIError{
 				StatusCode: http.StatusBadRequest,
-				APIError: &APIErrorObject{
-					Code:    2100,
-					Message: "Not Found",
-					Errors:  []string{"Not Found"},
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
 				},
 			},
 			want: true,
@@ -240,10 +261,12 @@ func TestAPIError_NotFound(t *testing.T) {
 			name: "not_found_weird_error_code",
 			a: APIError{
 				StatusCode: http.StatusNotFound,
-				APIError: &APIErrorObject{
-					Code:    2101,
-					Message: "Not Found",
-					Errors:  []string{"Not Found"},
+				APIError: NullAPIErrorObject{
+					ErrorObject: APIErrorObject{
+						Code:    2101,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
 				},
 			},
 			want: true,

@@ -67,6 +67,33 @@ type APIErrorObject struct {
 	Errors  []string `json:"errors,omitempty"`
 }
 
+// NullAPIErrorObject is a wrapper around the APIErrorObject type. If the Valid
+// field is true, the API response included a structured error JSON object. This
+// structured object is then set on the ErrorObject field.
+//
+// While the PagerDuty REST API is documented to always return the error object,
+// we assume it's possible in exceptional failure modes for this to be omitted.
+// As such, this wrapper type provides us a way to check if the object was
+// provided while avoiding cosnumers accidentally missing a nil pointer check,
+// thus crashing their whole program.
+type NullAPIErrorObject struct {
+	Valid       bool
+	ErrorObject APIErrorObject
+}
+
+// UnmarshalJSON satisfies encoding/json.Unmarshaler
+func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
+	var aeo APIErrorObject
+	if err := json.Unmarshal(data, &aeo); err != nil {
+		return err
+	}
+
+	n.ErrorObject = aeo
+	n.Valid = true
+
+	return nil
+}
+
 // APIError represents the error response received when an API call fails. The
 // HTTP response code is set inside of the StatusCode field, with the APIError
 // field being the structured JSON error object returned from the API.
@@ -80,12 +107,14 @@ type APIError struct {
 	// StatusCode is the HTTP response status code
 	StatusCode int `json:"-"`
 
-	// APIError represents the object returned by the API when an error occurs.
-	// If the response has no error object present, this will be nil.
+	// APIError represents the object returned by the API when an error occurs,
+	// which includes messages that should hopefully provide useful context
+	// to the end user.
 	//
-	// This includes messages that should hopefully provide useful context to
-	// the end user.
-	APIError *APIErrorObject `json:"error"`
+	// If the API response did not contain an error object, the .Valid field of
+	// APIError will be false. If .Valid is true, the .ErrorObject field is
+	// valid and should be consulted.
+	APIError NullAPIErrorObject `json:"error"`
 
 	message string
 }
@@ -97,13 +126,13 @@ func (a APIError) Error() string {
 		return a.message
 	}
 
-	if a.APIError == nil {
+	if !a.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
 	}
 
 	return fmt.Sprintf(
 		"HTTP response failed with status code %d, message: %s (code: %d)",
-		a.StatusCode, a.APIError.Message, a.APIError.Code,
+		a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code,
 	)
 }
 
@@ -124,7 +153,7 @@ func (a APIError) Temporary() bool {
 // NotFound returns whether this was an error where it seems like the resource
 // was not found.
 func (a APIError) NotFound() bool {
-	return a.StatusCode == http.StatusNotFound || a.APIError.Code == 2100
+	return a.StatusCode == http.StatusNotFound || (a.APIError.Valid && a.APIError.ErrorObject.Code == 2100)
 }
 
 func newDefaultHTTPClient() *http.Client {
