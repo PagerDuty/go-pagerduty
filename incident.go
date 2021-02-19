@@ -392,8 +392,8 @@ type ListIncidentLogEntriesOptions struct {
 	Includes   []string `url:"include,omitempty,brackets"`
 	IsOverview bool     `url:"is_overview,omitempty"`
 	TimeZone   string   `url:"time_zone,omitempty"`
-	Since      string   `url:since,omitempty`
-	Until      string   `url:until,omitempty`
+	Since      string   `url:"since,omitempty"`
+	Until      string   `url:"until,omitempty"`
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.
