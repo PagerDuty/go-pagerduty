@@ -63,7 +63,7 @@ func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) 
 		changeEventPath,
 		false,
 		bytes.NewBuffer(data),
-		&headers,
+		headers,
 	)
 	if err != nil {
 		return nil, err

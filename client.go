@@ -254,7 +254,7 @@ func (c *Client) delete(ctx context.Context, path string) (*http.Response, error
 	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
 
-func (c *Client) put(ctx context.Context, path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
+func (c *Client) put(ctx context.Context, path string, payload interface{}, headers map[string]string) (*http.Response, error) {
 	if payload != nil {
 		data, err := json.Marshal(payload)
 		if err != nil {
@@ -265,7 +265,7 @@ func (c *Client) put(ctx context.Context, path string, payload interface{}, head
 	return c.do(ctx, http.MethodPut, path, nil, headers)
 }
 
-func (c *Client) post(ctx context.Context, path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
+func (c *Client) post(ctx context.Context, path string, payload interface{}, headers map[string]string) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
@@ -278,17 +278,16 @@ func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
 }
 
 // needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
-func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers *map[string]string) (*http.Response, error) {
+func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers map[string]string) (*http.Response, error) {
 	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
-	if headers != nil {
-		for k, v := range *headers {
-			req.Header.Set(k, v)
-		}
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
 
 	if authRequired {
@@ -307,7 +306,7 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 	return c.checkResponse(resp, err)
 }
 
-func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
+func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	return c.doWithEndpoint(ctx, c.apiEndpoint, method, path, true, body, headers)
 }
 

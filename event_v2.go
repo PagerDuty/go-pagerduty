@@ -87,7 +87,7 @@ func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
 		return nil, err
 	}
 
-	resp, err := c.doWithEndpoint(context.TODO(), c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), &headers)
+	resp, err := c.doWithEndpoint(context.TODO(), c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), headers)
 	if err != nil {
 		return nil, err
 	}

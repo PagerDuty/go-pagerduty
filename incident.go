@@ -173,7 +173,7 @@ func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Inciden
 	headers["From"] = from
 	data := make(map[string]*CreateIncidentOptions)
 	data["incident"] = o
-	resp, e := c.post(context.TODO(), "/incidents", data, &headers)
+	resp, e := c.post(context.TODO(), "/incidents", data, headers)
 	if e != nil {
 		return nil, e
 	}
@@ -194,7 +194,7 @@ func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions
 	headers["From"] = from
 	data["incidents"] = incidents
 
-	resp, err := c.put(context.TODO(), "/incidents", data, &headers)
+	resp, err := c.put(context.TODO(), "/incidents", data, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeI
 	headers := make(map[string]string)
 	headers["From"] = from
 
-	resp, err := c.put(context.TODO(), "/incidents/"+id+"/merge", r, &headers)
+	resp, err := c.put(context.TODO(), "/incidents/"+id+"/merge", r, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -329,7 +329,7 @@ func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*
 	headers["From"] = note.User.Summary
 
 	data["note"] = note
-	resp, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, &headers)
+	resp, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -350,7 +350,7 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	headers := make(map[string]string)
 	headers["From"] = note.User.Summary
 	data["note"] = note
-	_, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, &headers)
+	_, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, headers)
 	return err
 }
 
@@ -459,7 +459,7 @@ func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*Respon
 	headers := make(map[string]string)
 	headers["From"] = o.From
 
-	resp, err := c.post(context.TODO(), "/incidents/"+id+"/responder_requests", o, &headers)
+	resp, err := c.post(context.TODO(), "/incidents/"+id+"/responder_requests", o, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +485,7 @@ func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertRes
 func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
 	headers := make(map[string]string)
 
-	resp, err := c.put(context.TODO(), "/incidents/"+incidentID+"/alerts/", alerts, &headers)
+	resp, err := c.put(context.TODO(), "/incidents/"+incidentID+"/alerts/", alerts, headers)
 	if err != nil {
 		return nil, nil, err
 	}

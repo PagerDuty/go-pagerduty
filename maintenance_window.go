@@ -59,7 +59,7 @@ func (c *Client) CreateMaintenanceWindow(from string, o MaintenanceWindow) (*Mai
 	if from != "" {
 		headers["From"] = from
 	}
-	resp, err := c.post(context.TODO(), "/maintenance_windows", data, &headers)
+	resp, err := c.post(context.TODO(), "/maintenance_windows", data, headers)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
