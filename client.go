@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
   "regexp"
@@ -9,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -57,10 +59,102 @@ type APIDetails struct {
 	Details string `json:"details,omitempty"`
 }
 
-type errorObject struct {
-	Code    int         `json:"code,omitempty"`
-	Message string      `json:"message,omitempty"`
-	Errors  interface{} `json:"errors,omitempty"`
+// APIErrorObject represents the object returned by the API when an error
+// occurs. This includes messages that should hopefully provide useful context
+// to the end user.
+type APIErrorObject struct {
+	Code    int      `json:"code,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
+}
+
+// NullAPIErrorObject is a wrapper around the APIErrorObject type. If the Valid
+// field is true, the API response included a structured error JSON object. This
+// structured object is then set on the ErrorObject field.
+//
+// While the PagerDuty REST API is documented to always return the error object,
+// we assume it's possible in exceptional failure modes for this to be omitted.
+// As such, this wrapper type provides us a way to check if the object was
+// provided while avoiding cosnumers accidentally missing a nil pointer check,
+// thus crashing their whole program.
+type NullAPIErrorObject struct {
+	Valid       bool
+	ErrorObject APIErrorObject
+}
+
+// UnmarshalJSON satisfies encoding/json.Unmarshaler
+func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
+	var aeo APIErrorObject
+	if err := json.Unmarshal(data, &aeo); err != nil {
+		return err
+	}
+
+	n.ErrorObject = aeo
+	n.Valid = true
+
+	return nil
+}
+
+// APIError represents the error response received when an API call fails. The
+// HTTP response code is set inside of the StatusCode field, with the APIError
+// field being the structured JSON error object returned from the API.
+//
+// This type also provides some helper methods like .RateLimited(), .NotFound(),
+// and .Temporary() to help callers reason about how to handle the error.
+//
+// You can read more about the HTTP status codes and API error codes returned
+// from the API here: https://developer.pagerduty.com/docs/rest-api-v2/errors/
+type APIError struct {
+	// StatusCode is the HTTP response status code
+	StatusCode int `json:"-"`
+
+	// APIError represents the object returned by the API when an error occurs,
+	// which includes messages that should hopefully provide useful context
+	// to the end user.
+	//
+	// If the API response did not contain an error object, the .Valid field of
+	// APIError will be false. If .Valid is true, the .ErrorObject field is
+	// valid and should be consulted.
+	APIError NullAPIErrorObject `json:"error"`
+
+	message string
+}
+
+// Error satisfies the error interface, and should contain the StatusCode,
+// APIErrorObject.Message, and APIErrorObject.Code.
+func (a APIError) Error() string {
+	if len(a.message) > 0 {
+		return a.message
+	}
+
+	if !a.APIError.Valid {
+		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
+	}
+
+	return fmt.Sprintf(
+		"HTTP response failed with status code %d, message: %s (code: %d)",
+		a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code,
+	)
+}
+
+// RateLimited returns whether the response had a status of 429, and as such the
+// client is rate limited. The PagerDuty rate limits should reset once per
+// minute, and for the REST API they are an account-wide rate limit (not per
+// API key or IP).
+func (a APIError) RateLimited() bool {
+	return a.StatusCode == http.StatusTooManyRequests
+}
+
+// Temporary returns whether it was a temporary error, one of which is a
+// RateLimited error.
+func (a APIError) Temporary() bool {
+	return a.RateLimited() || (a.StatusCode >= 500 && a.StatusCode < 600)
+}
+
+// NotFound returns whether this was an error where it seems like the resource
+// was not found.
+func (a APIError) NotFound() bool {
+	return a.StatusCode == http.StatusNotFound || (a.APIError.Valid && a.APIError.ErrorObject.Code == 2100)
 }
 
 func newDefaultHTTPClient() *http.Client {
@@ -157,42 +251,44 @@ func WithOAuth() ClientOptions {
 	}
 }
 
-func (c *Client) delete(path string) (*http.Response, error) {
-	return c.do("DELETE", path, nil, nil)
+func (c *Client) delete(ctx context.Context, path string) (*http.Response, error) {
+	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
 
-func (c *Client) put(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
-
+func (c *Client) put(ctx context.Context, path string, payload interface{}, headers map[string]string) (*http.Response, error) {
 	if payload != nil {
 		data, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		return c.do("PUT", path, bytes.NewBuffer(data), headers)
+		return c.do(ctx, http.MethodPut, path, bytes.NewBuffer(data), headers)
 	}
-	return c.do("PUT", path, nil, headers)
+	return c.do(ctx, http.MethodPut, path, nil, headers)
 }
 
-func (c *Client) post(path string, payload interface{}, headers *map[string]string) (*http.Response, error) {
+func (c *Client) post(ctx context.Context, path string, payload interface{}, headers map[string]string) (*http.Response, error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	return c.do("POST", path, bytes.NewBuffer(data), headers)
+	return c.do(ctx, http.MethodPost, path, bytes.NewBuffer(data), headers)
 }
 
-func (c *Client) get(path string) (*http.Response, error) {
-	return c.do("GET", path, nil, nil)
+func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, path, nil, nil)
 }
 
 // needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
-func (c *Client) doWithEndpoint(endpoint, method, path string, authRequired bool, body io.Reader, headers *map[string]string) (*http.Response, error) {
-	req, _ := http.NewRequest(method, endpoint+path, body)
+func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build request: %w", err)
+	}
+
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
-	if headers != nil {
-		for k, v := range *headers {
-			req.Header.Set(k, v)
-		}
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
 
 	if authRequired {
@@ -211,8 +307,8 @@ func (c *Client) doWithEndpoint(endpoint, method, path string, authRequired bool
 	return c.checkResponse(resp, err)
 }
 
-func (c *Client) do(method, path string, body io.Reader, headers *map[string]string) (*http.Response, error) {
-	return c.doWithEndpoint(c.apiEndpoint, method, path, true, body, headers)
+func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	return c.doWithEndpoint(ctx, c.apiEndpoint, method, path, true, body, headers)
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
@@ -225,27 +321,40 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 	if err != nil {
 		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
 	}
-	if 199 >= resp.StatusCode || 300 <= resp.StatusCode {
-		var eo *errorObject
-		var getErr error
-		if eo, getErr = c.getErrorFromResponse(resp); getErr != nil {
-			return resp, fmt.Errorf("Response did not contain formatted error: %s. HTTP response code: %v. Raw response: %+v", getErr, resp.StatusCode, resp)
-		}
-		return resp, fmt.Errorf("Failed call API endpoint. HTTP response code: %v. Error: %v", resp.StatusCode, eo)
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return resp, c.getErrorFromResponse(resp)
 	}
+
 	return resp, nil
 }
 
-func (c *Client) getErrorFromResponse(resp *http.Response) (*errorObject, error) {
-	var result map[string]errorObject
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
+func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
+	// check whether the error response is declared as JSON
+	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {
+		aerr := APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code %d does not contain Content-Type: application/json", resp.StatusCode),
+		}
+
+		return aerr
 	}
-	s, ok := result["error"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have error field")
+
+	var document APIError
+
+	// because of above check this probably won't fail, but it's possible...
+	if err := c.decodeJSON(resp, &document); err != nil {
+		aerr := APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code %d, JSON error object decode failed: %s", resp.StatusCode, err),
+		}
+
+		return aerr
 	}
-	return &s, nil
+
+	document.StatusCode = resp.StatusCode
+
+	return document
 }
 
 // Helper function to determine wither additional parameters should use ? or & to append args
@@ -268,7 +377,7 @@ func getBasePrefix(basePath string) string {
 // a specific slice. The responseHandler is responsible for closing the response.
 type responseHandler func(response *http.Response) (APIListObject, error)
 
-func (c *Client) pagedGet(basePath string, handler responseHandler) error {
+func (c *Client) pagedGet(ctx context.Context, basePath string, handler responseHandler) error {
 	// Indicates whether there are still additional pages associated with request.
 	var stillMore bool
 
@@ -278,7 +387,7 @@ func (c *Client) pagedGet(basePath string, handler responseHandler) error {
   basePrefix := getBasePrefix(basePath)
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
-		response, err := c.do("GET", fmt.Sprintf("%soffset=%d", basePrefix, nextOffset), nil, nil)
+		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%soffset=%d", basePath, nextOffset), nil, nil)
 		if err != nil {
 			return err
 		}

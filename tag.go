@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -58,36 +59,37 @@ type TagAssignment struct {
 
 // ListTags lists tags of your PagerDuty account, optionally filtered by a search query.
 func (c *Client) ListTags(o ListTagOptions) (*ListTagResponse, error) {
-	return getTagList(c, "", "", o)
+	return getTagList(context.TODO(), c, "", "", o)
 }
 
 // CreateTag creates a new tag.
 func (c *Client) CreateTag(t *Tag) (*Tag, *http.Response, error) {
 	data := make(map[string]*Tag)
 	data["tag"] = t
-	resp, err := c.post("/tags", data, nil)
+	resp, err := c.post(context.TODO(), "/tags", data, nil)
 	return getTagFromResponse(c, resp, err)
 }
 
 // DeleteTag removes an existing tag.
 func (c *Client) DeleteTag(id string) error {
-	_, err := c.delete("/tags/" + id)
+	_, err := c.delete(context.TODO(), "/tags/"+id)
 	return err
 }
 
 // GetTag gets details about an existing tag.
 func (c *Client) GetTag(id string) (*Tag, *http.Response, error) {
-	resp, err := c.get("/tags/" + id)
+	resp, err := c.get(context.TODO(), "/tags/"+id)
 	return getTagFromResponse(c, resp, err)
 }
 
 // AssignTags adds and removes tag assignments with entities
 func (c *Client) AssignTags(e, eid string, a *TagAssignments) (*http.Response, error) {
-	if resp, err := c.post("/"+e+"/"+eid+"/change_tags", a, nil); err != nil {
+	resp, err := c.post(context.TODO(), "/"+e+"/"+eid+"/change_tags", a, nil)
+	if err != nil {
 		return nil, err
-	} else {
-		return resp, nil
 	}
+
+	return resp, nil
 }
 
 // GetUsersByTag get related Users for the Tag.
@@ -115,11 +117,11 @@ func (c *Client) GetUsersByTag(tid string) (*ListUserResponse, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/tags/"+tid+"/users/", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/users/", responseHandler); err != nil {
 		return nil, err
 	}
 	userResponse.Users = users
-	fmt.Println()
+
 	return userResponse, nil
 }
 
@@ -148,7 +150,7 @@ func (c *Client) GetTeamsByTag(tid string) (*ListTeamsForTagResponse, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/tags/"+tid+"/teams/", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/teams/", responseHandler); err != nil {
 		return nil, err
 	}
 	teamsResponse.Teams = teams
@@ -181,7 +183,7 @@ func (c *Client) GetEscalationPoliciesByTag(tid string) (*ListEPResponse, error)
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/tags/"+tid+"/escalation_policies/", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/escalation_policies/", responseHandler); err != nil {
 		return nil, err
 	}
 	epResponse.EscalationPolicies = eps
@@ -191,7 +193,7 @@ func (c *Client) GetEscalationPoliciesByTag(tid string) (*ListEPResponse, error)
 
 // GetTagsForEntity Get related tags for Users, Teams or Escalation Policies.
 func (c *Client) GetTagsForEntity(e, eid string, o ListTagOptions) (*ListTagResponse, error) {
-	return getTagList(c, e, eid, o)
+	return getTagList(context.TODO(), c, e, eid, o)
 }
 
 func getTagFromResponse(c *Client, resp *http.Response, err error) (*Tag, *http.Response, error) {
@@ -211,7 +213,7 @@ func getTagFromResponse(c *Client, resp *http.Response, err error) (*Tag, *http.
 }
 
 // getTagList  is a utility function that processes all pages of a ListTagResponse
-func getTagList(c *Client, e, eid string, o ListTagOptions) (*ListTagResponse, error) {
+func getTagList(ctx context.Context, c *Client, e, eid string, o ListTagOptions) (*ListTagResponse, error) {
 	queryParms, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -242,7 +244,7 @@ func getTagList(c *Client, e, eid string, o ListTagOptions) (*ListTagResponse, e
 		path = "/" + e + "/" + eid + "/tags"
 	}
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(path+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, path+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 	tagResponse.Tags = tags

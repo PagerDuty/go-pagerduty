@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -112,7 +113,7 @@ func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/services?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +157,7 @@ type GetServiceOptions struct {
 // GetService gets details about an existing service.
 func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
-	resp, err := c.get("/services/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services/"+id+"?"+v.Encode())
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -164,7 +165,7 @@ func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
-	resp, err := c.post("/services", data, nil)
+	resp, err := c.post(context.TODO(), "/services", data, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -175,13 +176,13 @@ func (c *Client) UpdateService(s Service) (*Service, error) {
 	}{
 		s,
 	}
-	resp, err := c.put("/services/"+s.ID, body, nil)
+	resp, err := c.put(context.TODO(), "/services/"+s.ID, body, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
 // DeleteService deletes an existing service.
 func (c *Client) DeleteService(id string) error {
-	_, err := c.delete("/services/" + id)
+	_, err := c.delete(context.TODO(), "/services/"+id)
 	return err
 }
 
@@ -189,7 +190,7 @@ func (c *Client) DeleteService(id string) error {
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	data := make(map[string]Integration)
 	data["integration"] = i
-	resp, err := c.post("/services/"+id+"/integrations", data, nil)
+	resp, err := c.post(context.TODO(), "/services/"+id+"/integrations", data, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
@@ -204,19 +205,19 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 	if queryErr != nil {
 		return nil, queryErr
 	}
-	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
 	return getIntegrationFromResponse(c, resp, err)
 }
 
 // UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i, nil)
+	resp, err := c.put(context.TODO(), "/services/"+serviceID+"/integrations/"+i.ID, i, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
 // DeleteIntegration deletes an existing integration.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
-	_, err := c.delete("/services/" + serviceID + "/integrations/" + integrationID)
+	_, err := c.delete(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID)
 	return err
 }
 

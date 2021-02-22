@@ -1,6 +1,8 @@
 package pagerduty
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -21,7 +23,7 @@ var (
 func setup() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
-	var authToken = "foo"
+	authToken := "foo"
 	client = NewClient(authToken)
 }
 
@@ -58,4 +60,245 @@ func TestGetBasePrefix(t *testing.T) {
       t.Errorf("got %q, want %q", s, tt.out)
     }
   }
+}
+
+func TestAPIError_Error(t *testing.T) {
+	const jsonBody = `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["Enhance Your Calm", "Slow Your Roll"]}}`
+
+	var a APIError
+
+	if err := json.Unmarshal([]byte(jsonBody), &a); err != nil {
+		t.Fatalf("failed to unmarshal JSON: %s", err)
+	}
+
+	a.StatusCode = 429
+
+	const want = "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420)"
+
+	if got := a.Error(); got != want {
+		t.Errorf("a.Error() = %q, want %q", got, want)
+	}
+
+	tests := []struct {
+		name string
+		a    APIError
+		want string
+	}{
+		{
+			name: "message",
+			a: APIError{
+				message: "test message",
+			},
+			want: "test message",
+		},
+		{
+			name: "APIError_nil",
+			a: APIError{
+				StatusCode: http.StatusServiceUnavailable,
+			},
+			want: "HTTP response failed with status code 503 and no JSON error object was present",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.a.Error(); got != tt.want {
+				fmt.Println(got)
+				fmt.Println(tt.want)
+				t.Fatalf("tt.a.Error() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAPIError_RateLimited(t *testing.T) {
+	tests := []struct {
+		name string
+		a    APIError
+		want bool
+	}{
+		{
+			name: "rate_limited",
+			a: APIError{
+				StatusCode: http.StatusTooManyRequests,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "not_found",
+			a: APIError{
+				StatusCode: http.StatusNotFound,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
+				},
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.a.RateLimited(); got != tt.want {
+				t.Fatalf("tt.a.RateLimited() = %t, want %t", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAPIError_Temporary(t *testing.T) {
+	tests := []struct {
+		name string
+		a    APIError
+		want bool
+	}{
+		{
+			name: "rate_limited",
+			a: APIError{
+				StatusCode: http.StatusTooManyRequests,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "not_found",
+			a: APIError{
+				StatusCode: http.StatusNotFound,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
+				},
+			},
+			want: false,
+		},
+		{
+			name: "InternalServerError",
+			a: APIError{
+				StatusCode: http.StatusInternalServerError,
+			},
+			want: true,
+		},
+		{
+			name: "ServiceUnavailable",
+			a: APIError{
+				StatusCode: http.StatusServiceUnavailable,
+			},
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.a.Temporary(); got != tt.want {
+				t.Fatalf("tt.a.Temporary() = %t, want %t", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAPIError_NotFound(t *testing.T) {
+	tests := []struct {
+		name string
+		a    APIError
+		want bool
+	}{
+		{
+			name: "rate_limited",
+			a: APIError{
+				StatusCode: http.StatusTooManyRequests,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    420,
+						Message: "Enhance Your Calm",
+						Errors:  []string{"Enhance Your Calm"},
+					},
+				},
+			},
+			want: false,
+		},
+		{
+			name: "not_found",
+			a: APIError{
+				StatusCode: http.StatusNotFound,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "not_found_weird_status",
+			a: APIError{
+				StatusCode: http.StatusBadRequest,
+				APIError: NullAPIErrorObject{
+					Valid: true,
+					ErrorObject: APIErrorObject{
+						Code:    2100,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "not_found_weird_error_code",
+			a: APIError{
+				StatusCode: http.StatusNotFound,
+				APIError: NullAPIErrorObject{
+					ErrorObject: APIErrorObject{
+						Code:    2101,
+						Message: "Not Found",
+						Errors:  []string{"Not Found"},
+					},
+				},
+			},
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.a.NotFound(); got != tt.want {
+				t.Fatalf("tt.a.NotFound() = %t, want %t", got, tt.want)
+			}
+		})
+	}
 }
