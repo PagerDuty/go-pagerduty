@@ -1,10 +1,11 @@
 package pagerduty
 
 import (
-	"fmt"
+  "context"
 	"net/http"
-	"strconv"
 	"testing"
+  "fmt"
+  "strconv"
 )
 
 // ListServices
@@ -53,16 +54,16 @@ func TestService_ListPaginated(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		offsetStr := r.URL.Query()["offset"][0]
-		offset, _ := strconv.ParseInt(offsetStr, 10, 32)
+    offsetStr := r.URL.Query()["offset"][0]
+    offset, _ := strconv.ParseInt(offsetStr, 10, 32)
 
-		var more string
-		if offset == 0 {
-			more = "true"
-		} else {
-			more = "false"
-		}
-		resp := fmt.Sprintf(`{"services": [{"id": "%d"}],
+    var more string
+    if offset == 0 {
+      more = "true"
+    } else {
+      more = "false"
+    }
+    resp := fmt.Sprintf(`{"services": [{"id": "%d"}],
                           "More": %s,
                           "Offset": %d,
                           "Limit": 1}`, offset, more, offset)
@@ -79,25 +80,27 @@ func TestService_ListPaginated(t *testing.T) {
 		Query:         "baz",
 		Includes:      []string{},
 	}
-	res, err := client.ListServicesPaginated(opts)
+	res, err := client.ListServicesPaginated(context.TODO(), opts)
 
 	want := []Service{
-		{
-			APIObject: APIObject{
-				ID: "0",
-			},
-		}, {
-			APIObject: APIObject{
-				ID: "1",
-			},
-		},
-	}
+    {
+      APIObject: APIObject{
+        ID: "0",
+      },
+    }, {
+      APIObject: APIObject{
+        ID: "1",
+      },
+    },
+  }
 
 	if err != nil {
 		t.Fatal(err)
 	}
 	testEqual(t, want, res)
 }
+
+
 
 // Get Service
 func TestService_Get(t *testing.T) {

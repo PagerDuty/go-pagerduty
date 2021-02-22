@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
@@ -157,7 +158,7 @@ func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/rulesets/", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/rulesets/", responseHandler); err != nil {
 		return nil, err
 	}
 	rulesetResponse.Rulesets = rulesets
@@ -169,19 +170,19 @@ func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
 func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	data := make(map[string]*Ruleset)
 	data["ruleset"] = r
-	resp, err := c.post("/rulesets", data, nil)
+	resp, err := c.post(context.TODO(), "/rulesets", data, nil)
 	return getRulesetFromResponse(c, resp, err)
 }
 
 // DeleteRuleset deletes a ruleset.
 func (c *Client) DeleteRuleset(id string) error {
-	_, err := c.delete("/rulesets/" + id)
+	_, err := c.delete(context.TODO(), "/rulesets/"+id)
 	return err
 }
 
 // GetRuleset gets details about a ruleset.
 func (c *Client) GetRuleset(id string) (*Ruleset, *http.Response, error) {
-	resp, err := c.get("/rulesets/" + id)
+	resp, err := c.get(context.TODO(), "/rulesets/"+id)
 	return getRulesetFromResponse(c, resp, err)
 }
 
@@ -189,7 +190,7 @@ func (c *Client) GetRuleset(id string) (*Ruleset, *http.Response, error) {
 func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	v := make(map[string]*Ruleset)
 	v["ruleset"] = r
-	resp, err := c.put("/rulesets/"+r.ID, v, nil)
+	resp, err := c.put(context.TODO(), "/rulesets/"+r.ID, v, nil)
 	return getRulesetFromResponse(c, resp, err)
 }
 
@@ -234,7 +235,7 @@ func (c *Client) ListRulesetRules(rulesetID string) (*ListRulesetRulesResponse, 
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/rulesets/"+rulesetID+"/rules", responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/rulesets/"+rulesetID+"/rules", responseHandler); err != nil {
 		return nil, err
 	}
 	rulesResponse.Rules = rules
@@ -244,13 +245,13 @@ func (c *Client) ListRulesetRules(rulesetID string) (*ListRulesetRulesResponse, 
 
 // GetRulesetRule gets an event rule
 func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, *http.Response, error) {
-	resp, err := c.get("/rulesets/" + rulesetID + "/rules/" + ruleID)
+	resp, err := c.get(context.TODO(), "/rulesets/"+rulesetID+"/rules/"+ruleID)
 	return getRuleFromResponse(c, resp, err)
 }
 
 // DeleteRulesetRule deletes a rule.
 func (c *Client) DeleteRulesetRule(rulesetID, ruleID string) error {
-	_, err := c.delete("/rulesets/" + rulesetID + "/rules/" + ruleID)
+	_, err := c.delete(context.TODO(), "/rulesets/"+rulesetID+"/rules/"+ruleID)
 	return err
 }
 
@@ -258,7 +259,7 @@ func (c *Client) DeleteRulesetRule(rulesetID, ruleID string) error {
 func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, *http.Response, error) {
 	data := make(map[string]*RulesetRule)
 	data["rule"] = rule
-	resp, err := c.post("/rulesets/"+rulesetID+"/rules/", data, nil)
+	resp, err := c.post(context.TODO(), "/rulesets/"+rulesetID+"/rules/", data, nil)
 	return getRuleFromResponse(c, resp, err)
 }
 
@@ -266,7 +267,7 @@ func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*Rulese
 func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *http.Response, error) {
 	v := make(map[string]*RulesetRule)
 	v["rule"] = r
-	resp, err := c.put("/rulesets/"+rulesetID+"/rules/"+ruleID, v, nil)
+	resp, err := c.put(context.TODO(), "/rulesets/"+rulesetID+"/rules/"+ruleID, v, nil)
 	return getRuleFromResponse(c, resp, err)
 }
 

@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -48,9 +49,16 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, _ := http.NewRequest("POST", v2eventEndPoint, bytes.NewBuffer(data))
+
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodPost, v2eventEndPoint, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
 	req.Header.Set("User-Agent", "go-pagerduty/"+Version)
 	req.Header.Set("Content-Type", "application/json")
+
+	// TODO(theckman): switch to a package-local default client
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -78,7 +86,8 @@ func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.doWithEndpoint(c.v2EventsAPIEndpoint, "POST", "/v2/enqueue", false, bytes.NewBuffer(data), &headers)
+
+	resp, err := c.doWithEndpoint(context.TODO(), c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), headers)
 	if err != nil {
 		return nil, err
 	}

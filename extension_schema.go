@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -35,7 +36,7 @@ func (c *Client) ListExtensionSchemas(o ListExtensionSchemaOptions) (*ListExtens
 		return nil, err
 	}
 
-	resp, err := c.get("/extension_schemas?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/extension_schemas?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (c *Client) ListExtensionSchemas(o ListExtensionSchemaOptions) (*ListExtens
 }
 
 func (c *Client) GetExtensionSchema(id string) (*ExtensionSchema, error) {
-	resp, err := c.get("/extension_schemas/" + id)
+	resp, err := c.get(context.TODO(), "/extension_schemas/"+id)
 	return getExtensionSchemaFromResponse(c, resp, err)
 }
 
