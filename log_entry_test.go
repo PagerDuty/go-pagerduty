@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 )
@@ -71,4 +72,51 @@ func TestLogEntry_Get(t *testing.T) {
 		t.Fatal(err)
 	}
 	testEqual(t, want, res)
+}
+
+func TestChannel_MarhalUnmarshal(t *testing.T) {
+	logEntryRaw := []byte(`{
+		"id": "1",
+		"type": "trigger_log_entry",
+		"summary": "foo",
+		"channel": {
+			"type": "web_trigger",
+			"summary": "My new incident",
+			"details_omitted": false
+		}
+	}`)
+	want := &LogEntry{
+		CommonLogEntryField: CommonLogEntryField{
+			APIObject: APIObject{
+				ID:      "1",
+				Type:    "trigger_log_entry",
+				Summary: "foo",
+			},
+			Channel: Channel{
+				Type: "web_trigger",
+				Raw: map[string]interface{}{
+					"summary":         "My new incident",
+					"details_omitted": false,
+				},
+			},
+		},
+	}
+
+	logEntry := &LogEntry{}
+	if err := json.Unmarshal(logEntryRaw, logEntry); err != nil {
+		t.Fatal(err)
+	}
+
+	testEqual(t, want, logEntry)
+
+	newLogEntryRaw, err := json.Marshal(logEntry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	newLogEntry := &LogEntry{}
+	if err := json.Unmarshal(newLogEntryRaw, newLogEntry); err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, newLogEntry)
 }
