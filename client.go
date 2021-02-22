@@ -8,7 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
-  "path"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -359,10 +359,10 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 
 // Helper function to determine wither additional parameters should use ? or & to append args
 func getBasePrefix(basePath string) string {
-  if strings.Contains(path.Base(basePath), "?") {
-    return basePath + "&"
-  }
-  return basePath + "?"
+	if strings.Contains(path.Base(basePath), "?") {
+		return basePath + "&"
+	}
+	return basePath + "?"
 }
 
 // responseHandler is capable of parsing a response. At a minimum it must
@@ -379,7 +379,7 @@ func (c *Client) pagedGet(ctx context.Context, basePath string, handler response
 	// Offset to set for the next page request.
 	var nextOffset uint
 
-  basePrefix := getBasePrefix(basePath)
+	basePrefix := getBasePrefix(basePath)
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
 		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%soffset=%d", basePrefix, nextOffset), nil, nil)
