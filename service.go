@@ -122,7 +122,7 @@ func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error
 }
 
 // ListServices lists existing services processing paginated responses
-func (c *Client) ListServicesPaginated(o ListServiceOptions) ([]Service, error) {
+func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions) ([]Service, error) {
   services := make([]Service, 0)
 	v, err := query.Values(o)
 	if err != nil {
@@ -142,7 +142,7 @@ func (c *Client) ListServicesPaginated(o ListServiceOptions) ([]Service, error) 
         Limit: result.Limit,
     }, nil
   }
-	if err := c.pagedGet("/services?" + v.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/services?" + v.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 	return services, nil

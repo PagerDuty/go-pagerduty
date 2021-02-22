@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+  "context"
 	"net/http"
 	"testing"
   "fmt"
@@ -79,7 +80,7 @@ func TestService_ListPaginated(t *testing.T) {
 		Query:         "baz",
 		Includes:      []string{},
 	}
-	res, err := client.ListServicesPaginated(opts)
+	res, err := client.ListServicesPaginated(context.TODO(), opts)
 
 	want := []Service{
     {

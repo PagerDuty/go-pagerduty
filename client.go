@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-  "regexp"
 	"io"
 	"net"
 	"net/http"
+  "path"
 	"runtime"
 	"strings"
 	"time"
@@ -359,15 +359,10 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 
 // Helper function to determine wither additional parameters should use ? or & to append args
 func getBasePrefix(basePath string) string {
- var conjunction string
-  // check to see if there are already arguments in basePath (look for ? in path)
-  re := regexp.MustCompile(".*/[^/]*\\?[^/]*$")
-  if re.Match([]byte(basePath)) {
-    conjunction = "&"
-  } else {
-    conjunction = "?"
+  if strings.Contains(path.Base(basePath), "?") {
+    return basePath + "&"
   }
-  return fmt.Sprintf("%s%s", basePath, conjunction)
+  return basePath + "?"
 }
 
 // responseHandler is capable of parsing a response. At a minimum it must
@@ -387,7 +382,7 @@ func (c *Client) pagedGet(ctx context.Context, basePath string, handler response
   basePrefix := getBasePrefix(basePath)
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
-		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%soffset=%d", basePath, nextOffset), nil, nil)
+		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%soffset=%d", basePrefix, nextOffset), nil, nil)
 		if err != nil {
 			return err
 		}
