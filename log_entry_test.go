@@ -95,6 +95,7 @@ func TestChannel_MarhalUnmarshal(t *testing.T) {
 			Channel: Channel{
 				Type: "web_trigger",
 				Raw: map[string]interface{}{
+					"type":            "web_trigger",
 					"summary":         "My new incident",
 					"details_omitted": false,
 				},

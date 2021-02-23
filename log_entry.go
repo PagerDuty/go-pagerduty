@@ -115,7 +115,6 @@ func (c *Channel) UnmarshalJSON(b []byte) error {
 	ct, ok := raw["type"]
 	if ok {
 		c.Type = ct.(string)
-		delete(raw, "type")
 		c.Raw = raw
 	}
 
@@ -126,16 +125,10 @@ func (c *Channel) UnmarshalJSON(b []byte) error {
 func (c *Channel) MarshalJSON() ([]byte, error) {
 	raw := map[string]interface{}{}
 	if c != nil && c.Type != "" {
-		raw["type"] = c.Type
 		for k, v := range c.Raw {
 			raw[k] = v
 		}
 	}
 
-	b, err := json.Marshal(raw)
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
+	return json.Marshal(raw)
 }
