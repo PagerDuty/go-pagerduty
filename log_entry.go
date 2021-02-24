@@ -41,7 +41,7 @@ type CommonLogEntryField struct {
 // LogEntry is a list of all of the events that happened to an incident.
 type LogEntry struct {
 	CommonLogEntryField
-	Incident Incident
+	Incident Incident `json:"incident"`
 }
 
 // ListLogEntryResponse is the response data when calling the ListLogEntry API endpoint.
@@ -119,4 +119,16 @@ func (c *Channel) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalJSON Expands the LogEntry.Channel object to correctly marshal it back
+func (c *Channel) MarshalJSON() ([]byte, error) {
+	raw := map[string]interface{}{}
+	if c != nil && c.Type != "" {
+		for k, v := range c.Raw {
+			raw[k] = v
+		}
+	}
+
+	return json.Marshal(raw)
 }
