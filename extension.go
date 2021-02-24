@@ -11,7 +11,7 @@ import (
 type Extension struct {
 	APIObject
 	Name             string      `json:"name"`
-	EndpointURL      string      `json:"endpoint_url"`
+	EndpointURL      string      `json:"endpoint_url,omitempty"`
 	ExtensionObjects []APIObject `json:"extension_objects"`
 	ExtensionSchema  APIObject   `json:"extension_schema"`
 	Config           interface{} `json:"config"`
