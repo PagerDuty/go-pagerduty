@@ -166,7 +166,7 @@ func (c *Client) ListRulesets() (*ListRulesetsResponse, error) {
 	return rulesetResponse, nil
 }
 
-// CreateRuleset creates a new user.
+// CreateRuleset creates a new ruleset.
 func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	data := make(map[string]*Ruleset)
 	data["ruleset"] = r
