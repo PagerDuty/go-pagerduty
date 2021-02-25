@@ -80,7 +80,7 @@ func TestService_ListPaginated(t *testing.T) {
 		Query:         "baz",
 		Includes:      []string{},
 	}
-	res, err := client.ListServicesPaginated(context.TODO(), opts)
+	res, err := client.ListServicesPaginated(context.Background(), opts)
 
 	want := []Service{
 		{

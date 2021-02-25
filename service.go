@@ -123,7 +123,7 @@ func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error
 
 // ListServices lists existing services processing paginated responses
 func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions) ([]Service, error) {
-	services := make([]Service, 0)
+	var services []Service
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
