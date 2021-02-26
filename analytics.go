@@ -23,9 +23,9 @@ type AnalyticsFilter struct {
 	CreatedAtEnd   string   `json:"created_at_end,omitempty"`
 	Urgency        string   `json:"urgency,omitempty"`
 	Major          bool     `json:"major,omitempty"`
-	ServiceIds     []string `json:"service_ids,omitempty"`
-	TeamIds        []string `json:"team_ids,omitempty"`
-	PriorityIds    []string `json:"priority_ids,omitempty"`
+	ServiceIDs     []string `json:"service_ids,omitempty"`
+	TeamIDs        []string `json:"team_ids,omitempty"`
+	PriorityIDs    []string `json:"priority_ids,omitempty"`
 	PriorityName   []string `json:"priority_name,omitempty"`
 }
 

@@ -41,52 +41,64 @@ func (c *AnalyticsShow) Run(args []string) int {
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	servID := flags.String("service_id", "", "Service ID")
 	now := time.Now()
-	sevenDaysAgo :=now.Add(time.Duration(-24*7)*time.Hour)
+	sevenDaysAgo := now.Add(time.Duration(-24*7) * time.Hour)
 	start := flags.String("start", sevenDaysAgo.Format(time.RFC3339), "start date")
 	end := flags.String("end", now.Format(time.RFC3339), "end date")
-	urgency := flags.String("urgency","", "high|low")
-	teamID := flags.String("team_id","", "team ID")
+	urgency := flags.String("urgency", "", "high|low")
+	teamID := flags.String("team_id", "", "team ID")
 
 	//log.SetLevel(log.DebugLevel)
 	if err := flags.Parse(args); err != nil {
 		log.Errorln(err)
 		return -1
 	}
+
 	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	client := c.Meta.Client()
-	serviceIds := make([]string,1)
+
+	serviceIds := make([]string, 1)
 	if *servID == "" {
 		serviceIds = nil
 	} else {
 		serviceIds[0] = *servID
 	}
-	teamIds := make([]string,1)
-	if *teamID=="" {
-		teamIds=nil
+
+	teamIds := make([]string, 1)
+	if *teamID == "" {
+		teamIds = nil
 	} else {
 		teamIds[0] = *teamID
 	}
+
 	analyticsFilter := pagerduty.AnalyticsFilter{
 		CreatedAtStart: *start,
 		CreatedAtEnd:   *end,
 		Urgency:        *urgency,
-		ServiceIds:     serviceIds,
-		TeamIds: teamIds,
+		ServiceIDs:     serviceIds,
+		TeamIDs:        teamIds,
 	}
+
 	analytics := pagerduty.AnalyticsRequest{
 		AnalyticsFilter: &analyticsFilter,
 		AggregateUnit:   "day",
 		TimeZone:        "Etc/UTC",
 	}
+
 	aggregatedIncidentData, err := client.GetAggregatedIncidentData(analytics)
 	if err != nil {
 		log.Error(err)
 		return -1
 	}
-	aggregatedIncidentDataBytes,err:=json.Marshal(aggregatedIncidentData)
+
+	aggregatedIncidentDataBytes, err := json.Marshal(aggregatedIncidentData)
+	if err != nil {
+		log.Error(err)
+		return -1
+	}
 	fmt.Println(string(aggregatedIncidentDataBytes))
 	return 0
 }
