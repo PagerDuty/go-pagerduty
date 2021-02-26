@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // PriorityProperty is a single priorty object returned from the Priorities endpoint
@@ -17,18 +16,21 @@ type Priorities struct {
 	Priorities []PriorityProperty `json:"priorities"`
 }
 
-// ListPriorities lists existing priorities
+// ListPriorities lists existing priorities. It's recommended to use
+// ListPrioritiesWithContext instead.
 func (c *Client) ListPriorities() (*Priorities, error) {
-	resp, err := c.get(context.TODO(), "/priorities")
+	return c.ListPrioritiesWithContext(context.Background())
+}
+
+// ListPrioritiesWithContext lists existing priorities.
+func (c *Client) ListPrioritiesWithContext(ctx context.Context) (*Priorities, error) {
+	resp, err := c.get(ctx, "/priorities")
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO(theckman): make sure we close the resp.Body here
-
 	var p Priorities
-	err = json.NewDecoder(resp.Body).Decode(&p)
-	if err != nil {
+	if err := c.decodeJSON(resp, &p); err != nil {
 		return nil, err
 	}
 
