@@ -44,12 +44,19 @@ type ChangeEventResponse struct {
 // CreateChangeEvent Sends PagerDuty a single ChangeEvent to record
 // The v2EventsAPIEndpoint parameter must be set on the client
 // Documentation can be found at https://developer.pagerduty.com/docs/events-api-v2/send-change-events
+//
+// It's recommended to use CreateChangeEventWithContext instead.
 func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) {
+	return c.CreateChangeEventWithContext(context.Background(), e)
+}
+
+// CreateChangeEventWithContext sends PagerDuty a single ChangeEvent to record
+// The v2EventsAPIEndpoint parameter must be set on the client Documentation can
+// be found at https://developer.pagerduty.com/docs/events-api-v2/send-change-events
+func (c *Client) CreateChangeEventWithContext(ctx context.Context, e ChangeEvent) (*ChangeEventResponse, error) {
 	if c.v2EventsAPIEndpoint == "" {
 		return nil, errors.New("v2EventsAPIEndpoint field must be set on Client")
 	}
-
-	headers := make(map[string]string)
 
 	data, err := json.Marshal(e)
 	if err != nil {
@@ -57,20 +64,21 @@ func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) 
 	}
 
 	resp, err := c.doWithEndpoint(
-		context.TODO(),
+		ctx,
 		c.v2EventsAPIEndpoint,
 		http.MethodPost,
 		changeEventPath,
 		false,
 		bytes.NewBuffer(data),
-		headers,
+		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	var eventResponse ChangeEventResponse
-	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
+
+	if err := c.decodeJSON(resp, &eventResponse); err != nil {
 		return nil, err
 	}
 
