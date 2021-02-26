@@ -37,25 +37,41 @@ type ListVendorOptions struct {
 	Query string `url:"query,omitempty"`
 }
 
-// ListVendors lists existing vendors.
+// ListVendors lists existing vendors. It's recommended to use
+// ListVendorsWithContext instead.
 func (c *Client) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
+	return c.ListVendorsWithContext(context.Background(), o)
+}
+
+// ListVendorsWithContext lists existing vendors.
+func (c *Client) ListVendorsWithContext(ctx context.Context, o ListVendorOptions) (*ListVendorResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.get(context.TODO(), "/vendors?"+v.Encode())
+	resp, err := c.get(ctx, "/vendors?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
 
 	var result ListVendorResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
-// GetVendor gets details about an existing vendor.
+// GetVendor gets details about an existing vendor. It's recommended to use
+// GetVendorWithContext instead.
 func (c *Client) GetVendor(id string) (*Vendor, error) {
-	resp, err := c.get(context.TODO(), "/vendors/"+id)
+	return c.GetVendorWithContext(context.Background(), id)
+}
+
+// GetVendorWithContext gets details about an existing vendor.
+func (c *Client) GetVendorWithContext(ctx context.Context, id string) (*Vendor, error) {
+	resp, err := c.get(ctx, "/vendors/"+id)
 	return getVendorFromResponse(c, resp, err)
 }
 
@@ -63,14 +79,18 @@ func getVendorFromResponse(c *Client, resp *http.Response, err error) (*Vendor, 
 	if err != nil {
 		return nil, err
 	}
+
 	var target map[string]Vendor
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	rootNode := "vendor"
+
+	const rootNode = "vendor"
+
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
 		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &t, nil
 }
