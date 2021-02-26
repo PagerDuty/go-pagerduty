@@ -1,7 +1,10 @@
 package pagerduty
 
 import (
+	"context"
+	"fmt"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
@@ -34,6 +37,59 @@ func TestService_List(t *testing.T) {
 				APIObject: APIObject{
 					ID: "1",
 				},
+			},
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// ListServices
+func TestService_ListPaginated(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		offsetStr := r.URL.Query()["offset"][0]
+		offset, _ := strconv.ParseInt(offsetStr, 10, 32)
+
+		var more string
+		if offset == 0 {
+			more = "true"
+		} else {
+			more = "false"
+		}
+		resp := fmt.Sprintf(`{"services": [{"id": "%d"}],
+                          "More": %s,
+                          "Offset": %d,
+                          "Limit": 1}`, offset, more, offset)
+		w.Write([]byte(resp))
+	})
+
+	var listObj = APIListObject{Limit: 1, Offset: 0, More: false, Total: 0}
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	var opts = ListServiceOptions{
+		APIListObject: listObj,
+		TeamIDs:       []string{},
+		TimeZone:      "foo",
+		SortBy:        "bar",
+		Query:         "baz",
+		Includes:      []string{},
+	}
+	res, err := client.ListServicesPaginated(context.Background(), opts)
+
+	want := []Service{
+		{
+			APIObject: APIObject{
+				ID: "0",
+			},
+		}, {
+			APIObject: APIObject{
+				ID: "1",
 			},
 		},
 	}

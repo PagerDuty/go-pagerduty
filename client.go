@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -356,6 +357,14 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 	return document
 }
 
+// Helper function to determine wither additional parameters should use ? or & to append args
+func getBasePrefix(basePath string) string {
+	if strings.Contains(path.Base(basePath), "?") {
+		return basePath + "&"
+	}
+	return basePath + "?"
+}
+
 // responseHandler is capable of parsing a response. At a minimum it must
 // extract the page information for the current page. It can also execute
 // additional necessary handling; for example, if a closure, it has access
@@ -370,9 +379,10 @@ func (c *Client) pagedGet(ctx context.Context, basePath string, handler response
 	// Offset to set for the next page request.
 	var nextOffset uint
 
+	basePrefix := getBasePrefix(basePath)
 	// While there are more pages, keep adjusting the offset to get all results.
 	for stillMore, nextOffset = true, 0; stillMore; {
-		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%s?offset=%d", basePath, nextOffset), nil, nil)
+		response, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%soffset=%d", basePrefix, nextOffset), nil, nil)
 		if err != nil {
 			return err
 		}

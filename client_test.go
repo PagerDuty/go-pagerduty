@@ -73,6 +73,25 @@ func testErrCheck(t *testing.T, name string, errContains string, err error) bool
 	return true
 }
 
+func TestGetBasePrefix(t *testing.T) {
+	testTable := []struct {
+		in  string
+		out string
+	}{
+		{"base.com/noparams", "base.com/noparams?"},
+		{"base.com/?/noparams", "base.com/?/noparams?"},
+		{"base.com/params?value=1", "base.com/params?value=1&"},
+		{"base.com/?/params?value=1", "base.com/?/params?value=1&"},
+		{"noslashes", "noslashes?"}, // this is what it will do... tbd what it should actually do
+	}
+	for _, tt := range testTable {
+		s := getBasePrefix(tt.in)
+		if s != tt.out {
+			t.Errorf("got %q, want %q", s, tt.out)
+		}
+	}
+}
+
 func TestAPIError_Error(t *testing.T) {
 	const jsonBody = `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["Enhance Your Calm", "Slow Your Roll"]}}`
 
