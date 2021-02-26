@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -38,7 +39,7 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 		HTTPClient: defaultHTTPClient,
 	}
 
-	res, err := client.GetAggregatedIncidentData(analyticsRequest)
+	res, err := client.GetAggregatedIncidentData(context.Background(),analyticsRequest)
 	want := AnalyticsResponse{
 		Data:            []AnalyticsData{analyticsDataWanted},
 		AnalyticsFilter: &analyticsFilterWanted,
