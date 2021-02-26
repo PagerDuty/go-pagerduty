@@ -31,9 +31,9 @@ type AnalyticsFilter struct {
 }
 
 type AnalyticsData struct {
-	ServiceId                      string `json:"service_id,omitempty"`
+	ServiceID                      string `json:"service_id,omitempty"`
 	ServiceName                    string `json:"service_name,omitempty"`
-	TeamId                         string `json:"team_id,omitempty"`
+	TeamID                         string `json:"team_id,omitempty"`
 	TeamName                       string `json:"team_name,omitempty"`
 	MeanSecondsToResolve           int    `json:"mean_seconds_to_resolve,omitempty"`
 	MeanSecondsToFirstAck          int    `json:"mean_seconds_to_first_ack,omitempty"`
