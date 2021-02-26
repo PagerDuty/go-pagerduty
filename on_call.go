@@ -35,16 +35,28 @@ type ListOnCallOptions struct {
 	Earliest            bool     `url:"earliest,omitempty"`
 }
 
-// ListOnCalls list the on-call entries during a given time range.
+// ListOnCalls list the on-call entries during a given time range. It's
+// recommended to use ListOnCallsWithContext instead.
 func (c *Client) ListOnCalls(o ListOnCallOptions) (*ListOnCallsResponse, error) {
+	return c.ListOnCallsWithContext(context.Background(), o)
+}
+
+// ListOnCallsWithContext list the on-call entries during a given time range.
+func (c *Client) ListOnCallsWithContext(ctx context.Context, o ListOnCallOptions) (*ListOnCallsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/oncalls?"+v.Encode())
+
+	resp, err := c.get(ctx, "/oncalls?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListOnCallsResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
