@@ -43,14 +43,20 @@ type V2EventResponse struct {
 
 const v2eventEndPoint = "https://events.pagerduty.com/v2/enqueue"
 
-// ManageEvent handles the trigger, acknowledge, and resolve methods for an event
+// ManageEvent handles the trigger, acknowledge, and resolve methods for an
+// event. It's recommended to use ManageEventWithContext instead.
 func ManageEvent(e V2Event) (*V2EventResponse, error) {
+	return ManageEventWithContext(context.Background(), e)
+}
+
+// ManageEventWithContext handles the trigger, acknowledge, and resolve methods for an event.
+func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, error) {
 	data, err := json.Marshal(e)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(context.TODO(), http.MethodPost, v2eventEndPoint, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, v2eventEndPoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -63,35 +69,48 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusAccepted {
 		bytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 		}
+
 		return nil, fmt.Errorf("HTTP Status Code: %d, Message: %s", resp.StatusCode, string(bytes))
 	}
+
 	var eventResponse V2EventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
 		return nil, err
 	}
+
 	return &eventResponse, nil
 }
 
-// ManageEvent handles the trigger, acknowledge, and resolve methods for an event
+// ManageEvent handles the trigger, acknowledge, and resolve methods for an
+// event. It's recommended to use ManageEventWithContext instead.
 func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
-	headers := make(map[string]string)
+	return c.ManageEventWithContext(context.Background(), e)
+}
 
+// ManageEventWithContext handles the trigger, acknowledge, and resolve methods for an event.
+func (c *Client) ManageEventWithContext(ctx context.Context, e *V2Event) (*V2EventResponse, error) {
 	data, err := json.Marshal(e)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.doWithEndpoint(context.TODO(), c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), headers)
+	resp, err := c.doWithEndpoint(ctx, c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), nil)
 	if err != nil {
 		return nil, err
 	}
-	result := &V2EventResponse{}
-	err = json.NewDecoder(resp.Body).Decode(result)
-	return result, err
+
+	var result V2EventResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, err
 }
