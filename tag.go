@@ -57,28 +57,68 @@ type TagAssignment struct {
 	Label string `json:"label,omitempty"`
 }
 
-// ListTags lists tags of your PagerDuty account, optionally filtered by a search query.
+// ListTags lists tags on your PagerDuty account, optionally filtered by a
+// search query. This method currently handles pagination of the response, so
+// all tags matched should be present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use ListTagsPaginated() instead.
 func (c *Client) ListTags(o ListTagOptions) (*ListTagResponse, error) {
-	return getTagList(context.TODO(), c, "", "", o)
+	tags, err := c.ListTagsPaginated(context.Background(), o)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListTagResponse{Tags: tags}, nil
 }
 
-// CreateTag creates a new tag.
+// ListTagsPaginated lists tags on your PagerDuty account, optionally filtered by a search query.
+func (c *Client) ListTagsPaginated(ctx context.Context, o ListTagOptions) ([]*Tag, error) {
+	tags, err := getTagList(ctx, c, "", "", o)
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
+// CreateTag creates a new tag. It's recommended to use CreateTagWithContext
+// instead.
 func (c *Client) CreateTag(t *Tag) (*Tag, *http.Response, error) {
-	data := make(map[string]*Tag)
-	data["tag"] = t
-	resp, err := c.post(context.TODO(), "/tags", data, nil)
+	return c.CreateTagWithContext(context.Background(), t)
+}
+
+// CreateTagWithContext creates a new tag.
+func (c *Client) CreateTagWithContext(ctx context.Context, t *Tag) (*Tag, *http.Response, error) {
+	d := map[string]*Tag{
+		"tag": t,
+	}
+
+	resp, err := c.post(ctx, "/tags", d, nil)
 	return getTagFromResponse(c, resp, err)
 }
 
-// DeleteTag removes an existing tag.
+// DeleteTag removes an existing tag. It's recommended to use
+// DeleteTagWithContext instead.
 func (c *Client) DeleteTag(id string) error {
-	_, err := c.delete(context.TODO(), "/tags/"+id)
+	return c.DeleteTagWithContext(context.Background(), id)
+}
+
+// DeleteTagWithContext removes an existing tag.
+func (c *Client) DeleteTagWithContext(ctx context.Context, id string) error {
+	_, err := c.delete(ctx, "/tags/"+id)
 	return err
 }
 
-// GetTag gets details about an existing tag.
+// GetTag gets details about an existing tag. It's recommended to use
+// GetTagWithContext instead.
 func (c *Client) GetTag(id string) (*Tag, *http.Response, error) {
-	resp, err := c.get(context.TODO(), "/tags/"+id)
+	return c.GetTagWithContext(context.Background(), id)
+}
+
+// GetTagWithContext gets details about an existing tag.
+func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, *http.Response, error) {
+	resp, err := c.get(ctx, "/tags/"+id)
 	return getTagFromResponse(c, resp, err)
 }
 
@@ -92,10 +132,26 @@ func (c *Client) AssignTags(e, eid string, a *TagAssignments) (*http.Response, e
 	return resp, nil
 }
 
-// GetUsersByTag get related Users for the Tag.
+// GetUsersByTag gets related user references based on the Tag. This method
+// currently handles pagination of the response, so all user references with the
+// tag should be present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use GetUsersByTagPaginated() instead.
 func (c *Client) GetUsersByTag(tid string) (*ListUserResponse, error) {
-	userResponse := new(ListUserResponse)
-	users := make([]*APIObject, 0)
+	objs, err := c.GetUsersByTagPaginated(context.Background(), tid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListUserResponse{Users: objs}, nil
+}
+
+// GetUsersByTagPaginated gets related user references based on the tag. To get the
+// full info of the user, you will need to iterate over the returned slice
+// and get that user's details.
+func (c *Client) GetUsersByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+	var users []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -117,18 +173,33 @@ func (c *Client) GetUsersByTag(tid string) (*ListUserResponse, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/users/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tid+"/users/", responseHandler); err != nil {
 		return nil, err
 	}
-	userResponse.Users = users
 
-	return userResponse, nil
+	return users, nil
 }
 
-// GetTeamsByTag get related Users for the Tag.
+// GetTeamsByTag gets related teams based on the tag. This method currently
+// handles pagination of the response, so all team references with the tag
+// should be present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use GetTeamsByTagPaginated() instead.
 func (c *Client) GetTeamsByTag(tid string) (*ListTeamsForTagResponse, error) {
-	teamsResponse := new(ListTeamsForTagResponse)
-	teams := make([]*APIObject, 0)
+	objs, err := c.GetTeamsByTagPaginated(context.Background(), tid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListTeamsForTagResponse{Teams: objs}, nil
+}
+
+// GetTeamsByTagPaginated gets related teams based on the tag. To get the full
+// info of the team, you will need to iterate over the returend slice and get
+// that team's details.
+func (c *Client) GetTeamsByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+	var teams []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -150,18 +221,34 @@ func (c *Client) GetTeamsByTag(tid string) (*ListTeamsForTagResponse, error) {
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/teams/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tid+"/teams/", responseHandler); err != nil {
 		return nil, err
 	}
-	teamsResponse.Teams = teams
 
-	return teamsResponse, nil
+	return teams, nil
 }
 
-// GetEscalationPoliciesByTag get related Users for the Tag.
+// GetEscalationPoliciesByTag gets related escalation policies based on the tag.
+// This method currently handles pagination of the response, so all escalation
+// policy references with the tag should be present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use GetEscalationPoliciesByTagPaginated()
+// instead.
 func (c *Client) GetEscalationPoliciesByTag(tid string) (*ListEPResponse, error) {
-	epResponse := new(ListEPResponse)
-	eps := make([]*APIObject, 0)
+	objs, err := c.GetEscalationPoliciesByTagPaginated(context.Background(), tid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListEPResponse{EscalationPolicies: objs}, nil
+}
+
+// GetEscalationPoliciesByTagPaginated gets related escalation policies based on
+// the tag. To get the full info of the EP, you will need to iterate over the
+// returend slice and get that policy's details.
+func (c *Client) GetEscalationPoliciesByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+	var eps []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -183,43 +270,62 @@ func (c *Client) GetEscalationPoliciesByTag(tid string) (*ListEPResponse, error)
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(context.TODO(), "/tags/"+tid+"/escalation_policies/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tid+"/escalation_policies/", responseHandler); err != nil {
 		return nil, err
 	}
-	epResponse.EscalationPolicies = eps
 
-	return epResponse, nil
+	return eps, nil
 }
 
-// GetTagsForEntity Get related tags for Users, Teams or Escalation Policies.
-func (c *Client) GetTagsForEntity(e, eid string, o ListTagOptions) (*ListTagResponse, error) {
-	return getTagList(context.TODO(), c, e, eid, o)
+// GetTagsForEntity get related tags for Users, Teams or Escalation Policies.
+// This method currently handles pagination of the response, so all tags should
+// be present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use GetTagsForEntityPaginated() instead.
+func (c *Client) GetTagsForEntity(entityType, entityID string, o ListTagOptions) (*ListTagResponse, error) {
+	tags, err := c.GetTagsForEntityPaginated(context.Background(), entityType, entityID, o)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListTagResponse{Tags: tags}, nil
+}
+
+// GetTagsForEntityPaginated gets related tags for Users, Teams or Escalation
+// Policies.
+func (c *Client) GetTagsForEntityPaginated(ctx context.Context, entityType, entityID string, o ListTagOptions) ([]*Tag, error) {
+	return getTagList(ctx, c, entityType, entityID, o)
 }
 
 func getTagFromResponse(c *Client, resp *http.Response, err error) (*Tag, *http.Response, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
 	var target map[string]Tag
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	rootNode := "tag"
+
+	const rootNode = "tag"
+
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
 		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &t, resp, nil
 }
 
 // getTagList  is a utility function that processes all pages of a ListTagResponse
-func getTagList(ctx context.Context, c *Client, e, eid string, o ListTagOptions) (*ListTagResponse, error) {
+func getTagList(ctx context.Context, c *Client, entityType, entityID string, o ListTagOptions) ([]*Tag, error) {
 	queryParms, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	tagResponse := new(ListTagResponse)
-	tags := make([]*Tag, 0)
+
+	var tags []*Tag
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -239,15 +345,16 @@ func getTagList(ctx context.Context, c *Client, e, eid string, o ListTagOptions)
 			Limit:  result.Limit,
 		}, nil
 	}
+
 	path := "/tags"
-	if e != "" && eid != "" {
-		path = "/" + e + "/" + eid + "/tags"
+	if entityType != "" && entityID != "" {
+		path = "/" + entityType + "/" + entityID + "/tags"
 	}
+
 	// Make call to get all pages associated with the base endpoint.
 	if err := c.pagedGet(ctx, path+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
-	tagResponse.Tags = tags
 
-	return tagResponse, nil
+	return tags, nil
 }
