@@ -47,14 +47,30 @@ type ListBusinessServiceOptions struct {
 	APIListObject
 }
 
-// ListBusinessServices lists existing business services.
+// ListBusinessServices lists existing business services. This method currently
+// handles pagination of the response, so all business services should be
+// present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use ListBusinessServicesPaginated instead.
 func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusinessServicesResponse, error) {
+	bss, err := c.ListBusinessServicesPaginated(context.Background(), o)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListBusinessServicesResponse{BusinessServices: bss}, nil
+}
+
+// ListBusinessServicesPaginated lists existing business services, automatically
+// handling pagination and returning the full collection.
+func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusinessServiceOptions) ([]*BusinessService, error) {
 	queryParms, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	businessServiceResponse := new(ListBusinessServicesResponse)
-	businessServices := make([]*BusinessService, 0)
+
+	var businessServices []*BusinessService
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -76,41 +92,84 @@ func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusine
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(context.TODO(), "/business_services"+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/business_services"+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
-	businessServiceResponse.BusinessServices = businessServices
 
-	return businessServiceResponse, nil
+	return businessServices, nil
 }
 
-// CreateBusinessService creates a new business service.
+// CreateBusinessService creates a new business service. It's recommended to use
+// CreateBusinessServiceWithContext instead
 func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	data := make(map[string]*BusinessService)
-	data["business_service"] = b
-	resp, err := c.post(context.TODO(), "/business_services", data, nil)
+	return c.createBusinessServiceWithContext(context.Background(), b)
+}
+
+// CreateBusinessServiceWithContext creates a new business service.
+func (c *Client) CreateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
+	bs, _, err := c.createBusinessServiceWithContext(ctx, b)
+	return bs, err
+}
+
+func (c *Client) createBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, *http.Response, error) {
+	d := map[string]*BusinessService{
+		"business_service": b,
+	}
+
+	resp, err := c.post(ctx, "/business_services", d, nil)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
-// GetBusinessService gets details about a business service.
-func (c *Client) GetBusinessService(ID string) (*BusinessService, *http.Response, error) {
-	resp, err := c.get(context.TODO(), "/business_services/"+ID)
+// GetBusinessService gets details about a business service. It's recommended to
+// use GetBusinessServiceWithContext instead.
+func (c *Client) GetBusinessService(id string) (*BusinessService, *http.Response, error) {
+	return c.getBusinessServiceWithContext(context.Background(), id)
+}
+
+// GetBusinessServiceWithContext gets details about a business service.
+func (c *Client) GetBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, error) {
+	bs, _, err := c.getBusinessServiceWithContext(ctx, id)
+	return bs, err
+}
+
+func (c *Client) getBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, *http.Response, error) {
+	resp, err := c.get(ctx, "/business_services/"+id)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
-// DeleteBusinessService deletes a business_service.
-func (c *Client) DeleteBusinessService(ID string) error {
-	_, err := c.delete(context.TODO(), "/business_services/"+ID)
+// DeleteBusinessService deletes a business_service. It's recommended to use
+// DeleteBusinessServiceWithContext instead.
+func (c *Client) DeleteBusinessService(id string) error {
+	return c.DeleteBusinessServiceWithContext(context.Background(), id)
+}
+
+// DeleteBusinessServiceWithContext deletes a business_service.
+func (c *Client) DeleteBusinessServiceWithContext(ctx context.Context, id string) error {
+	_, err := c.delete(ctx, "/business_services/"+id)
 	return err
 }
 
-// UpdateBusinessService updates a business_service.
+// UpdateBusinessService updates a business_service. It's recommended to use
+// UpdateBusinessServiceWithContext instead.
 func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	v := make(map[string]*BusinessService)
+	return c.updateBusinessServiceWithContext(context.Background(), b)
+}
+
+// UpdateBusinessServiceWithContext updates a business_service.
+func (c *Client) UpdateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
+	bs, _, err := c.updateBusinessServiceWithContext(ctx, b)
+	return bs, err
+}
+
+func (c *Client) updateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, *http.Response, error) {
 	id := b.ID
 	b.ID = ""
-	v["business_service"] = b
-	resp, err := c.put(context.TODO(), "/business_services/"+id, v, nil)
+
+	d := map[string]*BusinessService{
+		"business_service": b,
+	}
+
+	resp, err := c.put(ctx, "/business_services/"+id, d, nil)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
@@ -118,13 +177,18 @@ func getBusinessServiceFromResponse(c *Client, resp *http.Response, err error) (
 	if err != nil {
 		return nil, nil, err
 	}
+
 	var target map[string]BusinessService
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	t, nodeOK := target["business_service"]
+
+	const rootNode = "business_service"
+
+	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have business_service field")
+		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &t, resp, nil
 }
