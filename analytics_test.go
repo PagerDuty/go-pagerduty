@@ -39,7 +39,7 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 		HTTPClient: defaultHTTPClient,
 	}
 
-	res, err := client.GetAggregatedIncidentData(context.Background(),analyticsRequest)
+	res, err := client.GetAggregatedIncidentData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
 		Data:            []AnalyticsData{analyticsDataWanted},
 		AnalyticsFilter: &analyticsFilterWanted,

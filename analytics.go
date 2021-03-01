@@ -54,12 +54,12 @@ type AnalyticsData struct {
 	RangeStart                     string `json:"range_start,omitempty"`
 }
 
-func (c *Client) GetAggregatedIncidentData(ctx context.Context,analytics AnalyticsRequest) (AnalyticsResponse, error) {
+func (c *Client) GetAggregatedIncidentData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
 	var analyticsResponse AnalyticsResponse
 	headers := make(map[string]string)
 	headers["X-EARLY-ACCESS"] = "analytics-v2"
 
-	resp, err := c.post(ctx,"/analytics/metrics/incidents/all", analytics, headers)
+	resp, err := c.post(ctx, "/analytics/metrics/incidents/all", analytics, headers)
 	if err != nil {
 		return analyticsResponse, err
 	}

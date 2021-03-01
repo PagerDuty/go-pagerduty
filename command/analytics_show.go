@@ -89,7 +89,7 @@ func (c *AnalyticsShow) Run(args []string) int {
 		TimeZone:        "Etc/UTC",
 	}
 
-	aggregatedIncidentData, err := client.GetAggregatedIncidentData(context.Background(),analytics)
+	aggregatedIncidentData, err := client.GetAggregatedIncidentData(context.Background(), analytics)
 	if err != nil {
 		log.Error(err)
 		return -1
