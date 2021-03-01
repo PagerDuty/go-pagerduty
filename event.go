@@ -49,7 +49,7 @@ func CreateEventWithHTTPClient(e Event, client HTTPClient) (*EventResponse, erro
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		return  nil, fmt.Errorf("failed to action request: %w", err)
+		return nil, fmt.Errorf("failed to action request: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
