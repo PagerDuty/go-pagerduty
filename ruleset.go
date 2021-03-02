@@ -104,13 +104,14 @@ type ListRulesetRulesResponse struct {
 
 // RuleActions represents a rule action
 type RuleActions struct {
-	Suppress    *RuleActionSuppress     `json:"suppress,omitempty"`
 	Annotate    *RuleActionParameter    `json:"annotate,omitempty"`
-	Severity    *RuleActionParameter    `json:"severity,omitempty"`
-	Priority    *RuleActionParameter    `json:"priority,omitempty"`
-	Route       *RuleActionParameter    `json:"route"`
 	EventAction *RuleActionParameter    `json:"event_action,omitempty"`
 	Extractions []*RuleActionExtraction `json:"extractions,omitempty"`
+	Priority    *RuleActionParameter    `json:"priority,omitempty"`
+	Severity    *RuleActionParameter    `json:"severity,omitempty"`
+	Suppress    *RuleActionSuppress     `json:"suppress,omitempty"`
+	Suspend     *RuleActionSuspend      `json:"suspend,omitempty"`
+	Route       *RuleActionParameter    `json:"route"`
 }
 
 // RuleActionParameter represents a generic parameter object on a rule action
@@ -124,6 +125,11 @@ type RuleActionSuppress struct {
 	ThresholdValue      int    `json:"threshold_value,omitempty"`
 	ThresholdTimeUnit   string `json:"threshold_time_unit,omitempty"`
 	ThresholdTimeAmount int    `json:"threshold_time_amount,omitempty"`
+}
+
+// RuleActionSuspend represents a rule suspend action object
+type RuleActionSuspend struct {
+	Value bool `json:"value,omitempty"`
 }
 
 // RuleActionExtraction represents a rule extraction action object
