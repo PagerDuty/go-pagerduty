@@ -429,3 +429,129 @@ func TestService_DeleteIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// List Service Rules
+func TestService_ListRules(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services/1/rules", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"rules": [{"id": "1"}]}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	serviceID := "1"
+	res, err := client.ListServicetRules(serviceID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &ListServiceRulesResponse{
+		Rules: []*ServiceRule{
+			{
+				ID: "1",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
+
+// Create Service Rule
+func TestService_CreateServiceRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services/1/rules/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	serviceID := "1"
+	rule := &ServiceRule{}
+
+	res, _, err := client.CreateServiceRule(serviceID, rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &ServiceRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Get Service Rule
+func TestService_GetServiceRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	serviceID := "1"
+	ruleID := "1"
+	res, _, err := client.GetServiceRule(serviceID, ruleID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &ServiceRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Update Service Rule
+func TestService_UpdateServiceRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		w.Write([]byte(`{"rule": {"id": "1"}}`))
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	serviceID := "1"
+	ruleID := "1"
+	rule := &ServiceRule{}
+
+	res, _, err := client.UpdateServiceRule(serviceID, ruleID, rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &ServiceRule{
+		ID: "1",
+	}
+	testEqual(t, want, res)
+}
+
+// Delete Service Rule
+func TestService_DeleteServiceRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+
+	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	serviceID := "1"
+	ruleID := "1"
+
+	err := client.DeleteServiceRule(serviceID, ruleID)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+}
