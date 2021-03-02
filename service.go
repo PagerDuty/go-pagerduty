@@ -251,8 +251,8 @@ func (c *Client) DeleteIntegration(serviceID string, integrationID string) error
 	return err
 }
 
-// ListServicetRules gets all rules for a service.
-func (c *Client) ListServicetRules(serviceID string) (*ListServiceRulesResponse, error) {
+// ListServiceRules gets all rules for a service.
+func (c *Client) ListServiceRules(serviceID string) (*ListServiceRulesResponse, error) {
 	rulesResponse := new(ListServiceRulesResponse)
 	rules := make([]*ServiceRule, 0)
 

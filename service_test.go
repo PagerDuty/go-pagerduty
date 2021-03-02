@@ -443,7 +443,7 @@ func TestService_ListRules(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
-	res, err := client.ListServicetRules(serviceID)
+	res, err := client.ListServiceRules(serviceID)
 	if err != nil {
 		t.Fatal(err)
 	}
