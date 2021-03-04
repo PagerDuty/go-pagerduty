@@ -20,7 +20,7 @@ build-deps:
 
 .PHONY: install
 install: build
-	cp pd $(GOPATH)/bin
+	cp pd $(GOROOT)/bin
 
 .PHONY: test
 test:

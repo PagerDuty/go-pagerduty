@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
-	"github.com/nytimes/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )

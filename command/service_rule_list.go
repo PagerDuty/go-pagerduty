@@ -6,7 +6,6 @@ import (
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type ServiceRuleList struct {
@@ -39,27 +38,27 @@ func (c *ServiceRuleList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	client := c.Meta.Client()
-
 	if len(flags.Args()) != 1 {
 		log.Error("Please specify service id")
 		return -1
 	}
 	log.Info("Service id is:", flags.Arg(0))
 
-	if rulesList, err := client.ListServiceRules(flags.Arg(0)); err != nil {
-		log.Error(err)
-		return -1
-	} else {
-		for i, rule := range rulesList.Rules {
-			fmt.Println("Entry: ", i+1)
-			data, err := yaml.Marshal(rule)
-			if err != nil {
-				log.Error(err)
-				return -1
-			}
-			fmt.Println(string(data))
-		}
-	}
+	// TODO: Only after PR is merged upstream
+	// client := c.Meta.Client()
+	// if rulesList, err := client.ListServiceRules(flags.Arg(0)); err != nil {
+	// 	log.Error(err)
+	// 	return -1
+	// } else {
+	// 	for i, rule := range rulesList.Rules {
+	// 		fmt.Println("Entry: ", i+1)
+	// 		data, err := yaml.Marshal(rule)
+	// 		if err != nil {
+	// 			log.Error(err)
+	// 			return -1
+	// 		}
+	// 		fmt.Println(string(data))
+	// 	}
+	// }
 	return 0
 }

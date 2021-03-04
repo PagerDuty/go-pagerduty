@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/cli"
-	"github.com/nytimes/go-pagerduty"
+	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 )
 
