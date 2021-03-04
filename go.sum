@@ -1,5 +1,3 @@
-github.com/PagerDuty/go-pagerduty v1.3.0 h1:2vWajLxpmGeP8pmsyZ0MjFneHa8ASJrztJRSe3FNOzg=
-github.com/PagerDuty/go-pagerduty v1.3.0/go.mod h1:W5hSIIPrzSgAkNBDiuymWN5g9yQVzimL7BUBL44f3RY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310 h1:BUAU3CGlLvorLI26FmByPp2eC2qla6E1Tw+scpcg/to=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=
