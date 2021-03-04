@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
+
+	"github.com/mitchellh/cli"
+	"github.com/nytimes/go-pagerduty"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type ServiceList struct {

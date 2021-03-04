@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/cli"
 	"os"
+
+	"github.com/mitchellh/cli"
 )
 
 const (
@@ -69,6 +70,11 @@ func loadCommands() map[string]cli.CommandFactory {
 		"service integration create": ServiceIntegrationCreateCommand,
 		"service integration show":   ServiceIntegrationShowCommand,
 		"service integration update": ServiceIntegrationUpdateCommand,
+		"service rule create":        ServiceRuleCreateCommand,
+		"service rule delete":        ServiceRuleDeleteCommand,
+		"service rule list":          ServiceRuleListCommand,
+		"service rule show":          ServiceRuleShowCommand,
+		"service rule update":        ServiceRuleUpdateCommand,
 
 		"team list":                     TeamListCommand,
 		"team create":                   TeamShowCommand,
