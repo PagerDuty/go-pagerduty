@@ -58,11 +58,11 @@ type IncidentUrgencyRule struct {
 
 // ListServiceRulesResponse represents a list of rules in a service
 type ListServiceRulesResponse struct {
-	Offset uint           `json:"offset,omitempty"`
-	Limit  uint           `json:"limit,omitempty"`
-	More   bool           `json:"more,omitempty"`
-	Total  uint           `json:"total,omitempty"`
-	Rules  []*ServiceRule `json:"rules,omitempty"`
+	Offset uint          `json:"offset,omitempty"`
+	Limit  uint          `json:"limit,omitempty"`
+	More   bool          `json:"more,omitempty"`
+	Total  uint          `json:"total,omitempty"`
+	Rules  []ServiceRule `json:"rules,omitempty"`
 }
 
 // ServiceRule represents a Service rule
@@ -78,13 +78,13 @@ type ServiceRule struct {
 
 // ServiceRuleActions represents a rule action
 type ServiceRuleActions struct {
-	Annotate    *RuleActionParameter    `json:"annotate,omitempty"`
-	EventAction *RuleActionParameter    `json:"event_action,omitempty"`
-	Extractions []*RuleActionExtraction `json:"extractions,omitempty"`
-	Priority    *RuleActionParameter    `json:"priority,omitempty"`
-	Severity    *RuleActionParameter    `json:"severity,omitempty"`
-	Suppress    *RuleActionSuppress     `json:"suppress,omitempty"`
-	Suspend     *RuleActionSuspend      `json:"suspend,omitempty"`
+	Annotate    *RuleActionParameter   `json:"annotate,omitempty"`
+	EventAction *RuleActionParameter   `json:"event_action,omitempty"`
+	Extractions []RuleActionExtraction `json:"extractions,omitempty"`
+	Priority    *RuleActionParameter   `json:"priority,omitempty"`
+	Severity    *RuleActionParameter   `json:"severity,omitempty"`
+	Suppress    *RuleActionSuppress    `json:"suppress,omitempty"`
+	Suspend     *RuleActionSuspend     `json:"suspend,omitempty"`
 }
 
 // Service represents something you monitor (like a web service, email service, or database service).
@@ -252,9 +252,8 @@ func (c *Client) DeleteIntegration(serviceID string, integrationID string) error
 }
 
 // ListServiceRules gets all rules for a service.
-func (c *Client) ListServiceRules(serviceID string) (*ListServiceRulesResponse, error) {
-	rulesResponse := new(ListServiceRulesResponse)
-	rules := make([]*ServiceRule, 0)
+func (c *Client) ListServiceRulesPaginated(ctx context.Context, serviceID string) ([]ServiceRule, error) {
+	var rules []ServiceRule
 
 	// Create a handler closure capable of parsing data from the Service rules endpoint
 	// and appending resultant Service rules to the return slice.
@@ -277,56 +276,61 @@ func (c *Client) ListServiceRules(serviceID string) (*ListServiceRulesResponse, 
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(context.TODO(), "/services/"+serviceID+"/rules", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/services/"+serviceID+"/rules", responseHandler); err != nil {
 		return nil, err
 	}
-	rulesResponse.Rules = rules
 
-	return rulesResponse, nil
+	return rules, nil
 }
 
 // GetServiceRule gets a service rule.
-func (c *Client) GetServiceRule(serviceID, ruleID string) (*ServiceRule, *http.Response, error) {
-	resp, err := c.get(context.TODO(), "/services/"+serviceID+"/rules/"+ruleID)
+func (c *Client) GetServiceRule(ctx context.Context, serviceID, ruleID string) (ServiceRule, error) {
+	resp, err := c.get(ctx, "/services/"+serviceID+"/rules/"+ruleID)
 	return getServiceRuleFromResponse(c, resp, err)
 }
 
 // DeleteServiceRule deletes a service rule.
-func (c *Client) DeleteServiceRule(serviceID, ruleID string) error {
-	_, err := c.delete(context.TODO(), "/services/"+serviceID+"/rules/"+ruleID)
+func (c *Client) DeleteServiceRule(ctx context.Context, serviceID, ruleID string) error {
+	_, err := c.delete(ctx, "/services/"+serviceID+"/rules/"+ruleID)
 	return err
 }
 
 // CreateServiceRule creates a service rule.
-func (c *Client) CreateServiceRule(serviceID string, rule *ServiceRule) (*ServiceRule, *http.Response, error) {
-	data := make(map[string]*ServiceRule)
-	data["rule"] = rule
-	resp, err := c.post(context.TODO(), "/services/"+serviceID+"/rules/", data, nil)
+func (c *Client) CreateServiceRule(ctx context.Context, serviceID string, rule ServiceRule) (ServiceRule, error) {
+	d := map[string]ServiceRule{
+		"rule": rule,
+	}
+	resp, err := c.post(ctx, "/services/"+serviceID+"/rules/", d, nil)
 	return getServiceRuleFromResponse(c, resp, err)
 }
 
 // UpdateServiceRule updates a service rule.
-func (c *Client) UpdateServiceRule(serviceID, ruleID string, rule *ServiceRule) (*ServiceRule, *http.Response, error) {
-	data := make(map[string]*ServiceRule)
-	data["rule"] = rule
-	resp, err := c.put(context.TODO(), "/services/"+serviceID+"/rules/"+ruleID, data, nil)
+func (c *Client) UpdateServiceRule(ctx context.Context, serviceID, ruleID string, rule ServiceRule) (ServiceRule, error) {
+	d := map[string]ServiceRule{
+		"rule": rule,
+	}
+	resp, err := c.put(ctx, "/services/"+serviceID+"/rules/"+ruleID, d, nil)
 	return getServiceRuleFromResponse(c, resp, err)
 }
 
-func getServiceRuleFromResponse(c *Client, resp *http.Response, err error) (*ServiceRule, *http.Response, error) {
+func getServiceRuleFromResponse(c *Client, resp *http.Response, err error) (ServiceRule, error) {
 	if err != nil {
-		return nil, nil, err
+		return ServiceRule{}, err
 	}
+
 	var target map[string]ServiceRule
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return ServiceRule{}, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	rootNode := "rule"
+
+	const rootNode = "rule"
+
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return ServiceRule{}, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
-	return &t, resp, nil
+
+	return t, nil
 }
 
 func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service, error) {

@@ -443,18 +443,12 @@ func TestService_ListRules(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
-	res, err := client.ListServiceRules(serviceID)
+	res, err := client.ListServiceRulesPaginated(context.Background(), serviceID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	want := &ListServiceRulesResponse{
-		Rules: []*ServiceRule{
-			{
-				ID: "1",
-			},
-		},
-	}
+	want := []ServiceRule{{ID: "1"}}
 	testEqual(t, want, res)
 }
 
@@ -471,14 +465,14 @@ func TestService_CreateServiceRule(t *testing.T) {
 	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
-	rule := &ServiceRule{}
+	rule := ServiceRule{}
 
-	res, _, err := client.CreateServiceRule(serviceID, rule)
+	res, err := client.CreateServiceRule(context.Background(), serviceID, rule)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	want := &ServiceRule{
+	want := ServiceRule{
 		ID: "1",
 	}
 	testEqual(t, want, res)
@@ -498,12 +492,12 @@ func TestService_GetServiceRule(t *testing.T) {
 
 	serviceID := "1"
 	ruleID := "1"
-	res, _, err := client.GetServiceRule(serviceID, ruleID)
+	res, err := client.GetServiceRule(context.Background(), serviceID, ruleID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	want := &ServiceRule{
+	want := ServiceRule{
 		ID: "1",
 	}
 	testEqual(t, want, res)
@@ -523,14 +517,14 @@ func TestService_UpdateServiceRule(t *testing.T) {
 
 	serviceID := "1"
 	ruleID := "1"
-	rule := &ServiceRule{}
+	rule := ServiceRule{}
 
-	res, _, err := client.UpdateServiceRule(serviceID, ruleID, rule)
+	res, err := client.UpdateServiceRule(context.Background(), serviceID, ruleID, rule)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	want := &ServiceRule{
+	want := ServiceRule{
 		ID: "1",
 	}
 	testEqual(t, want, res)
@@ -549,7 +543,7 @@ func TestService_DeleteServiceRule(t *testing.T) {
 	serviceID := "1"
 	ruleID := "1"
 
-	err := client.DeleteServiceRule(serviceID, ruleID)
+	err := client.DeleteServiceRule(context.Background(), serviceID, ruleID)
 
 	if err != nil {
 		t.Fatal(err)
