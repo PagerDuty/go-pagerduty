@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type ServiceRuleList struct {
@@ -44,21 +46,20 @@ func (c *ServiceRuleList) Run(args []string) int {
 	}
 	log.Info("Service id is:", flags.Arg(0))
 
-	// TODO: Only after PR is merged upstream
-	// client := c.Meta.Client()
-	// if rulesList, err := client.ListServiceRules(flags.Arg(0)); err != nil {
-	// 	log.Error(err)
-	// 	return -1
-	// } else {
-	// 	for i, rule := range rulesList.Rules {
-	// 		fmt.Println("Entry: ", i+1)
-	// 		data, err := yaml.Marshal(rule)
-	// 		if err != nil {
-	// 			log.Error(err)
-	// 			return -1
-	// 		}
-	// 		fmt.Println(string(data))
-	// 	}
-	// }
+	client := c.Meta.Client()
+	if rulesList, err := client.ListServiceRulesPaginated(context.Background(), flags.Arg(0)); err != nil {
+		log.Error(err)
+		return -1
+	} else {
+		for i, rule := range rulesList {
+			fmt.Println("Entry: ", i+1)
+			data, err := yaml.Marshal(rule)
+			if err != nil {
+				log.Error(err)
+				return -1
+			}
+			fmt.Println(string(data))
+		}
+	}
 	return 0
 }

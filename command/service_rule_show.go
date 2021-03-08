@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type ServiceRuleShow struct {
@@ -45,19 +47,17 @@ func (c *ServiceRuleShow) Run(args []string) int {
 	log.Info("Service id is:", flags.Arg(0))
 	log.Info("Rule id is:", flags.Arg(1))
 
-	// TODO: Only after PR is merged upstream
-	// client := c.Meta.Client()
-	// rule, r, err := client.GetServiceRule(flags.Arg(0), flags.Arg(1))
-	// defer r.Body.Close()
-	// if err != nil {
-	// 	log.Error(err)
-	// 	return -1
-	// }
-	// data, err := yaml.Marshal(rule)
-	// if err != nil {
-	// 	log.Error(err)
-	// 	return -1
-	// }
-	// fmt.Println(string(data))
+	client := c.Meta.Client()
+	rule, err := client.GetServiceRule(context.Background(), flags.Arg(0), flags.Arg(1))
+	if err != nil {
+		log.Error(err)
+		return -1
+	}
+	data, err := yaml.Marshal(rule)
+	if err != nil {
+		log.Error(err)
+		return -1
+	}
+	fmt.Println(string(data))
 	return 0
 }
