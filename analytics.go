@@ -1,10 +1,7 @@
 package pagerduty
 
 import (
-	"bytes"
 	"context"
-	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 )
 
 type AnalyticsRequest struct {
@@ -62,12 +59,6 @@ func (c *Client) GetAggregatedIncidentData(ctx context.Context, analytics Analyt
 	resp, err := c.post(ctx, "/analytics/metrics/incidents/all", analytics, headers)
 	if err != nil {
 		return analyticsResponse, err
-	}
-	if log.IsLevelEnabled(log.DebugLevel) {
-		bytesBody, _ := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		log.Debug(string(bytesBody))
-		resp.Body = ioutil.NopCloser(bytes.NewBuffer(bytesBody))
 	}
 	err = c.decodeJSON(resp, &analyticsResponse)
 	return analyticsResponse, err
