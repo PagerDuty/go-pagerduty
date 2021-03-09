@@ -69,7 +69,7 @@ type ListServiceRulesResponse struct {
 type ServiceRule struct {
 	ID         string              `json:"id,omitempty"`
 	Self       string              `json:"self,omitempty"`
-	Disabled   bool                `json:"disabled,omitempty"`
+	Disabled   *bool               `json:"disabled,omitempty"`
 	Conditions *RuleConditions     `json:"conditions,omitempty"`
 	TimeFrame  *RuleTimeFrame      `json:"time_frame,omitempty"`
 	Position   *int                `json:"position,omitempty"`

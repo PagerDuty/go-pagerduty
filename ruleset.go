@@ -129,7 +129,7 @@ type RuleActionSuppress struct {
 
 // RuleActionSuspend represents a rule suspend action object
 type RuleActionSuspend struct {
-	Value bool `json:"value,omitempty"`
+	Value *bool `json:"value,omitempty"`
 }
 
 // RuleActionExtraction represents a rule extraction action object
