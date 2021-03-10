@@ -60,20 +60,29 @@ type ListLogEntriesOptions struct {
 	Includes   []string `url:"include,omitempty,brackets"`
 }
 
-// ListLogEntries lists all of the incident log entries across the entire account.
+// ListLogEntries lists all of the incident log entries across the entire
+// account. It's recommended to use ListLogEntriesWithContext instead.
 func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
+	return c.ListLogEntriesWithContext(context.Background(), o)
+}
+
+// ListLogEntriesWithContext lists all of the incident log entries across the entire account.
+func (c *Client) ListLogEntriesWithContext(ctx context.Context, o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/log_entries?"+v.Encode())
+
+	resp, err := c.get(ctx, "/log_entries?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListLogEntryResponse
-	if err := c.decodeJSON(resp, &result); err != nil {
+	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
+
 	return &result, err
 }
 
@@ -83,13 +92,20 @@ type GetLogEntryOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// GetLogEntry list log entries for the specified incident.
+// GetLogEntry list log entries for the specified incident. It's recommended to
+// use GetLogEntryWithContext instead.
 func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error) {
+	return c.GetLogEntryWithContext(context.Background(), id, o)
+}
+
+// GetLogEntryWithContext list log entries for the specified incident.
+func (c *Client) GetLogEntryWithContext(ctx context.Context, id string, o GetLogEntryOptions) (*LogEntry, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/log_entries/"+id+"?"+v.Encode())
+
+	resp, err := c.get(ctx, "/log_entries/"+id+"?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +119,7 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have log_entry field")
 	}
+
 	return &le, nil
 }
 
