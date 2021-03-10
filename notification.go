@@ -31,16 +31,31 @@ type ListNotificationsResponse struct {
 	Notifications []Notification
 }
 
-// ListNotifications lists notifications for a given time range, optionally filtered by type (sms_notification, email_notification, phone_notification, or push_notification).
+// ListNotifications lists notifications for a given time range, optionally
+// filtered by type (sms_notification, email_notification, phone_notification,
+// or push_notification). It's recommended to use ListNotificationsWithContext instead.
 func (c *Client) ListNotifications(o ListNotificationOptions) (*ListNotificationsResponse, error) {
+	return c.ListNotificationsWithContext(context.Background(), o)
+}
+
+// ListNotificationsWithContext lists notifications for a given time range,
+// optionally filtered by type (sms_notification, email_notification,
+// phone_notification, or push_notification).
+func (c *Client) ListNotificationsWithContext(ctx context.Context, o ListNotificationOptions) (*ListNotificationsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/notifications?"+v.Encode())
+
+	resp, err := c.get(ctx, "/notifications?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListNotificationsResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
