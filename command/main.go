@@ -103,7 +103,9 @@ func loadCommands() map[string]cli.CommandFactory {
 
 		"vendor list":                          VendorListCommand,
 		"vendor show":                          VendorShowCommand,
-		"analyticsAggregatedIncidentData show": AnalyticsGetAggregatedIncidentDataCommand,
+		"analytics incident show":     AnalyticsGetAggregatedIncidentDataCommand,
+		"analytics service show":      AnalyticsGetAggregatedServiceDataCommand,
+		"analytics team show":         AnalyticsGetAggregatedTeamDataCommand,
 	}
 }
 

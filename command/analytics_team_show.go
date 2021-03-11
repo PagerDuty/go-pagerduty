@@ -4,27 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"strings"
-	"time"
 )
 
-type AnalyticsShow struct {
+type AnalyticsTeamShow struct {
 	Meta
 }
 
-func AnalyticsGetAggregatedIncidentDataCommand() (cli.Command, error) {
-	return &AnalyticsShow{}, nil
+func AnalyticsGetAggregatedTeamDataCommand() (cli.Command, error) {
+	return &AnalyticsServiceShow{}, nil
 }
 
-func (c *AnalyticsShow) Help() string {
+func (c *AnalyticsTeamShow) Help() string {
 	helpText := `
-	analytics show
-
+	analytics team show
 	Options:
-
 		 -(service_id|team_id) #MANDATORY provide service or team id to stats on.
 		 -start #Optional RFC3339 format default : 7 days ago
 		 -end #Optional RFC3339 format default : now
@@ -33,12 +32,12 @@ func (c *AnalyticsShow) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
-func (c *AnalyticsShow) Synopsis() string {
-	return "Get analytics aggregated incident data"
+func (c *AnalyticsTeamShow) Synopsis() string {
+	return "Get aggregated team data analytics"
 }
 
-func (c *AnalyticsShow) Run(args []string) int {
-	flags := c.Meta.FlagSet("analytics show")
+func (c *AnalyticsTeamShow) Run(args []string) int {
+	flags := c.Meta.FlagSet("analytics team show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	servID := flags.String("service_id", "", "Service ID")
 	now := time.Now()
@@ -89,17 +88,17 @@ func (c *AnalyticsShow) Run(args []string) int {
 		TimeZone:        "Etc/UTC",
 	}
 
-	aggregatedIncidentData, err := client.GetAggregatedIncidentData(context.Background(), analytics)
+	aggregatedTeamData, err := client.GetAggregatedTeamData(context.Background(), analytics)
 	if err != nil {
 		log.Error(err)
 		return -1
 	}
 
-	aggregatedIncidentDataBytes, err := json.Marshal(aggregatedIncidentData)
+	aggregatedTeamDataBytes, err := json.Marshal(aggregatedTeamData)
 	if err != nil {
 		log.Error(err)
 		return -1
 	}
-	fmt.Println(string(aggregatedIncidentDataBytes))
+	fmt.Println(string(aggregatedTeamDataBytes))
 	return 0
 }
