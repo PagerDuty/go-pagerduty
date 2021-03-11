@@ -3,3 +3,4 @@ bin/*
 pd
 vendor/
 .vscode/
+.idea/

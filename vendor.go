@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -39,13 +40,11 @@ type ListVendorOptions struct {
 // ListVendors lists existing vendors.
 func (c *Client) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
 	v, err := query.Values(o)
-
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.get("/vendors?" + v.Encode())
-
+	resp, err := c.get(context.TODO(), "/vendors?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +55,7 @@ func (c *Client) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
 
 // GetVendor gets details about an existing vendor.
 func (c *Client) GetVendor(id string) (*Vendor, error) {
-	resp, err := c.get("/vendors/" + id)
+	resp, err := c.get(context.TODO(), "/vendors/"+id)
 	return getVendorFromResponse(c, resp, err)
 }
 

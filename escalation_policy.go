@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -62,7 +63,7 @@ func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListE
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), escPath+"?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -74,13 +75,13 @@ func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListE
 func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = e
-	resp, err := c.post(escPath, data, nil)
+	resp, err := c.post(context.TODO(), escPath, data, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
 // DeleteEscalationPolicy deletes an existing escalation policy and rules.
 func (c *Client) DeleteEscalationPolicy(id string) error {
-	_, err := c.delete(escPath + "/" + id)
+	_, err := c.delete(context.TODO(), escPath+"/"+id)
 	return err
 }
 
@@ -95,7 +96,7 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), escPath+"/"+id+"?"+v.Encode())
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
@@ -103,7 +104,7 @@ func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (
 func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
 	data := make(map[string]EscalationPolicy)
 	data["escalation_policy"] = *e
-	resp, err := c.put(escPath+"/"+id, data, nil)
+	resp, err := c.put(context.TODO(), escPath+"/"+id, data, nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
@@ -112,7 +113,7 @@ func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*Escala
 func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
 	data := make(map[string]EscalationRule)
 	data["escalation_rule"] = e
-	resp, err := c.post(escPath+"/"+escID+"/escalation_rules", data, nil)
+	resp, err := c.post(context.TODO(), escPath+"/"+escID+"/escalation_rules", data, nil)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
@@ -122,13 +123,13 @@ func (c *Client) GetEscalationRule(escID string, id string, o *GetEscalationRule
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(escPath + "/" + escID + "/escalation_rules/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), escPath+"/"+escID+"/escalation_rules/"+id+"?"+v.Encode())
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
 // DeleteEscalationRule deletes an existing escalation rule.
 func (c *Client) DeleteEscalationRule(escID string, id string) error {
-	_, err := c.delete(escPath + "/" + escID + "/escalation_rules/" + id)
+	_, err := c.delete(context.TODO(), escPath+"/"+escID+"/escalation_rules/"+id)
 	return err
 }
 
@@ -136,13 +137,13 @@ func (c *Client) DeleteEscalationRule(escID string, id string) error {
 func (c *Client) UpdateEscalationRule(escID string, id string, e *EscalationRule) (*EscalationRule, error) {
 	data := make(map[string]EscalationRule)
 	data["escalation_rule"] = *e
-	resp, err := c.put(escPath+"/"+escID+"/escalation_rules/"+id, data, nil)
+	resp, err := c.put(context.TODO(), escPath+"/"+escID+"/escalation_rules/"+id, data, nil)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
 // ListEscalationRules lists all of the escalation rules for an existing escalation policy.
 func (c *Client) ListEscalationRules(escID string) (*ListEscalationRulesResponse, error) {
-	resp, err := c.get(escPath + "/" + escID + "/escalation_rules")
+	resp, err := c.get(context.TODO(), escPath+"/"+escID+"/escalation_rules")
 	if err != nil {
 		return nil, err
 	}

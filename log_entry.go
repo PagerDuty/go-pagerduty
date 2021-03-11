@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -40,7 +41,7 @@ type CommonLogEntryField struct {
 // LogEntry is a list of all of the events that happened to an incident.
 type LogEntry struct {
 	CommonLogEntryField
-	Incident Incident
+	Incident Incident `json:"incident"`
 }
 
 // ListLogEntryResponse is the response data when calling the ListLogEntry API endpoint.
@@ -65,7 +66,7 @@ func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse,
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/log_entries?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -88,12 +89,12 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/log_entries/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/log_entries/"+id+"?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
-	var result map[string]LogEntry
 
+	var result map[string]LogEntry
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
@@ -108,7 +109,6 @@ func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error)
 // UnmarshalJSON Expands the LogEntry.Channel object to parse out a raw value
 func (c *Channel) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
-
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -119,4 +119,16 @@ func (c *Channel) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalJSON Expands the LogEntry.Channel object to correctly marshal it back
+func (c *Channel) MarshalJSON() ([]byte, error) {
+	raw := map[string]interface{}{}
+	if c != nil && c.Type != "" {
+		for k, v := range c.Raw {
+			raw[k] = v
+		}
+	}
+
+	return json.Marshal(raw)
 }

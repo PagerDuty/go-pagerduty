@@ -29,6 +29,7 @@ type IncidentDetails struct {
 	AlertCounts          AlertCounts       `json:"alert_counts"`
 	Metadata             interface{}       `json:"metadata"`
 	Description          string            `json:"description"`
+	Alerts               []IncidentAlert   `json:"alerts,omitempty"`
 }
 
 // WebhookPayloadMessages is the wrapper around the Webhook payloads. The Array may contain multiple message elements if webhook firing actions occurred in quick succession

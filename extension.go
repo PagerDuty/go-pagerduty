@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -10,7 +11,7 @@ import (
 type Extension struct {
 	APIObject
 	Name             string      `json:"name"`
-	EndpointURL      string      `json:"endpoint_url"`
+	EndpointURL      string      `json:"endpoint_url,omitempty"`
 	ExtensionObjects []APIObject `json:"extension_objects"`
 	ExtensionSchema  APIObject   `json:"extension_schema"`
 	Config           interface{} `json:"config"`
@@ -34,7 +35,7 @@ func (c *Client) ListExtensions(o ListExtensionOptions) (*ListExtensionResponse,
 		return nil, err
 	}
 
-	resp, err := c.get("/extensions?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/extensions?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -45,22 +46,22 @@ func (c *Client) ListExtensions(o ListExtensionOptions) (*ListExtensionResponse,
 }
 
 func (c *Client) CreateExtension(e *Extension) (*Extension, error) {
-	resp, err := c.post("/extensions", e, nil)
+	resp, err := c.post(context.TODO(), "/extensions", e, nil)
 	return getExtensionFromResponse(c, resp, err)
 }
 
 func (c *Client) DeleteExtension(id string) error {
-	_, err := c.delete("/extensions/" + id)
+	_, err := c.delete(context.TODO(), "/extensions/"+id)
 	return err
 }
 
 func (c *Client) GetExtension(id string) (*Extension, error) {
-	resp, err := c.get("/extensions/" + id)
+	resp, err := c.get(context.TODO(), "/extensions/"+id)
 	return getExtensionFromResponse(c, resp, err)
 }
 
 func (c *Client) UpdateExtension(id string, e *Extension) (*Extension, error) {
-	resp, err := c.put("/extensions/"+id, e, nil)
+	resp, err := c.put(context.TODO(), "/extensions/"+id, e, nil)
 	return getExtensionFromResponse(c, resp, err)
 }
 

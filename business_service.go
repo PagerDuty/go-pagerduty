@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -75,7 +76,7 @@ func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusine
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/business_services"+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(context.TODO(), "/business_services"+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 	businessServiceResponse.BusinessServices = businessServices
@@ -87,27 +88,29 @@ func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusine
 func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
 	data := make(map[string]*BusinessService)
 	data["business_service"] = b
-	resp, err := c.post("/business_services", data, nil)
+	resp, err := c.post(context.TODO(), "/business_services", data, nil)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
 // GetBusinessService gets details about a business service.
 func (c *Client) GetBusinessService(ID string) (*BusinessService, *http.Response, error) {
-	resp, err := c.get("/business_services/" + ID)
+	resp, err := c.get(context.TODO(), "/business_services/"+ID)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
 // DeleteBusinessService deletes a business_service.
 func (c *Client) DeleteBusinessService(ID string) error {
-	_, err := c.delete("/business_services/" + ID)
+	_, err := c.delete(context.TODO(), "/business_services/"+ID)
 	return err
 }
 
 // UpdateBusinessService updates a business_service.
 func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
 	v := make(map[string]*BusinessService)
+	id := b.ID
+	b.ID = ""
 	v["business_service"] = b
-	resp, err := c.put("/business_services/"+b.ID, v, nil)
+	resp, err := c.put(context.TODO(), "/business_services/"+id, v, nil)
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 

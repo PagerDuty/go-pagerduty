@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -73,7 +74,7 @@ func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/schedules?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, 
 func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	data := make(map[string]Schedule)
 	data["schedule"] = s
-	resp, err := c.post("/schedules", data, nil)
+	resp, err := c.post(context.TODO(), "/schedules", data, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -108,13 +109,13 @@ func (c *Client) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
 	}
 	var data map[string]Schedule
 	data["schedule"] = s
-	_, e := c.post("/schedules/preview?"+v.Encode(), data, nil)
-	return e
+	_, err = c.post(context.TODO(), "/schedules/preview?"+v.Encode(), data, nil)
+	return err
 }
 
 // DeleteSchedule deletes an on-call schedule.
 func (c *Client) DeleteSchedule(id string) error {
-	_, err := c.delete("/schedules/" + id)
+	_, err := c.delete(context.TODO(), "/schedules/"+id)
 	return err
 }
 
@@ -132,7 +133,7 @@ func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error)
 	if err != nil {
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
-	resp, err := c.get("/schedules/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/schedules/"+id+"?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ type UpdateScheduleOptions struct {
 func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	v := make(map[string]Schedule)
 	v["schedule"] = s
-	resp, err := c.put("/schedules/"+id, v, nil)
+	resp, err := c.put(context.TODO(), "/schedules/"+id, v, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +185,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) (*ListOverride
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules/" + id + "/overrides?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/schedules/"+id+"/overrides?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +197,7 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) (*ListOverride
 func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
 	data := make(map[string]Override)
 	data["override"] = o
-	resp, err := c.post("/schedules/"+id+"/overrides", data, nil)
+	resp, err := c.post(context.TODO(), "/schedules/"+id+"/overrides", data, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +206,7 @@ func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
 
 // DeleteOverride removes an override.
 func (c *Client) DeleteOverride(scheduleID, overrideID string) error {
-	_, err := c.delete("/schedules/" + scheduleID + "/overrides/" + overrideID)
+	_, err := c.delete(context.TODO(), "/schedules/"+scheduleID+"/overrides/"+overrideID)
 	return err
 }
 
@@ -222,7 +223,7 @@ func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, e
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/schedules/" + id + "/users?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/schedules/"+id+"/users?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}

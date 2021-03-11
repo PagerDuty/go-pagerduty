@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -58,22 +59,36 @@ type IncidentUrgencyRule struct {
 // Service represents something you monitor (like a web service, email service, or database service).
 type Service struct {
 	APIObject
-	Name                   string               `json:"name,omitempty"`
-	Description            string               `json:"description,omitempty"`
-	AutoResolveTimeout     *uint                `json:"auto_resolve_timeout"`
-	AcknowledgementTimeout *uint                `json:"acknowledgement_timeout"`
-	CreateAt               string               `json:"created_at,omitempty"`
-	Status                 string               `json:"status,omitempty"`
-	LastIncidentTimestamp  string               `json:"last_incident_timestamp,omitempty"`
-	Integrations           []Integration        `json:"integrations,omitempty"`
-	EscalationPolicy       EscalationPolicy     `json:"escalation_policy,omitempty"`
-	Teams                  []Team               `json:"teams,omitempty"`
-	IncidentUrgencyRule    *IncidentUrgencyRule `json:"incident_urgency_rule,omitempty"`
-	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
-	ScheduledActions       []ScheduledAction    `json:"scheduled_actions,omitempty"`
-	AlertCreation          string               `json:"alert_creation,omitempty"`
-	AlertGrouping          string               `json:"alert_grouping,omitempty"`
-	AlertGroupingTimeout   *uint                `json:"alert_grouping_timeout,omitempty"`
+	Name                    string                   `json:"name,omitempty"`
+	Description             string                   `json:"description,omitempty"`
+	AutoResolveTimeout      *uint                    `json:"auto_resolve_timeout"`
+	AcknowledgementTimeout  *uint                    `json:"acknowledgement_timeout"`
+	CreateAt                string                   `json:"created_at,omitempty"`
+	Status                  string                   `json:"status,omitempty"`
+	LastIncidentTimestamp   string                   `json:"last_incident_timestamp,omitempty"`
+	Integrations            []Integration            `json:"integrations,omitempty"`
+	EscalationPolicy        EscalationPolicy         `json:"escalation_policy,omitempty"`
+	Teams                   []Team                   `json:"teams,omitempty"`
+	IncidentUrgencyRule     *IncidentUrgencyRule     `json:"incident_urgency_rule,omitempty"`
+	SupportHours            *SupportHours            `json:"support_hours"`
+	ScheduledActions        []ScheduledAction        `json:"scheduled_actions"`
+	AlertCreation           string                   `json:"alert_creation,omitempty"`
+	AlertGrouping           string                   `json:"alert_grouping,omitempty"`
+	AlertGroupingTimeout    *uint                    `json:"alert_grouping_timeout,omitempty"`
+	AlertGroupingParameters *AlertGroupingParameters `json:"alert_grouping_parameters,omitempty"`
+}
+
+// AlertGroupingParameters defines how alerts on the servicewill be automatically grouped into incidents
+type AlertGroupingParameters struct {
+	Type   string                 `json:"type"`
+	Config AlertGroupParamsConfig `json:"config"`
+}
+
+// AlertGroupParamsConfig is the config object on alert_grouping_parameters
+type AlertGroupParamsConfig struct {
+	Timeout   uint     `json:"timeout,omitempty"`
+	Aggregate string   `json:"aggregate,omitempty"`
+	Fields    []string `json:"fields,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
@@ -98,12 +113,39 @@ func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get("/services?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
 	var result ListServiceResponse
 	return &result, c.decodeJSON(resp, &result)
+}
+
+// ListServices lists existing services processing paginated responses
+func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions) ([]Service, error) {
+	var services []Service
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	responseHandler := func(response *http.Response) (APIListObject, error) {
+		var result ListServiceResponse
+		if err := c.decodeJSON(response, &result); err != nil {
+			return APIListObject{}, err
+		}
+
+		services = append(services, result.Services...)
+
+		return APIListObject{
+			More:   result.More,
+			Offset: result.Offset,
+			Limit:  result.Limit,
+		}, nil
+	}
+	if err := c.pagedGet(ctx, "/services?"+v.Encode(), responseHandler); err != nil {
+		return nil, err
+	}
+	return services, nil
 }
 
 // GetServiceOptions is the data structure used when calling the GetService API endpoint.
@@ -114,7 +156,7 @@ type GetServiceOptions struct {
 // GetService gets details about an existing service.
 func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
-	resp, err := c.get("/services/" + id + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services/"+id+"?"+v.Encode())
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -122,7 +164,7 @@ func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 func (c *Client) CreateService(s Service) (*Service, error) {
 	data := make(map[string]Service)
 	data["service"] = s
-	resp, err := c.post("/services", data, nil)
+	resp, err := c.post(context.TODO(), "/services", data, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -133,13 +175,13 @@ func (c *Client) UpdateService(s Service) (*Service, error) {
 	}{
 		s,
 	}
-	resp, err := c.put("/services/"+s.ID, body, nil)
+	resp, err := c.put(context.TODO(), "/services/"+s.ID, body, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
 // DeleteService deletes an existing service.
 func (c *Client) DeleteService(id string) error {
-	_, err := c.delete("/services/" + id)
+	_, err := c.delete(context.TODO(), "/services/"+id)
 	return err
 }
 
@@ -147,7 +189,7 @@ func (c *Client) DeleteService(id string) error {
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	data := make(map[string]Integration)
 	data["integration"] = i
-	resp, err := c.post("/services/"+id+"/integrations", data, nil)
+	resp, err := c.post(context.TODO(), "/services/"+id+"/integrations", data, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
@@ -162,19 +204,19 @@ func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegratio
 	if queryErr != nil {
 		return nil, queryErr
 	}
-	resp, err := c.get("/services/" + serviceID + "/integrations/" + integrationID + "?" + v.Encode())
+	resp, err := c.get(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
 	return getIntegrationFromResponse(c, resp, err)
 }
 
 // UpdateIntegration updates an integration belonging to a service.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put("/services/"+serviceID+"/integrations/"+i.ID, i, nil)
+	resp, err := c.put(context.TODO(), "/services/"+serviceID+"/integrations/"+i.ID, i, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
 // DeleteIntegration deletes an existing integration.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
-	_, err := c.delete("/services/" + serviceID + "/integrations/" + integrationID)
+	_, err := c.delete(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID)
 	return err
 }
 

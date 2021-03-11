@@ -1,6 +1,8 @@
 package pagerduty
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -95,6 +97,18 @@ func TestBusinessService_Update(t *testing.T) {
 
 	mux.HandleFunc("/business_services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
+		reqText, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		v := make(map[string]*BusinessService)
+		if err := json.Unmarshal(reqText, &v); err != nil {
+			t.Fatal(err)
+		}
+		if v["business_service"].ID != "" {
+			t.Fatalf("got ID in the body when we were not supposed to")
+		}
+
 		w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
 	})
 
