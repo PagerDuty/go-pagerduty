@@ -16,10 +16,12 @@ type AnalyticsTeamShow struct {
 	Meta
 }
 
+// AnalyticsGetAggregatedTeamDataCommand gets the aggregated team analytics for the requested data.
 func AnalyticsGetAggregatedTeamDataCommand() (cli.Command, error) {
 	return &AnalyticsServiceShow{}, nil
 }
 
+// Help displays information on how to use the analytics team cli command.
 func (c *AnalyticsTeamShow) Help() string {
 	helpText := `
 	analytics team show
@@ -32,10 +34,12 @@ func (c *AnalyticsTeamShow) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
+// Synopsis returns a synopsis of the analytics team cli command.
 func (c *AnalyticsTeamShow) Synopsis() string {
 	return "Get aggregated team data analytics"
 }
 
+//Run executes analytics cli command and displays team analytics for the requested data.
 func (c *AnalyticsTeamShow) Run(args []string) int {
 	flags := c.Meta.FlagSet("analytics team show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
@@ -47,7 +51,6 @@ func (c *AnalyticsTeamShow) Run(args []string) int {
 	urgency := flags.String("urgency", "", "high|low")
 	teamID := flags.String("team_id", "", "team ID")
 
-	//log.SetLevel(log.DebugLevel)
 	if err := flags.Parse(args); err != nil {
 		log.Errorln(err)
 		return -1
@@ -74,7 +77,7 @@ func (c *AnalyticsTeamShow) Run(args []string) int {
 		teamIds[0] = *teamID
 	}
 
-	analyticsFilter := pagerduty.AnalyticsFilter{
+	filters := pagerduty.Filters{
 		CreatedAtStart: *start,
 		CreatedAtEnd:   *end,
 		Urgency:        *urgency,
@@ -83,9 +86,9 @@ func (c *AnalyticsTeamShow) Run(args []string) int {
 	}
 
 	analytics := pagerduty.AnalyticsRequest{
-		AnalyticsFilter: &analyticsFilter,
-		AggregateUnit:   "day",
-		TimeZone:        "Etc/UTC",
+		Filters:       &filters,
+		AggregateUnit: "day",
+		TimeZone:      "Etc/UTC",
 	}
 
 	aggregatedTeamData, err := client.GetAggregatedTeamData(context.Background(), analytics)

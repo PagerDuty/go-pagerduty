@@ -4,21 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"strings"
-	"time"
 )
 
 type AnalyticsShow struct {
 	Meta
 }
 
+// AnalyticsGetAggregatedIncidentDataCommand gets the aggregated incident analytics for the requested data.
 func AnalyticsGetAggregatedIncidentDataCommand() (cli.Command, error) {
 	return &AnalyticsShow{}, nil
 }
 
+// Help displays information on how to use the analytics incident cli command.
 func (c *AnalyticsShow) Help() string {
 	helpText := `
 	analytics incident show
@@ -33,10 +36,12 @@ func (c *AnalyticsShow) Help() string {
 	return strings.TrimSpace(helpText)
 }
 
+// Synopsis returns a synopsis of the analytics incident cli command.
 func (c *AnalyticsShow) Synopsis() string {
 	return "Get aggregated incident data analytics"
 }
 
+//Run executes analytics cli command and displays incident analytics for the requested data.
 func (c *AnalyticsShow) Run(args []string) int {
 	flags := c.Meta.FlagSet("analytics incident show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
@@ -48,7 +53,6 @@ func (c *AnalyticsShow) Run(args []string) int {
 	urgency := flags.String("urgency", "", "high|low")
 	teamID := flags.String("team_id", "", "team ID")
 
-	//log.SetLevel(log.DebugLevel)
 	if err := flags.Parse(args); err != nil {
 		log.Errorln(err)
 		return -1
@@ -75,7 +79,7 @@ func (c *AnalyticsShow) Run(args []string) int {
 		teamIds[0] = *teamID
 	}
 
-	analyticsFilter := pagerduty.AnalyticsFilter{
+	filters := pagerduty.Filters{
 		CreatedAtStart: *start,
 		CreatedAtEnd:   *end,
 		Urgency:        *urgency,
@@ -84,9 +88,9 @@ func (c *AnalyticsShow) Run(args []string) int {
 	}
 
 	analytics := pagerduty.AnalyticsRequest{
-		AnalyticsFilter: &analyticsFilter,
-		AggregateUnit:   "day",
-		TimeZone:        "Etc/UTC",
+		Filters:       &filters,
+		AggregateUnit: "day",
+		TimeZone:      "Etc/UTC",
 	}
 
 	aggregatedIncidentData, err := client.GetAggregatedIncidentData(context.Background(), analytics)
