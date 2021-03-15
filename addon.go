@@ -30,58 +30,101 @@ type ListAddonResponse struct {
 	Addons []Addon `json:"addons"`
 }
 
-// ListAddons lists all of the add-ons installed on your account.
+// ListAddons lists all of the add-ons installed on your account. It's
+// recommended to use ListAddonsWithContext instead.
 func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
+	return c.ListAddonsWithContext(context.Background(), o)
+}
+
+// ListAddonsWithContext lists all of the add-ons installed on your account.
+func (c *Client) ListAddonsWithContext(ctx context.Context, o ListAddonOptions) (*ListAddonResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/addons?"+v.Encode())
+
+	resp, err := c.get(ctx, "/addons?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListAddonResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
-// InstallAddon installs an add-on for your account.
+// InstallAddon installs an add-on for your account. It's recommended to use
+// InstallAddonWithContext instead.
 func (c *Client) InstallAddon(a Addon) (*Addon, error) {
-	data := make(map[string]Addon)
-	data["addon"] = a
-	resp, err := c.post(context.TODO(), "/addons", data, nil)
-	defer resp.Body.Close() // TODO(theckman): validate that this is safe
+	return c.InstallAddonWithContext(context.Background(), a)
+}
+
+// InstallAddonWithContext installs an add-on for your account.
+func (c *Client) InstallAddonWithContext(ctx context.Context, a Addon) (*Addon, error) {
+	d := map[string]Addon{
+		"addon": a,
+	}
+
+	resp, err := c.post(ctx, "/addons", d, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	if resp.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("Failed to create. HTTP Status code: %d", resp.StatusCode)
 	}
+
 	return getAddonFromResponse(c, resp)
 }
 
-// DeleteAddon deletes an add-on from your account.
+// DeleteAddon deletes an add-on from your account. It's recommended to use
+// DeleteAddonWithContext instead.
 func (c *Client) DeleteAddon(id string) error {
-	_, err := c.delete(context.TODO(), "/addons/"+id)
+	return c.DeleteAddonWithContext(context.Background(), id)
+}
+
+// DeleteAddonWithContext deletes an add-on from your account.
+func (c *Client) DeleteAddonWithContext(ctx context.Context, id string) error {
+	_, err := c.delete(ctx, "/addons/"+id)
 	return err
 }
 
-// GetAddon gets details about an existing add-on.
+// GetAddon gets details about an existing add-on. It's recommended to use
+// GetAddonWithContext instead.
 func (c *Client) GetAddon(id string) (*Addon, error) {
-	resp, err := c.get(context.TODO(), "/addons/"+id)
+	return c.GetAddonWithContext(context.Background(), id)
+}
+
+// GetAddonWithContext gets details about an existing add-on.
+func (c *Client) GetAddonWithContext(ctx context.Context, id string) (*Addon, error) {
+	resp, err := c.get(ctx, "/addons/"+id)
 	if err != nil {
 		return nil, err
 	}
+
 	return getAddonFromResponse(c, resp)
 }
 
-// UpdateAddon updates an existing add-on.
+// UpdateAddon updates an existing add-on. It's recommended to use
+// UpdateAddonWithContext instead.
 func (c *Client) UpdateAddon(id string, a Addon) (*Addon, error) {
-	v := make(map[string]Addon)
-	v["addon"] = a
-	resp, err := c.put(context.TODO(), "/addons/"+id, v, nil)
+	return c.UpdateAddonWithContext(context.Background(), id, a)
+}
+
+// UpdateAddonWithContext updates an existing add-on.
+func (c *Client) UpdateAddonWithContext(ctx context.Context, id string, a Addon) (*Addon, error) {
+	d := map[string]Addon{
+		"addon": a,
+	}
+
+	resp, err := c.put(ctx, "/addons/"+id, d, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	return getAddonFromResponse(c, resp)
 }
 
@@ -90,9 +133,13 @@ func getAddonFromResponse(c *Client, resp *http.Response) (*Addon, error) {
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
-	a, ok := result["addon"]
+
+	const rootNode = "addon"
+
+	a, ok := result[rootNode]
 	if !ok {
-		return nil, fmt.Errorf("JSON response does not have 'addon' field")
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &a, nil
 }
