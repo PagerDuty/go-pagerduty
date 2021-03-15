@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -77,7 +78,7 @@ func (c *AnalyticsServiceShow) Run(args []string) int {
 		teamIds[0] = *teamID
 	}
 
-	filters := pagerduty.Filters{
+	analyticsFilter := pagerduty.AnalyticsFilter{
 		CreatedAtStart: *start,
 		CreatedAtEnd:   *end,
 		Urgency:        *urgency,
@@ -86,7 +87,7 @@ func (c *AnalyticsServiceShow) Run(args []string) int {
 	}
 
 	analytics := pagerduty.AnalyticsRequest{
-		Filters:       &filters,
+		Filters:       &analyticsFilter,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}

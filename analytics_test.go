@@ -12,7 +12,7 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 	defer teardown()
 
 	analyticsRequest := AnalyticsRequest{
-		Filters: &Filters{
+		Filters: &AnalyticsFilter{
 			CreatedAtStart: "2021-01-01T15:00:32Z",
 			CreatedAtEnd:   "2021-01-08T15:00:32Z",
 			TeamIDs:        []string{"PCDYDX0"},
@@ -21,10 +21,10 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	analyticsDataWanted := AnalyticsData{MeanSecondsToResolve: 34550, MeanSecondsToFirstAck: 70, MeanEngagedSeconds: 502, MeanAssignmentCount: 1, TotalBusinessHourInterruptions: 1, TotalEngagedSeconds: 2514, TotalIncidentCount: 5, RangeStart: "2021-01-06T00:00:00.000000"}
-	filtersWanted := Filters{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
+	analyticsFilterWanted := AnalyticsFilter{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
 	analyticsResponse := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}
@@ -43,7 +43,7 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 	res, err := client.GetAggregatedIncidentData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}
@@ -58,7 +58,7 @@ func TestAnalytics_GetAggregatedServiceData(t *testing.T) {
 	defer teardown()
 
 	analyticsRequest := AnalyticsRequest{
-		Filters: &Filters{
+		Filters: &AnalyticsFilter{
 			CreatedAtStart: "2021-01-01T15:00:32Z",
 			CreatedAtEnd:   "2021-01-08T15:00:32Z",
 			TeamIDs:        []string{"PCDYDX0"},
@@ -67,10 +67,10 @@ func TestAnalytics_GetAggregatedServiceData(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	analyticsDataWanted := AnalyticsData{MeanAssignmentCount: 1, MeanEngagedSeconds: 502, MeanEngagedUserCount: 0, MeanSecondsToResolve: 34550, MeanSecondsToFirstAck: 70, TotalBusinessHourInterruptions: 1, TotalEngagedSeconds: 2514, TotalIncidentCount: 5, RangeStart: "2021-01-06T00:00:00.000000", ServiceID: "PSEJLIN", ServiceName: "FooAlerts", TeamID: "PCDYDX0", TeamName: "FooTeam", UpTimePct: 89.86111111111111}
-	filtersWanted := Filters{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
+	analyticsFilterWanted := AnalyticsFilter{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
 	analyticsResponse := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}
@@ -88,7 +88,7 @@ func TestAnalytics_GetAggregatedServiceData(t *testing.T) {
 	res, err := client.GetAggregatedServiceData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}
@@ -103,7 +103,7 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 	defer teardown()
 
 	analyticsRequest := AnalyticsRequest{
-		Filters: &Filters{
+		Filters: &AnalyticsFilter{
 			CreatedAtStart: "2021-01-01T15:00:32Z",
 			CreatedAtEnd:   "2021-01-08T15:00:32Z",
 			TeamIDs:        []string{"PCDYDX0"},
@@ -112,10 +112,10 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	analyticsDataWanted := AnalyticsData{MeanAssignmentCount: 1, MeanEngagedSeconds: 502, MeanEngagedUserCount: 0, MeanSecondsToResolve: 34550, MeanSecondsToFirstAck: 70, TotalBusinessHourInterruptions: 1, TotalEngagedSeconds: 2514, TotalIncidentCount: 5, RangeStart: "2021-01-06T00:00:00.000000", TeamID: "PCDYDX0", TeamName: "FooTeam", UpTimePct: 89.86111111111111}
-	filtersWanted := Filters{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
+	analyticsFilterWanted := AnalyticsFilter{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
 	analyticsResponse := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}
@@ -133,7 +133,7 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 	res, err := client.GetAggregatedTeamData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
 		Data:          []AnalyticsData{analyticsDataWanted},
-		Filters:       &filtersWanted,
+		Filters:       &analyticsFilterWanted,
 		AggregateUnit: "day",
 		TimeZone:      "Etc/UTC",
 	}

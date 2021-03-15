@@ -1,3 +1,4 @@
+
 package pagerduty
 
 import (
@@ -7,22 +8,22 @@ import (
 // AnalyticsRequest represents the request to be sent to PagerDuty when you want
 // aggregated analytics.
 type AnalyticsRequest struct {
-	Filters       *Filters `json:"filters,omitempty"`
-	AggregateUnit string   `json:"aggregate_unit,omitempty"`
-	TimeZone      string   `json:"time_zone,omitempty"`
+	Filters       *AnalyticsFilter `json:"filters,omitempty"`
+	AggregateUnit string           `json:"aggregate_unit,omitempty"`
+	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
 // AnalyticsResponse represents the response from the PagerDuty API.
 type AnalyticsResponse struct {
-	Data          []AnalyticsData `json:"data,omitempty"`
-	Filters       *Filters        `json:"filters,omitempty"`
-	AggregateUnit string          `json:"aggregate_unit,omitempty"`
-	TimeZone      string          `json:"time_zone,omitempty"`
+	Data          []AnalyticsData  `json:"data,omitempty"`
+	Filters       *AnalyticsFilter `json:"filters,omitempty"`
+	AggregateUnit string           `json:"aggregate_unit,omitempty"`
+	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
-// Filters represents the set of filters as part of the request to PagerDuty when
+// AnalyticsFilter represents the set of filters as part of the request to PagerDuty when
 // requesting analytics.
-type Filters struct {
+type AnalyticsFilter struct {
 	CreatedAtStart string   `json:"created_at_start,omitempty"`
 	CreatedAtEnd   string   `json:"created_at_end,omitempty"`
 	Urgency        string   `json:"urgency,omitempty"`
