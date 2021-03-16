@@ -138,27 +138,41 @@ type ListServiceResponse struct {
 	Services []Service
 }
 
-// ListServices lists existing services.
+// ListServices lists existing services. It's recommended to use
+// ListServicesWithContext instead.
 func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
-	v, err := query.Values(o)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.get(context.TODO(), "/services?"+v.Encode())
-	if err != nil {
-		return nil, err
-	}
-	var result ListServiceResponse
-	return &result, c.decodeJSON(resp, &result)
+	return c.ListServicesWithContext(context.Background(), o)
 }
 
-// ListServices lists existing services processing paginated responses
-func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions) ([]Service, error) {
-	var services []Service
+// ListServicesWithContext lists existing services.
+func (c *Client) ListServicesWithContext(ctx context.Context, o ListServiceOptions) (*ListServiceResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
+
+	resp, err := c.get(ctx, "/services?"+v.Encode())
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListServiceResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListServicesPaginated lists existing services processing paginated responses
+func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions) ([]Service, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	var services []Service
+
 	responseHandler := func(response *http.Response) (APIListObject, error) {
 		var result ListServiceResponse
 		if err := c.decodeJSON(response, &result); err != nil {
@@ -173,9 +187,11 @@ func (c *Client) ListServicesPaginated(ctx context.Context, o ListServiceOptions
 			Limit:  result.Limit,
 		}, nil
 	}
+
 	if err := c.pagedGet(ctx, "/services?"+v.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
+
 	return services, nil
 }
 
@@ -184,43 +200,80 @@ type GetServiceOptions struct {
 	Includes []string `url:"include,brackets,omitempty"`
 }
 
-// GetService gets details about an existing service.
+// GetService gets details about an existing service. It's recommended to use
+// GetServiceWithContext instead.
 func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
+	return c.GetServiceWithContext(context.Background(), id, o)
+}
+
+// GetServiceWithContext gets details about an existing service.
+func (c *Client) GetServiceWithContext(ctx context.Context, id string, o *GetServiceOptions) (*Service, error) {
 	v, err := query.Values(o)
-	resp, err := c.get(context.TODO(), "/services/"+id+"?"+v.Encode())
-	return getServiceFromResponse(c, resp, err)
-}
-
-// CreateService creates a new service.
-func (c *Client) CreateService(s Service) (*Service, error) {
-	data := make(map[string]Service)
-	data["service"] = s
-	resp, err := c.post(context.TODO(), "/services", data, nil)
-	return getServiceFromResponse(c, resp, err)
-}
-
-// UpdateService updates an existing service.
-func (c *Client) UpdateService(s Service) (*Service, error) {
-	body := struct {
-		Service `json:"service,omitempty"`
-	}{
-		s,
+	if err != nil {
+		return nil, err
 	}
-	resp, err := c.put(context.TODO(), "/services/"+s.ID, body, nil)
+
+	resp, err := c.get(ctx, "/services/"+id+"?"+v.Encode())
 	return getServiceFromResponse(c, resp, err)
 }
 
-// DeleteService deletes an existing service.
+// CreateService creates a new service. It's recommended to use
+// CreateServiceWithContext instead.
+func (c *Client) CreateService(s Service) (*Service, error) {
+	return c.CreateServiceWithContext(context.Background(), s)
+}
+
+// CreateServiceWithContext creates a new service.
+func (c *Client) CreateServiceWithContext(ctx context.Context, s Service) (*Service, error) {
+	d := map[string]Service{
+		"service": s,
+	}
+
+	resp, err := c.post(ctx, "/services", d, nil)
+	return getServiceFromResponse(c, resp, err)
+}
+
+// UpdateService updates an existing service. It's recommended to use
+// UpdateServiceWithContext instead.
+func (c *Client) UpdateService(s Service) (*Service, error) {
+	return c.UpdateServiceWithContext(context.Background(), s)
+}
+
+// UpdateServiceWithContext updates an existing service.
+func (c *Client) UpdateServiceWithContext(ctx context.Context, s Service) (*Service, error) {
+	d := map[string]Service{
+		"service": s,
+	}
+
+	resp, err := c.put(ctx, "/services/"+s.ID, d, nil)
+	return getServiceFromResponse(c, resp, err)
+}
+
+// DeleteService deletes an existing service. It's recommended to use
+// DeleteServiceWithContext instead.
 func (c *Client) DeleteService(id string) error {
-	_, err := c.delete(context.TODO(), "/services/"+id)
+	return c.DeleteServiceWithContext(context.Background(), id)
+}
+
+// DeleteServiceWithContext deletes an existing service.
+func (c *Client) DeleteServiceWithContext(ctx context.Context, id string) error {
+	_, err := c.delete(ctx, "/services/"+id)
 	return err
 }
 
-// CreateIntegration creates a new integration belonging to a service.
+// CreateIntegration creates a new integration belonging to a service. It's
+// recommended to use CreateIntegrationWithContext instead.
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
-	data := make(map[string]Integration)
-	data["integration"] = i
-	resp, err := c.post(context.TODO(), "/services/"+id+"/integrations", data, nil)
+	return c.CreateIntegrationWithContext(context.Background(), id, i)
+}
+
+// CreateIntegrationWithContext creates a new integration belonging to a service.
+func (c *Client) CreateIntegrationWithContext(ctx context.Context, id string, i Integration) (*Integration, error) {
+	d := map[string]Integration{
+		"integration": i,
+	}
+
+	resp, err := c.post(ctx, "/services/"+id+"/integrations", d, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
@@ -229,25 +282,44 @@ type GetIntegrationOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// GetIntegration gets details about an integration belonging to a service.
+// GetIntegration gets details about an integration belonging to a service. It's
+// recommended to use GetIntegrationWithContext instead.
 func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
-	v, queryErr := query.Values(o)
-	if queryErr != nil {
-		return nil, queryErr
+	return c.GetIntegrationWithContext(context.Background(), serviceID, integrationID, o)
+}
+
+// GetIntegrationWithContext gets details about an integration belonging to a service.
+func (c *Client) GetIntegrationWithContext(ctx context.Context, serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
+
+	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
 	return getIntegrationFromResponse(c, resp, err)
 }
 
-// UpdateIntegration updates an integration belonging to a service.
+// UpdateIntegration updates an integration belonging to a service. It's
+// recommended to use UpdateIntegrationWithContext instead.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put(context.TODO(), "/services/"+serviceID+"/integrations/"+i.ID, i, nil)
+	return c.UpdateIntegrationWithContext(context.Background(), serviceID, i)
+}
+
+// UpdateIntegrationWithContext updates an integration belonging to a service.
+func (c *Client) UpdateIntegrationWithContext(ctx context.Context, serviceID string, i Integration) (*Integration, error) {
+	resp, err := c.put(ctx, "/services/"+serviceID+"/integrations/"+i.ID, i, nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
-// DeleteIntegration deletes an existing integration.
+// DeleteIntegration deletes an existing integration. It's recommended to use
+// DeleteIntegrationWithContext instead.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
-	_, err := c.delete(context.TODO(), "/services/"+serviceID+"/integrations/"+integrationID)
+	return c.DeleteIntegrationWithContext(context.Background(), serviceID, integrationID)
+}
+
+// DeleteIntegrationWithContext deletes an existing integration.
+func (c *Client) DeleteIntegrationWithContext(ctx context.Context, serviceID string, integrationID string) error {
+	_, err := c.delete(ctx, "/services/"+serviceID+"/integrations/"+integrationID)
 	return err
 }
 
@@ -337,15 +409,19 @@ func getServiceFromResponse(c *Client, resp *http.Response, err error) (*Service
 	if err != nil {
 		return nil, err
 	}
+
 	var target map[string]Service
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	rootNode := "service"
+
+	const rootNode = "service"
+
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
 		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &t, nil
 }
 
@@ -353,14 +429,18 @@ func getIntegrationFromResponse(c *Client, resp *http.Response, err error) (*Int
 	if err != nil {
 		return nil, err
 	}
+
 	var target map[string]Integration
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", err)
 	}
-	rootNode := "integration"
+
+	const rootNode = "integration"
+
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
 		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
+
 	return &t, nil
 }
