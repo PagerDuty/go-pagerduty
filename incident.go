@@ -2,7 +2,6 @@ package pagerduty
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -120,18 +119,30 @@ type ConferenceBridge struct {
 	ConferenceURL    string `json:"conference_url,omitempty"`
 }
 
-// ListIncidents lists existing incidents.
+// ListIncidents lists existing incidents. It's recommended to use
+// ListIncidentsWithContext instead.
 func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, error) {
+	return c.ListIncidentsWithContext(context.Background(), o)
+}
+
+// ListIncidentsWithContext lists existing incidents.
+func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOptions) (*ListIncidentsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/incidents?"+v.Encode())
+
+	resp, err := c.get(ctx, "/incidents?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListIncidentsResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 // createIncidentResponse is returned from the API when creating a response.
@@ -167,70 +178,119 @@ type MergeIncidentsOptions struct {
 	Type string `json:"type"`
 }
 
-// CreateIncident creates an incident synchronously without a corresponding event from a monitoring service.
+// CreateIncident creates an incident synchronously without a corresponding
+// event from a monitoring service. It's recommended to use
+// CreateIncidentWithContext instead.
 func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Incident, error) {
-	headers := make(map[string]string)
-	headers["From"] = from
-	data := make(map[string]*CreateIncidentOptions)
-	data["incident"] = o
-	resp, e := c.post(context.TODO(), "/incidents", data, headers)
-	if e != nil {
-		return nil, e
+	return c.CreateIncidentWithContext(context.Background(), from, o)
+}
+
+// CreateIncidentWithContext creates an incident synchronously without a
+// corresponding event from a monitoring service.
+func (c *Client) CreateIncidentWithContext(ctx context.Context, from string, o *CreateIncidentOptions) (*Incident, error) {
+	h := map[string]string{
+		"From": from,
+	}
+
+	d := map[string]*CreateIncidentOptions{
+		"incident": o,
+	}
+
+	resp, err := c.post(ctx, "/incidents", d, h)
+	if err != nil {
+		return nil, err
 	}
 
 	var ii createIncidentResponse
-	e = json.NewDecoder(resp.Body).Decode(&ii)
-	if e != nil {
-		return nil, e
+	if err = c.decodeJSON(resp, &ii); err != nil {
+		return nil, err
 	}
 
 	return &ii.Incident, nil
 }
 
-// ManageIncidents acknowledges, resolves, escalates, or reassigns one or more incidents.
+// ManageIncidents acknowledges, resolves, escalates, or reassigns one or more
+// incidents. It's recommended to use ManageIncidentsWithContext instead.
 func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
-	data := make(map[string][]ManageIncidentsOptions)
-	headers := make(map[string]string)
-	headers["From"] = from
-	data["incidents"] = incidents
+	return c.ManageIncidentsWithContext(context.Background(), from, incidents)
+}
 
-	resp, err := c.put(context.TODO(), "/incidents", data, headers)
+// ManageIncidentsWithContext acknowledges, resolves, escalates, or reassigns
+// one or more incidents.
+func (c *Client) ManageIncidentsWithContext(ctx context.Context, from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
+	d := map[string][]ManageIncidentsOptions{
+		"incidents": incidents,
+	}
+
+	h := map[string]string{
+		"From": from,
+	}
+
+	resp, err := c.put(ctx, "/incidents", d, h)
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListIncidentsResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
-// MergeIncidents a list of source incidents into a specified incident.
+// MergeIncidents merges a list of source incidents into a specified incident.
+// It's recommended to use MergeIncidentsWithContext instead.
 func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeIncidentsOptions) (*Incident, error) {
-	r := make(map[string][]MergeIncidentsOptions)
-	r["source_incidents"] = sourceIncidents
-	headers := make(map[string]string)
-	headers["From"] = from
-
-	resp, err := c.put(context.TODO(), "/incidents/"+id+"/merge", r, headers)
-	if err != nil {
-		return nil, err
-	}
-	var result createIncidentResponse
-	return &result.Incident, c.decodeJSON(resp, &result)
+	return c.MergeIncidentsWithContext(context.Background(), from, id, sourceIncidents)
 }
 
-// GetIncident shows detailed information about an incident.
-func (c *Client) GetIncident(id string) (*Incident, error) {
-	resp, err := c.get(context.TODO(), "/incidents/"+id)
+// MergeIncidentsWithContext merges a list of source incidents into a specified incident.
+func (c *Client) MergeIncidentsWithContext(ctx context.Context, from, id string, sourceIncidents []MergeIncidentsOptions) (*Incident, error) {
+	d := map[string][]MergeIncidentsOptions{
+		"source_incidents": sourceIncidents,
+	}
+
+	h := map[string]string{
+		"From": from,
+	}
+
+	resp, err := c.put(ctx, "/incidents/"+id+"/merge", d, h)
 	if err != nil {
 		return nil, err
 	}
+
+	var result createIncidentResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result.Incident, nil
+}
+
+// GetIncident shows detailed information about an incident. It's recommended to
+// use GetIncidentWithContext instead.
+func (c *Client) GetIncident(id string) (*Incident, error) {
+	return c.GetIncidentWithContext(context.Background(), id)
+}
+
+// GetIncidentWithContext shows detailed information about an incident.
+func (c *Client) GetIncidentWithContext(ctx context.Context, id string) (*Incident, error) {
+	resp, err := c.get(ctx, "/incidents/"+id)
+	if err != nil {
+		return nil, err
+	}
+
 	var result map[string]Incident
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
+
 	i, ok := result["incident"]
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have incident field")
 	}
+
 	return &i, nil
 }
 
@@ -247,20 +307,29 @@ type CreateIncidentNoteResponse struct {
 	IncidentNote IncidentNote `json:"note"`
 }
 
-// ListIncidentNotes lists existing notes for the specified incident.
+// ListIncidentNotes lists existing notes for the specified incident. It's
+// recommended to use ListIncidentNotesWithContext instead.
 func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
-	resp, err := c.get(context.TODO(), "/incidents/"+id+"/notes")
+	return c.ListIncidentNotesWithContext(context.Background(), id)
+}
+
+// ListIncidentNotesWithContext lists existing notes for the specified incident.
+func (c *Client) ListIncidentNotesWithContext(ctx context.Context, id string) ([]IncidentNote, error) {
+	resp, err := c.get(ctx, "/incidents/"+id+"/notes")
 	if err != nil {
 		return nil, err
 	}
+
 	var result map[string][]IncidentNote
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
+
 	notes, ok := result["notes"]
 	if !ok {
 		return nil, fmt.Errorf("JSON response does not have notes field")
 	}
+
 	return notes, nil
 }
 
@@ -302,41 +371,63 @@ type ListIncidentAlertsOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// ListIncidentAlerts lists existing alerts for the specified incident.
+// ListIncidentAlerts lists existing alerts for the specified incident. It's
+// recommended to use ListIncidentAlertsWithContext instead.
 func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
-	return c.ListIncidentAlertsWithOpts(id, ListIncidentAlertsOptions{})
+	return c.ListIncidentAlertsWithContext(context.Background(), id, ListIncidentAlertsOptions{})
 }
 
 // ListIncidentAlertsWithOpts lists existing alerts for the specified incident.
+// It's recommended to use ListIncidentAlertsWithContext instead.
 func (c *Client) ListIncidentAlertsWithOpts(id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
+	return c.ListIncidentAlertsWithContext(context.Background(), id, o)
+}
+
+// ListIncidentAlertsWithContext lists existing alerts for the specified
+// incident. If you don't want to filter any of the results, pass in an empty
+// ListIncidentAlertOptions.
+func (c *Client) ListIncidentAlertsWithContext(ctx context.Context, id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/incidents/"+id+"/alerts?"+v.Encode())
+
+	resp, err := c.get(ctx, "/incidents/"+id+"/alerts?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
 
 	var result ListAlertsResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, err
 }
 
 // CreateIncidentNoteWithResponse creates a new note for the specified incident.
+// It's recommended to use CreateIncidentNoteWithContext instead.
 func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*IncidentNote, error) {
-	data := make(map[string]IncidentNote)
-	headers := make(map[string]string)
-	headers["From"] = note.User.Summary
+	return c.CreateIncidentNoteWithContext(context.Background(), id, note)
+}
 
-	data["note"] = note
-	resp, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, headers)
+// CreateIncidentNoteWithContext creates a new note for the specified incident.
+func (c *Client) CreateIncidentNoteWithContext(ctx context.Context, id string, note IncidentNote) (*IncidentNote, error) {
+	d := map[string]IncidentNote{
+		"note": note,
+	}
+
+	h := map[string]string{
+		"From": note.User.Summary,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/notes", d, h)
 	if err != nil {
 		return nil, err
 	}
-	var result CreateIncidentNoteResponse
 
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
+	var result CreateIncidentNoteResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 
@@ -344,27 +435,36 @@ func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*
 }
 
 // CreateIncidentNote creates a new note for the specified incident.
-// DEPRECATED: please use CreateIncidentNoteWithResponse going forward
+//
+// Deprecated: please use CreateIncidentNoteWithContext going forward
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	headers := make(map[string]string)
 	headers["From"] = note.User.Summary
 	data["note"] = note
-	_, err := c.post(context.TODO(), "/incidents/"+id+"/notes", data, headers)
+	_, err := c.post(context.Background(), "/incidents/"+id+"/notes", data, headers)
 	return err
 }
 
-// SnoozeIncidentSnoozeIncidentWithResponse sets an incident to not alert for a specified period of time.
+// SnoozeIncidentWithResponse sets an incident to not alert for a specified
+// period of time. It's recommended to use SnoozeIncidentWithContext instead.
 func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
-	data := make(map[string]uint)
-	data["duration"] = duration
-	resp, err := c.post(context.TODO(), "/incidents/"+id+"/snooze", data, nil)
+	return c.SnoozeIncidentWithContext(context.Background(), id, duration)
+}
+
+// SnoozeIncidentWithContext sets an incident to not alert for a specified period of time.
+func (c *Client) SnoozeIncidentWithContext(ctx context.Context, id string, duration uint) (*Incident, error) {
+	d := map[string]uint{
+		"duration": duration,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/snooze", d, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	var result createIncidentResponse
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
+	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
 
@@ -372,11 +472,12 @@ func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident
 }
 
 // SnoozeIncident sets an incident to not alert for a specified period of time.
-// DEPRECATED: please use SnoozeIncidentWithResponse going forward
+//
+// Deprecated: please use SnoozeIncidentWithContext going forward
 func (c *Client) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post(context.TODO(), "/incidents/"+id+"/snooze", data, nil)
+	_, err := c.post(context.Background(), "/incidents/"+id+"/snooze", data, nil)
 	return err
 }
 
@@ -397,17 +498,30 @@ type ListIncidentLogEntriesOptions struct {
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.
+// It's recommended to use ListIncidentLogEntriesWithContext instead.
 func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error) {
+	return c.ListIncidentLogEntriesWithContext(context.Background(), id, o)
+}
+
+// ListIncidentLogEntriesWithContext lists existing log entries for the
+// specified incident.
+func (c *Client) ListIncidentLogEntriesWithContext(ctx context.Context, id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.get(context.TODO(), "/incidents/"+id+"/log_entries?"+v.Encode())
+
+	resp, err := c.get(ctx, "/incidents/"+id+"/log_entries?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
+
 	var result ListIncidentLogEntriesResponse
-	return &result, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 // IncidentResponders contains details about responders to an incident.
@@ -455,42 +569,80 @@ type ResponderRequest struct {
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.
+// It's recommended to use ResponderRequestWithContext instead.
 func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*ResponderRequestResponse, error) {
-	headers := make(map[string]string)
-	headers["From"] = o.From
+	return c.ResponderRequestWithContext(context.Background(), id, o)
+}
 
-	resp, err := c.post(context.TODO(), "/incidents/"+id+"/responder_requests", o, headers)
+// ResponderRequestWithContext will submit a request to have a responder join an incident.
+func (c *Client) ResponderRequestWithContext(ctx context.Context, id string, o ResponderRequestOptions) (*ResponderRequestResponse, error) {
+	h := map[string]string{
+		"From": o.From,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/responder_requests", o, h)
 	if err != nil {
 		return nil, err
 	}
 
-	result := &ResponderRequestResponse{}
-	err = json.NewDecoder(resp.Body).Decode(result)
-	return result, err
+	var result ResponderRequestResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
-// GetIncidentAlert
+// GetIncidentAlert gets the alert that triggered the incident. It's recommended
+// to use GetIncidentAlertWithContext instead.
 func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
-	resp, err := c.get(context.TODO(), "/incidents/"+incidentID+"/alerts/"+alertID)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	result := &IncidentAlertResponse{}
-	err = json.NewDecoder(resp.Body).Decode(result)
-	return result, resp, err
+	return c.getIncidentAlertWithContext(context.Background(), incidentID, alertID)
 }
 
-// ManageIncidentAlerts
-func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
-	headers := make(map[string]string)
+// GetIncidentAlertWithContext gets the alert that triggered the incident.
+func (c *Client) GetIncidentAlertWithContext(ctx context.Context, incidentID, alertID string) (*IncidentAlertResponse, error) {
+	iar, _, err := c.getIncidentAlertWithContext(context.Background(), incidentID, alertID)
+	return iar, err
+}
 
-	resp, err := c.put(context.TODO(), "/incidents/"+incidentID+"/alerts/", alerts, headers)
+func (c *Client) getIncidentAlertWithContext(ctx context.Context, incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
+	resp, err := c.get(ctx, "/incidents/"+incidentID+"/alerts/"+alertID)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	var result IncidentAlertResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, nil, err
+	}
+
+	return &result, resp, nil
+}
+
+// ManageIncidentAlerts allows you to manage the alerts of an incident. It's
+// recommended to use ManageIncidentAlertsWithContext instead.
+func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
+	return c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
+}
+
+// ManageIncidentAlertsWithContext allows you to manage the alerts of an incident.
+func (c *Client) ManageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
+	lar, _, err := c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
+	return lar, err
+}
+
+func (c *Client) manageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
+	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var result ListAlertsResponse
-	return &result, resp, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, nil, err
+	}
+
+	return &result, resp, nil
 }
 
 /* TODO: Create Status Updates */
