@@ -4,11 +4,15 @@ import (
 	"context"
 )
 
+// AnalyticsRequest represents the request to be sent to PagerDuty when you want
+// aggregated analytics.
 type AnalyticsRequest struct {
 	AnalyticsFilter *AnalyticsFilter `json:"filters,omitempty"`
 	AggregateUnit   string           `json:"aggregate_unit,omitempty"`
 	TimeZone        string           `json:"time_zone,omitempty"`
 }
+
+// AnalyticsResponse represents the response from the PagerDuty API.
 type AnalyticsResponse struct {
 	Data            []AnalyticsData  `json:"data,omitempty"`
 	AnalyticsFilter *AnalyticsFilter `json:"filters,omitempty"`
@@ -16,6 +20,8 @@ type AnalyticsResponse struct {
 	TimeZone        string           `json:"time_zone,omitempty"`
 }
 
+// AnalyticsFilter is the filter is part of the request to PagerDuty when
+// requesting incident analytics.
 type AnalyticsFilter struct {
 	CreatedAtStart string   `json:"created_at_start,omitempty"`
 	CreatedAtEnd   string   `json:"created_at_end,omitempty"`
@@ -27,6 +33,7 @@ type AnalyticsFilter struct {
 	PriorityName   []string `json:"priority_name,omitempty"`
 }
 
+// AnalyticsData represents the structure of the analytics we have available.
 type AnalyticsData struct {
 	ServiceID                      string `json:"service_id,omitempty"`
 	ServiceName                    string `json:"service_name,omitempty"`
@@ -51,15 +58,21 @@ type AnalyticsData struct {
 	RangeStart                     string `json:"range_start,omitempty"`
 }
 
+// GetAggregatedIncidentData gets the aggregated analytics for the requested data.
 func (c *Client) GetAggregatedIncidentData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
-	var analyticsResponse AnalyticsResponse
-	headers := make(map[string]string)
-	headers["X-EARLY-ACCESS"] = "analytics-v2"
-
-	resp, err := c.post(ctx, "/analytics/metrics/incidents/all", analytics, headers)
-	if err != nil {
-		return analyticsResponse, err
+	h := map[string]string{
+		"X-EARLY-ACCESS": "analytics-v2",
 	}
-	err = c.decodeJSON(resp, &analyticsResponse)
-	return analyticsResponse, err
+
+	resp, err := c.post(ctx, "/analytics/metrics/incidents/all", analytics, h)
+	if err != nil {
+		return AnalyticsResponse{}, err
+	}
+
+	var analyticsResponse AnalyticsResponse
+	if err = c.decodeJSON(resp, &analyticsResponse); err != nil {
+		return AnalyticsResponse{}, err
+	}
+
+	return analyticsResponse, nil
 }
