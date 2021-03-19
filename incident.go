@@ -170,6 +170,7 @@ type ManageIncidentsOptions struct {
 	Status      string        `json:"status,omitempty"`
 	Priority    *APIReference `json:"priority,omitempty"`
 	Assignments []Assignee    `json:"assignments,omitempty"`
+	Resolution  string        `json:"resolution,omitempty"`
 }
 
 // MergeIncidentsOptions is the structure used when merging incidents with MergeIncidents func
