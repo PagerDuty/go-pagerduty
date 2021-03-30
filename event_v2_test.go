@@ -11,9 +11,9 @@ func TestEventV2_ManageEvent(t *testing.T) {
 
 	mux.HandleFunc("/v2/enqueue", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"status": "ok", "dedup_key": "yes", "message": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok", "dedup_key": "yes", "message": "ok"}`))
 	})
-	var client = &Client{v2EventsAPIEndpoint: server.URL, apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{v2EventsAPIEndpoint: server.URL, apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	evt := &V2Event{
 		RoutingKey: "abc123",
 	}

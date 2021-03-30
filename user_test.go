@@ -12,12 +12,12 @@ func TestUser_List(t *testing.T) {
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"users": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"users": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListUsersOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListUsersOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 		TeamIDs:       []string{},
@@ -49,10 +49,10 @@ func TestUser_Create(t *testing.T) {
 
 	mux.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
+		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := User{
 		Email: "foo@bar.com",
 	}
@@ -80,10 +80,9 @@ func TestUser_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteUser(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,10 +95,10 @@ func TestUser_Get(t *testing.T) {
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
+		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	opts := GetUserOptions{
 		Includes: []string{},
@@ -126,10 +125,10 @@ func TestUser_Update(t *testing.T) {
 
 	mux.HandleFunc("/users/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
+		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := User{
 		APIObject: APIObject{
 			ID: "1",
@@ -158,10 +157,10 @@ func TestUser_GetCurrent(t *testing.T) {
 
 	mux.HandleFunc("/users/me", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
+		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	opts := GetCurrentUserOptions{
 		Includes: []string{},
 	}
@@ -187,11 +186,11 @@ func TestUser_ListContactMethods(t *testing.T) {
 
 	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"contact_methods": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"contact_methods": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ID := "1"
 
 	res, err := client.ListUserContactMethods(ID)
@@ -218,10 +217,10 @@ func TestUser_GetContactMethod(t *testing.T) {
 
 	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"contact_method": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"contact_method": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	methodID := "1"
 	userID := "1"
 
@@ -244,10 +243,10 @@ func TestUser_CreateContactMethod(t *testing.T) {
 
 	mux.HandleFunc("/users/1/contact_methods", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
+		_, _ = w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	contactMethod := ContactMethod{
 		Type: "email_contact_method",
@@ -274,12 +273,11 @@ func TestUser_DeleteContactMethod(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	contactMethodID := "1"
 
 	err := client.DeleteUserContactMethod(userID, contactMethodID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -292,10 +290,10 @@ func TestUser_UpdateContactMethod(t *testing.T) {
 
 	mux.HandleFunc("/users/1/contact_methods/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
+		_, _ = w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	contactMethod := ContactMethod{
 		ID:   "1",
@@ -321,10 +319,10 @@ func TestUser_GetUserNotificationRule(t *testing.T) {
 
 	mux.HandleFunc("/users/1/notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ruleID := "1"
 	userID := "1"
 
@@ -352,10 +350,10 @@ func TestUser_CreateUserNotificationRule(t *testing.T) {
 
 	mux.HandleFunc("/users/1/notification_rules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	rule := NotificationRule{
 		Type: "email_contact_method",
@@ -384,11 +382,11 @@ func TestUser_ListUserNotificationRules(t *testing.T) {
 
 	mux.HandleFunc("/users/1/notification_rules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"notification_rules": [{"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}]}`))
+		_, _ = w.Write([]byte(`{"notification_rules": [{"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ID := "1"
 
 	res, err := client.ListUserNotificationRules(ID)
@@ -420,10 +418,10 @@ func TestUser_UpdateUserNotificationRule(t *testing.T) {
 
 	mux.HandleFunc("/users/1/notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
+		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	userID := "1"
 	rule := NotificationRule{
 		ID:   "1",
@@ -457,7 +455,7 @@ func TestUser_DeleteUserNotificationRule(t *testing.T) {
 	userID := "1"
 	ruleID := "1"
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	if err := client.DeleteUserNotificationRule(userID, ruleID); err != nil {
 		t.Fatal(err)
 	}

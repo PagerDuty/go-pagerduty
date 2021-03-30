@@ -28,12 +28,12 @@ func (c *Client) ListAbilitiesWithContext(ctx context.Context) (*ListAbilityResp
 	return &result, nil
 }
 
-// TestAbility Check if your account has the given ability.
+// TestAbility checks if your account has the given ability.
 func (c *Client) TestAbility(ability string) error {
 	return c.TestAbilityWithContext(context.Background(), ability)
 }
 
-// TestAbility Check if your account has the given ability.
+// TestAbilityWithContext checks if your account has the given ability.
 func (c *Client) TestAbilityWithContext(ctx context.Context, ability string) error {
 	_, err := c.get(ctx, "/abilities/"+ability)
 	return err

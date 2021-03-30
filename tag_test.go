@@ -12,12 +12,12 @@ func TestTag_List(t *testing.T) {
 
 	mux.HandleFunc("/tags/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"tags": [{"id": "1","label":"MyTag"}]}`))
+		_, _ = w.Write([]byte(`{"tags": [{"id": "1","label":"MyTag"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListTagOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListTagOptions{
 		APIListObject: listObj,
 	}
 	res, err := client.ListTags(opts)
@@ -45,10 +45,10 @@ func TestTag_Create(t *testing.T) {
 
 	mux.HandleFunc("/tags", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"tag": {"id": "1","Label":"foo"}}`))
+		_, _ = w.Write([]byte(`{"tag": {"id": "1","Label":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &Tag{
 		Label: "foo",
 	}
@@ -76,10 +76,9 @@ func TestTag_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteTag(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,10 +91,10 @@ func TestTag_Get(t *testing.T) {
 
 	mux.HandleFunc("/tags/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"tag": {"id": "1","label":"foo"}}`))
+		_, _ = w.Write([]byte(`{"tag": {"id": "1","label":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	res, _, err := client.GetTag(id)
 
@@ -121,7 +120,7 @@ func TestTag_AssignAdd(t *testing.T) {
 		testMethod(t, r, "POST")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ta := &TagAssignments{
 		Add: []*TagAssignment{
 			{
@@ -136,7 +135,6 @@ func TestTag_AssignAdd(t *testing.T) {
 	}
 	// this endpoint only returns  an "ok" in the body. no point in testing for it.
 	_, err := client.AssignTags("teams", "1", ta)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +149,7 @@ func TestTag_AssignRemove(t *testing.T) {
 		testMethod(t, r, "POST")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ta := &TagAssignments{
 		Remove: []*TagAssignment{
 			{
@@ -162,7 +160,6 @@ func TestTag_AssignRemove(t *testing.T) {
 	}
 	// this endpoint only returns  an "ok" in the body. no point in testing for it.
 	_, err := client.AssignTags("teams", "1", ta)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,10 +172,10 @@ func TestTag_GetUsersByTag(t *testing.T) {
 
 	mux.HandleFunc("/tags/1/users/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"users": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"users": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	tid := "1"
 
 	res, err := client.GetUsersByTag(tid)
@@ -203,10 +200,10 @@ func TestTag_GetTeamsByTag(t *testing.T) {
 
 	mux.HandleFunc("/tags/1/teams/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"teams": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"teams": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	tid := "1"
 
 	res, err := client.GetTeamsByTag(tid)
@@ -231,10 +228,10 @@ func TestTag_GetEscalationPoliciesByTag(t *testing.T) {
 
 	mux.HandleFunc("/tags/1/escalation_policies/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"escalation_policies": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"escalation_policies": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	tid := "1"
 
 	res, err := client.GetEscalationPoliciesByTag(tid)
@@ -259,15 +256,15 @@ func TestTag_GetTagsForEntity(t *testing.T) {
 
 	mux.HandleFunc("/escalation_policies/1/tags/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"tags": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"tags": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	eid := "1"
 	e := "escalation_policies"
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 
-	var opts = ListTagOptions{
+	opts := ListTagOptions{
 		APIListObject: listObj,
 	}
 	res, err := client.GetTagsForEntity(e, eid, opts)

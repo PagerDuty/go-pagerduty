@@ -11,11 +11,11 @@ func TestAddon_List(t *testing.T) {
 
 	mux.HandleFunc("/addons", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"addons": [{"name": "Internal Status Page"}]}`))
+		_, _ = w.Write([]byte(`{"addons": [{"name": "Internal Status Page"}]}`))
 	})
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var opts ListAddonOptions
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.ListAddons(opts)
 	want := &ListAddonResponse{
@@ -43,10 +43,10 @@ func TestAddon_Install(t *testing.T) {
 	mux.HandleFunc("/addons", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"addon": {"name": "Internal Status Page", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"addon": {"name": "Internal Status Page", "id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.InstallAddon(input)
 
@@ -68,9 +68,9 @@ func TestAddon_Get(t *testing.T) {
 
 	mux.HandleFunc("/addons/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"addon": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"addon": {"id": "1"}}`))
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.GetAddon("1")
 
@@ -91,9 +91,9 @@ func TestAddon_Update(t *testing.T) {
 
 	mux.HandleFunc("/addons/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"addon": {"name": "Internal Status Page", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"addon": {"name": "Internal Status Page", "id": "1"}}`))
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	input := Addon{
 		Name: "Internal Status Page",
@@ -121,9 +121,8 @@ func TestAddon_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNoContent)
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	err := client.DeleteAddon("1")
-
 	if err != nil {
 		t.Fatal(err)
 	}

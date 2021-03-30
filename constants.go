@@ -1,5 +1,6 @@
 package pagerduty
 
 const (
-	Version = "1.1.2"
+	// Version is current version of this client.
+	Version = "1.4.0"
 )

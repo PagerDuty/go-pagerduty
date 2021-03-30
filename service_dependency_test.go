@@ -12,10 +12,10 @@ func TestBusinessServiceDependency_List(t *testing.T) {
 
 	mux.HandleFunc("/service_dependencies/business_services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
+		_, _ = w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	bServeID := "1"
 	res, _, err := client.ListBusinessServiceDependencies(bServeID)
 	if err != nil {
@@ -46,10 +46,10 @@ func TestTechnicalServiceDependency_List(t *testing.T) {
 
 	mux.HandleFunc("/service_dependencies/technical_services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
+		_, _ = w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	bServeID := "1"
 	res, _, err := client.ListTechnicalServiceDependencies(bServeID)
 	if err != nil {
@@ -80,10 +80,10 @@ func TestServiceDependency_Associate(t *testing.T) {
 
 	mux.HandleFunc("/service_dependencies/associate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
+		_, _ = w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &ListServiceDependencies{
 		Relationships: []*ServiceDependency{
 			{
@@ -99,7 +99,6 @@ func TestServiceDependency_Associate(t *testing.T) {
 		},
 	}
 	res, _, err := client.AssociateServiceDependencies(input)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,10 +126,10 @@ func TestServiceDependency_Disassociate(t *testing.T) {
 
 	mux.HandleFunc("/service_dependencies/disassociate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
+		_, _ = w.Write([]byte(`{"relationships": [{"id": "1","dependent_service":{"id":"1"},"supporting_service":{"id":"1"},"type":"service_dependency"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &ListServiceDependencies{
 		Relationships: []*ServiceDependency{
 			{
@@ -146,7 +145,6 @@ func TestServiceDependency_Disassociate(t *testing.T) {
 		},
 	}
 	res, _, err := client.DisassociateServiceDependencies(input)
-
 	if err != nil {
 		t.Fatal(err)
 	}

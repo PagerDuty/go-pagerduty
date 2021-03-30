@@ -12,12 +12,12 @@ func TestVendor_List(t *testing.T) {
 
 	mux.HandleFunc("/vendors", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"vendors": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"vendors": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListVendorOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListVendorOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 	}
@@ -47,10 +47,10 @@ func TestVendor_Get(t *testing.T) {
 
 	mux.HandleFunc("/vendors/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"vendor": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"vendor": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	venID := "1"
 
 	res, err := client.GetVendor(venID)

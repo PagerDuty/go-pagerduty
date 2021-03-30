@@ -14,12 +14,12 @@ func TestBusinessService_List(t *testing.T) {
 
 	mux.HandleFunc("/business_services/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"business_services": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"business_services": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListBusinessServiceOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListBusinessServiceOptions{
 		APIListObject: listObj,
 	}
 	res, err := client.ListBusinessServices(opts)
@@ -44,10 +44,10 @@ func TestBusinessService_Create(t *testing.T) {
 
 	mux.HandleFunc("/business_services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"business_service": {"id": "1", "name": "foo"}}`))
+		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name": "foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &BusinessService{
 		Name: "foo",
 	}
@@ -71,10 +71,10 @@ func TestBusinessService_Get(t *testing.T) {
 
 	mux.HandleFunc("/business_services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ruleSetID := "1"
 
 	res, _, err := client.GetBusinessService(ruleSetID)
@@ -109,10 +109,10 @@ func TestBusinessService_Update(t *testing.T) {
 			t.Fatalf("got ID in the body when we were not supposed to")
 		}
 
-		w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &BusinessService{
 		ID:   "1",
 		Name: "foo",
@@ -139,10 +139,9 @@ func TestBusinessService_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ID := "1"
 	err := client.DeleteBusinessService(ID)
-
 	if err != nil {
 		t.Fatal(err)
 	}

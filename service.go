@@ -323,7 +323,7 @@ func (c *Client) DeleteIntegrationWithContext(ctx context.Context, serviceID str
 	return err
 }
 
-// ListServiceRules gets all rules for a service.
+// ListServiceRulesPaginated gets all rules for a service.
 func (c *Client) ListServiceRulesPaginated(ctx context.Context, serviceID string) ([]ServiceRule, error) {
 	var rules []ServiceRule
 

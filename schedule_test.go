@@ -12,12 +12,12 @@ func TestSchedule_List(t *testing.T) {
 
 	mux.HandleFunc("/schedules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"schedules": [{"id": "1","summary":"foo"}]}`))
+		_, _ = w.Write([]byte(`{"schedules": [{"id": "1","summary":"foo"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListSchedulesOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListSchedulesOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 	}
@@ -48,10 +48,10 @@ func TestSchedule_Create(t *testing.T) {
 
 	mux.HandleFunc("/schedules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
+		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := Schedule{
 		APIObject: APIObject{
 			ID:      "1",
@@ -84,10 +84,9 @@ func TestSchedule_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteSchedule(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,11 +99,11 @@ func TestSchedule_Get(t *testing.T) {
 
 	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
+		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 
 	input := "1"
 	opts := GetScheduleOptions{
@@ -135,10 +134,10 @@ func TestSchedule_Update(t *testing.T) {
 
 	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
+		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	id := "1"
 	sched := Schedule{
@@ -169,12 +168,12 @@ func TestSchedule_ListOverrides(t *testing.T) {
 
 	mux.HandleFunc("/schedules/1/overrides", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"overrides": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"overrides": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListOverridesOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListOverridesOptions{
 		APIListObject: listObj,
 		Since:         "foo",
 		Until:         "bar",
@@ -207,11 +206,11 @@ func TestSchedule_CreateOverride(t *testing.T) {
 
 	mux.HandleFunc("/schedules/1/overrides", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"override": {"id": "1", "start": "foo", "end": "bar"}}`))
+		_, _ = w.Write([]byte(`{"override": {"id": "1", "start": "foo", "end": "bar"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var input = Override{
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := Override{
 		Start: "foo",
 		End:   "bar",
 	}
@@ -240,11 +239,10 @@ func TestSchedule_DeleteOverride(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	schedID := "1"
 	overID := "1"
 	err := client.DeleteOverride(schedID, overID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,12 +255,12 @@ func TestSchedule_ListOnCallUsers(t *testing.T) {
 
 	mux.HandleFunc("/schedules/1/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"users": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"users": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListOnCallUsersOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListOnCallUsersOptions{
 		APIListObject: listObj,
 		Since:         "foo",
 		Until:         "bar",

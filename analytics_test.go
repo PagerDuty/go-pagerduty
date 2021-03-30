@@ -30,14 +30,17 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 	}
 
 	bytesAnalyticsResponse, err := json.Marshal(analyticsResponse)
+	testErrCheck(t, "json.Marshal()", "", err)
+
 	mux.HandleFunc("/analytics/metrics/incidents/all", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write(bytesAnalyticsResponse)
+		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{apiEndpoint: server.URL,
-		authToken:  "foo",
-		HTTPClient: defaultHTTPClient,
+	client := &Client{
+		apiEndpoint: server.URL,
+		authToken:   "foo",
+		HTTPClient:  defaultHTTPClient,
 	}
 
 	res, err := client.GetAggregatedIncidentData(context.Background(), analyticsRequest)
@@ -75,14 +78,17 @@ func TestAnalytics_GetAggregatedServiceData(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	bytesAnalyticsResponse, err := json.Marshal(analyticsResponse)
+	testErrCheck(t, "json.Marshal()", "", err)
+
 	mux.HandleFunc("/analytics/metrics/incidents/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write(bytesAnalyticsResponse)
+		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{apiEndpoint: server.URL,
-		authToken:  "foo",
-		HTTPClient: defaultHTTPClient,
+	client := &Client{
+		apiEndpoint: server.URL,
+		authToken:   "foo",
+		HTTPClient:  defaultHTTPClient,
 	}
 
 	res, err := client.GetAggregatedServiceData(context.Background(), analyticsRequest)
@@ -120,14 +126,17 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	bytesAnalyticsResponse, err := json.Marshal(analyticsResponse)
+	testErrCheck(t, "json.Marshal()", "", err)
+
 	mux.HandleFunc("/analytics/metrics/incidents/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write(bytesAnalyticsResponse)
+		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{apiEndpoint: server.URL,
-		authToken:  "foo",
-		HTTPClient: defaultHTTPClient,
+	client := &Client{
+		apiEndpoint: server.URL,
+		authToken:   "foo",
+		HTTPClient:  defaultHTTPClient,
 	}
 
 	res, err := client.GetAggregatedTeamData(context.Background(), analyticsRequest)

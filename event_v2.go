@@ -70,7 +70,7 @@ func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, e
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }() // explicitly discard error
 
 	if resp.StatusCode != http.StatusAccepted {
 		bytes, err := ioutil.ReadAll(resp.Body)

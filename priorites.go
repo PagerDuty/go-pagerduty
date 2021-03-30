@@ -11,6 +11,8 @@ type PriorityProperty struct {
 	Description string `json:"description"`
 }
 
+// Priorities repreents the API response from PagerDuty when listing the
+// configured priorities.
 type Priorities struct {
 	APIListObject
 	Priorities []PriorityProperty `json:"priorities"`

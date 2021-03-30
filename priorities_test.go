@@ -12,11 +12,11 @@ func TestPriorities_List(t *testing.T) {
 
 	mux.HandleFunc("/priorities", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"priorities": [{"id": "1", "summary": "foo"}]}`))
+		_, _ = w.Write([]byte(`{"priorities": [{"id": "1", "summary": "foo"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.ListPriorities()
 

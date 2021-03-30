@@ -12,12 +12,12 @@ func TestLogEntry_List(t *testing.T) {
 
 	mux.HandleFunc("/log_entries", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"log_entries": [{"id": "1","summary":"foo"}]}`))
+		_, _ = w.Write([]byte(`{"log_entries": [{"id": "1","summary":"foo"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var entriesOpts = ListLogEntriesOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	entriesOpts := ListLogEntriesOptions{
 		APIListObject: listObj,
 		Includes:      []string{},
 		IsOverview:    true,
@@ -51,10 +51,10 @@ func TestLogEntry_Get(t *testing.T) {
 
 	mux.HandleFunc("/log_entries/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"log_entry": {"id": "1", "summary": "foo"}}`))
+		_, _ = w.Write([]byte(`{"log_entry": {"id": "1", "summary": "foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	opts := GetLogEntryOptions{TimeZone: "UTC", Includes: []string{}}
 	res, err := client.GetLogEntry(id, opts)

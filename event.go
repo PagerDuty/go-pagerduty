@@ -51,7 +51,9 @@ func CreateEventWithHTTPClient(e Event, client HTTPClient) (*EventResponse, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to action request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() { _ = resp.Body.Close() }() // explicitly discard error
+
 	if resp.StatusCode != http.StatusOK {
 		return &EventResponse{HttpStatus: resp.StatusCode}, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 	}
