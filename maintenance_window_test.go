@@ -12,12 +12,12 @@ func TestMaintenanceWindow_List(t *testing.T) {
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"maintenance_windows": [{"id": "1", "summary": "foo"}]}`))
+		_, _ = w.Write([]byte(`{"maintenance_windows": [{"id": "1", "summary": "foo"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListMaintenanceWindowsOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListMaintenanceWindowsOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 		Includes:      []string{},
@@ -55,10 +55,10 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.CreateMaintenanceWindow(from, input)
 
@@ -74,6 +74,7 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
 func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 	setup()
 	defer teardown()
@@ -83,10 +84,10 @@ func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 
 	mux.HandleFunc("/maintenance_windows", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.CreateMaintenanceWindow(from, input)
 
@@ -112,9 +113,8 @@ func TestMaintenanceWindow_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNoContent)
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	err := client.DeleteMaintenanceWindow("1")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,10 +127,10 @@ func TestMaintenanceWindow_Get(t *testing.T) {
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	opts := GetMaintenanceWindowOptions{Includes: []string{}}
 	res, err := client.GetMaintenanceWindow(id, opts)
@@ -162,9 +162,9 @@ func TestMaintenanceWindow_Update(t *testing.T) {
 
 	mux.HandleFunc("/maintenance_windows/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.UpdateMaintenanceWindow(input)
 

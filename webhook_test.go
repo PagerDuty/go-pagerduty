@@ -14,7 +14,6 @@ func TestWebhook_DecodeWebhook(t *testing.T) {
 
 	jsonData := strings.NewReader(webhookPayload)
 	res, err := DecodeWebhook(jsonData)
-
 	if err != nil {
 		t.Fatal(err)
 	}

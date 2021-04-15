@@ -15,12 +15,12 @@ func TestTeam_List(t *testing.T) {
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"teams": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"teams": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListTeamOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListTeamOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 	}
@@ -50,10 +50,10 @@ func TestTeam_Create(t *testing.T) {
 
 	mux.HandleFunc("/teams", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &Team{
 		Name: "foo",
 	}
@@ -81,10 +81,9 @@ func TestTeam_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteTeam(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,10 +96,10 @@ func TestTeam_Get(t *testing.T) {
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	res, err := client.GetTeam(id)
 
@@ -124,10 +123,10 @@ func TestTeam_Update(t *testing.T) {
 
 	mux.HandleFunc("/teams/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	input := &Team{
 		APIObject: APIObject{
@@ -160,12 +159,11 @@ func TestTeam_RemoveEscalationPolicyFromTeam(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	teamID := "1"
 	epID := "1"
 
 	err := client.RemoveEscalationPolicyFromTeam(teamID, epID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,12 +178,11 @@ func TestTeam_AddEscalationPolicyToTeam(t *testing.T) {
 		testMethod(t, r, "PUT")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	teamID := "1"
 	epID := "1"
 
 	err := client.AddEscalationPolicyToTeam(teamID, epID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,12 +197,11 @@ func TestTeam_RemoveUserFromTeam(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	teamID := "1"
 	userID := "1"
 
 	err := client.RemoveUserFromTeam(teamID, userID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,12 +216,11 @@ func TestTeam_AddUserToTeam(t *testing.T) {
 		testMethod(t, r, "PUT")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	teamID := "1"
 	userID := "1"
 
 	err := client.AddUserToTeam(teamID, userID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -304,7 +299,6 @@ func genMembersRespPage(details pageDetails, t *testing.T) string {
 		"limit":  details.limit,
 		"offset": details.offset,
 	})
-
 	if err != nil {
 		t.Fatalf("Failed to apply values to template: %v", err)
 	}
@@ -316,7 +310,6 @@ func genRespPages(amount,
 	maxPageSize int,
 	pageGenerator func(pageDetails, *testing.T) string,
 	t *testing.T) []string {
-
 	pages := make([]string, 0)
 
 	lowNumber := 1
@@ -340,7 +333,8 @@ func genRespPages(amount,
 			highNumber: tempHighNumber,
 			limit:      maxPageSize,
 			more:       more,
-			offset:     offset}, t)
+			offset:     offset,
+		}, t)
 
 		pages = append(pages, page)
 

@@ -12,12 +12,12 @@ func TestNotification_List(t *testing.T) {
 
 	mux.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"notifications": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"notifications": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListNotificationOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListNotificationOptions{
 		APIListObject: listObj,
 		Includes:      []string{},
 		Filter:        "foo",

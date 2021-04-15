@@ -54,6 +54,8 @@ type APIReference struct {
 	Type string `json:"type,omitempty"`
 }
 
+// APIDetails are the fields required to represent a details non-hydrated
+// object.
 type APIDetails struct {
 	Type    string `json:"type,omitempty"`
 	Details string `json:"details,omitempty"`
@@ -312,7 +314,8 @@ func (c *Client) do(ctx context.Context, method, path string, body io.Reader, he
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }() // explicitly discard error
+
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(payload)
 }

@@ -215,7 +215,7 @@ type ListOverridesResponse struct {
 	Overrides []Override `json:"overrides,omitempty"`
 }
 
-// Overrides are any schedule layers from the override layer.
+// Override are any schedule layers from the override layer.
 type Override struct {
 	ID    string    `json:"id,omitempty"`
 	Start string    `json:"start,omitempty"`

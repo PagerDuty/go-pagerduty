@@ -40,7 +40,7 @@ type Priority struct {
 	Description string `json:"description,omitempty"`
 }
 
-// Resolve reason is the data structure describing the reason an incident was resolved
+// ResolveReason is the data structure describing the reason an incident was resolved
 type ResolveReason struct {
 	Type     string    `json:"type,omitempty"`
 	Incident APIObject `json:"incident"`
@@ -52,6 +52,7 @@ type IncidentBody struct {
 	Details string `json:"details,omitempty"`
 }
 
+// Assignee is an individual assigned to an incident.
 type Assignee struct {
 	Assignee APIObject `json:"assignee"`
 }
@@ -536,7 +537,8 @@ type IncidentResponders struct {
 	RequestedAt string    `json:"requested_at"`
 }
 
-// ResponderRequestResponse
+// ResponderRequestResponse is the response from the API when requesting someone
+// respond to an incident.
 type ResponderRequestResponse struct {
 	ResponderRequest ResponderRequest `json:"responder_request"`
 }

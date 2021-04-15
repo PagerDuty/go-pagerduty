@@ -22,11 +22,11 @@ func TestChangeEvent_Create(t *testing.T) {
 		"/v2/change/enqueue", func(w http.ResponseWriter, r *http.Request) {
 			testMethod(t, r, "POST")
 			w.WriteHeader(http.StatusAccepted)
-			w.Write([]byte(`{"message": "Change event processed", "status": "success"}`))
+			_, _ = w.Write([]byte(`{"message": "Change event processed", "status": "success"}`))
 		},
 	)
 
-	var client = &Client{
+	client := &Client{
 		v2EventsAPIEndpoint: server.URL,
 		apiEndpoint:         server.URL,
 		authToken:           "foo",
@@ -60,7 +60,6 @@ func TestChangeEvent_Create(t *testing.T) {
 	}
 
 	res, err := client.CreateChangeEvent(ce)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +81,7 @@ func TestChangeEvent_CreateWithPayloadVerification(t *testing.T) {
 		},
 	)
 
-	var client = &Client{
+	client := &Client{
 		v2EventsAPIEndpoint: server.URL,
 		apiEndpoint:         server.URL,
 		authToken:           "foo",
@@ -111,5 +110,4 @@ func TestChangeEvent_CreateWithPayloadVerification(t *testing.T) {
 	}
 
 	_, _ = client.CreateChangeEvent(ce)
-
 }

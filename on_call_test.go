@@ -12,12 +12,12 @@ func TestOnCall_List(t *testing.T) {
 
 	mux.HandleFunc("/oncalls", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"oncalls": [{"escalation_level":2}]}`))
+		_, _ = w.Write([]byte(`{"oncalls": [{"escalation_level":2}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListOnCallOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListOnCallOptions{
 		APIListObject:       listObj,
 		TimeZone:            "UTC",
 		Includes:            []string{},

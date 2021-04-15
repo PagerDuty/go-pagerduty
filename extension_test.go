@@ -12,13 +12,12 @@ func TestExtension_List(t *testing.T) {
 
 	mux.HandleFunc("/extensions", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"extensions":[{"id":"1","summary":"foo","config": {"restrict": "any"}, "extension_objects":[{"id":"foo","summary":"foo"}]}]}`))
-
+		_, _ = w.Write([]byte(`{"extensions":[{"id":"1","summary":"foo","config": {"restrict": "any"}, "extension_objects":[{"id":"foo","summary":"foo"}]}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListExtensionOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListExtensionOptions{
 		APIListObject: listObj,
 		Query:         "foo",
 	}
@@ -70,15 +69,15 @@ func TestExtension_Create(t *testing.T) {
 		if name == "foo" {
 			testNoEndpointURL(t, got)
 			testMethod(t, r, "POST")
-			w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
+			_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
 		} else {
 			testGotExpectedURL(t, "expected_url", got)
 			testMethod(t, r, "POST")
-			w.Write([]byte(`{"extension": {"name": "bar", "id": "2", "endpoint_url": "expected_url"}}`))
+			_, _ = w.Write([]byte(`{"extension": {"name": "bar", "id": "2", "endpoint_url": "expected_url"}}`))
 		}
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	want1 := &Extension{
 		Name: "foo",
@@ -117,7 +116,7 @@ func TestExtension_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	if err := client.DeleteExtension("1"); err != nil {
 		t.Fatal(err)
@@ -130,10 +129,10 @@ func TestExtension_Get(t *testing.T) {
 
 	mux.HandleFunc("/extensions/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.GetExtension("1")
 
@@ -166,7 +165,7 @@ func TestExtension_Update(t *testing.T) {
 		testNoEndpointURL(t, got)
 
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
+		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
 	})
 
 	mux.HandleFunc("/extensions/2", func(w http.ResponseWriter, r *http.Request) {
@@ -178,10 +177,10 @@ func TestExtension_Update(t *testing.T) {
 		testGotExpectedURL(t, "expected_url", got)
 
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"extension": {"name": "foo", "id": "2", "endpoint_url": "expected_url"}}`))
+		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "2", "endpoint_url": "expected_url"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	want1 := &Extension{
 		Name: "foo",

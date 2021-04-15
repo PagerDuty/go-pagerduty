@@ -12,10 +12,10 @@ func TestRuleset_List(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"rulesets": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"rulesets": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	res, err := client.ListRulesets()
 	if err != nil {
@@ -39,10 +39,10 @@ func TestRuleset_Create(t *testing.T) {
 
 	mux.HandleFunc("/rulesets", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"ruleset": {"id": "1", "name": "foo"}}`))
+		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name": "foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &Ruleset{
 		Name: "foo",
 	}
@@ -66,10 +66,10 @@ func TestRuleset_Get(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ruleSetID := "1"
 
 	res, _, err := client.GetRuleset(ruleSetID)
@@ -92,10 +92,10 @@ func TestRuleset_Update(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := &Ruleset{
 		ID:   "1",
 		Name: "foo",
@@ -122,10 +122,9 @@ func TestRuleset_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteRuleset(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,10 +137,10 @@ func TestRuleset_ListRules(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1/rules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"rules": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"rules": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	rulesetID := "1"
 	res, err := client.ListRulesetRules(rulesetID)
@@ -166,10 +165,10 @@ func TestRuleset_GetRule(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	rulesetID := "1"
 	ruleID := "1"
@@ -191,10 +190,10 @@ func TestRuleset_CreateRule(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1/rules/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	rulesetID := "1"
 	rule := &RulesetRule{}
@@ -217,10 +216,10 @@ func TestRuleset_UpdateRule(t *testing.T) {
 
 	mux.HandleFunc("/rulesets/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	rulesetID := "1"
 	ruleID := "1"
@@ -246,12 +245,11 @@ func TestRuleset_DeleteRule(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	ruleID := "1"
 	rulesetID := "1"
 
 	err := client.DeleteRulesetRule(rulesetID, ruleID)
-
 	if err != nil {
 		t.Fatal(err)
 	}

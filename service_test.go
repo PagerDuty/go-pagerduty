@@ -15,12 +15,12 @@ func TestService_List(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"services": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"services": [{"id": "1"}]}`))
 	})
 
-	var listObj = APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListServiceOptions{
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListServiceOptions{
 		APIListObject: listObj,
 		TeamIDs:       []string{},
 		TimeZone:      "foo",
@@ -67,12 +67,12 @@ func TestService_ListPaginated(t *testing.T) {
                           "More": %s,
                           "Offset": %d,
                           "Limit": 1}`, offset, more, offset)
-		w.Write([]byte(resp))
+		_, _ = w.Write([]byte(resp))
 	})
 
-	var listObj = APIListObject{Limit: 1, Offset: 0, More: false, Total: 0}
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var opts = ListServiceOptions{
+	listObj := APIListObject{Limit: 1, Offset: 0, More: false, Total: 0}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	opts := ListServiceOptions{
 		APIListObject: listObj,
 		TeamIDs:       []string{},
 		TimeZone:      "foo",
@@ -87,7 +87,8 @@ func TestService_ListPaginated(t *testing.T) {
 			APIObject: APIObject{
 				ID: "0",
 			},
-		}, {
+		},
+		{
 			APIObject: APIObject{
 				ID: "1",
 			},
@@ -107,10 +108,10 @@ func TestService_Get(t *testing.T) {
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	id := "1"
 	opts := &GetServiceOptions{
@@ -138,10 +139,10 @@ func TestService_Create(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := Service{
 		Name: "foo",
 	}
@@ -167,10 +168,10 @@ func TestService_CreateWithAlertGroupParamsTime(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -202,10 +203,10 @@ func TestService_CreateWithAlertGroupParamsContentBased(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -238,10 +239,10 @@ func TestService_CreateWithAlertGroupParamsIntelligent(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -270,10 +271,10 @@ func TestService_Update(t *testing.T) {
 
 	mux.HandleFunc("/services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	input := Service{
 		APIObject: APIObject{
@@ -305,10 +306,9 @@ func TestService_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	id := "1"
 	err := client.DeleteService(id)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -321,11 +321,11 @@ func TestService_CreateIntegration(t *testing.T) {
 
 	mux.HandleFunc("/services/1/integrations", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var input = Integration{
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := Integration{
 		Name: "foo",
 	}
 	servID := "1"
@@ -352,11 +352,11 @@ func TestService_GetIntegration(t *testing.T) {
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var input = GetIntegrationOptions{
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := GetIntegrationOptions{
 		Includes: []string{},
 	}
 	servID := "1"
@@ -384,11 +384,11 @@ func TestService_UpdateIntegration(t *testing.T) {
 
 	mux.HandleFunc("/services/1/integrations/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
+		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
-	var input = Integration{
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	input := Integration{
 		APIObject: APIObject{
 			ID: "1",
 		},
@@ -420,11 +420,10 @@ func TestService_DeleteIntegration(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	servID := "1"
 	intID := "1"
 	err := client.DeleteIntegration(servID, intID)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -437,10 +436,10 @@ func TestService_ListRules(t *testing.T) {
 
 	mux.HandleFunc("/services/1/rules", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"rules": [{"id": "1"}]}`))
+		_, _ = w.Write([]byte(`{"rules": [{"id": "1"}]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
 	res, err := client.ListServiceRulesPaginated(context.Background(), serviceID)
@@ -459,10 +458,10 @@ func TestService_CreateServiceRule(t *testing.T) {
 
 	mux.HandleFunc("/services/1/rules/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
 	rule := ServiceRule{}
@@ -485,10 +484,10 @@ func TestService_GetServiceRule(t *testing.T) {
 
 	mux.HandleFunc("/services/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
 	ruleID := "1"
@@ -510,10 +509,10 @@ func TestService_UpdateServiceRule(t *testing.T) {
 
 	mux.HandleFunc("/services/1/rules/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		w.Write([]byte(`{"rule": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	serviceID := "1"
 	ruleID := "1"
@@ -539,12 +538,11 @@ func TestService_DeleteServiceRule(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	serviceID := "1"
 	ruleID := "1"
 
 	err := client.DeleteServiceRule(context.Background(), serviceID, ruleID)
-
 	if err != nil {
 		t.Fatal(err)
 	}

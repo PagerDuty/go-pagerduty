@@ -12,14 +12,13 @@ func TestAbility_ListAbilities(t *testing.T) {
 
 	mux.HandleFunc("/abilities", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		w.Write([]byte(`{"abilities": ["sso"]}`))
+		_, _ = w.Write([]byte(`{"abilities": ["sso"]}`))
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	want := &ListAbilityResponse{Abilities: []string{"sso"}}
 
 	res, err := client.ListAbilities()
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +34,7 @@ func TestAbility_ListAbilitiesFailure(t *testing.T) {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	if _, err := client.ListAbilities(); err == nil {
 		t.Fatal("expected error; got nil")
@@ -51,7 +50,7 @@ func TestAbility_TestAbility(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	if err := client.TestAbility("sso"); err != nil {
 		t.Fatal(err)
@@ -67,7 +66,7 @@ func TestAbility_TestAbilityFailure(t *testing.T) {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	var client = &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	if err := client.TestAbility("sso"); err == nil {
 		t.Fatal("expected error; got nil")
