@@ -19,7 +19,7 @@ func TestTeam_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListTeamOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -53,7 +53,7 @@ func TestTeam_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := &Team{
 		Name: "foo",
 	}
@@ -81,7 +81,7 @@ func TestTeam_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.DeleteTeam(id)
 	if err != nil {
@@ -99,7 +99,7 @@ func TestTeam_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	res, err := client.GetTeam(id)
 
@@ -126,7 +126,7 @@ func TestTeam_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"team": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	input := &Team{
 		APIObject: APIObject{
@@ -159,7 +159,7 @@ func TestTeam_RemoveEscalationPolicyFromTeam(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	teamID := "1"
 	epID := "1"
 
@@ -178,7 +178,7 @@ func TestTeam_AddEscalationPolicyToTeam(t *testing.T) {
 		testMethod(t, r, "PUT")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	teamID := "1"
 	epID := "1"
 
@@ -197,7 +197,7 @@ func TestTeam_RemoveUserFromTeam(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	teamID := "1"
 	userID := "1"
 
@@ -216,7 +216,7 @@ func TestTeam_AddUserToTeam(t *testing.T) {
 		testMethod(t, r, "PUT")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	teamID := "1"
 	userID := "1"
 
@@ -359,7 +359,7 @@ func TestListMembersSuccess(t *testing.T) {
 		fmt.Fprint(w, page)
 	})
 
-	api := &Client{apiEndpoint: server.URL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+	api := defaultTestClient(server.URL, testAPIKey)
 	members, err := api.ListMembers(testValidTeamID, ListMembersOptions{})
 	if err != nil {
 		t.Fatalf("Failed to get members: %v", err)
@@ -371,7 +371,7 @@ func TestListMembersSuccess(t *testing.T) {
 }
 
 func TestListMembersError(t *testing.T) {
-	api := &Client{apiEndpoint: testBadURL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+	api := defaultTestClient(testBadURL, testAPIKey)
 	members, err := api.ListMembers(testValidTeamID, ListMembersOptions{})
 	if err == nil {
 		t.Fatalf("Expected error, got nil")
@@ -394,7 +394,7 @@ func TestListAllMembersSuccessMultiplePages(t *testing.T) {
 		currentPage++
 	})
 
-	api := &Client{apiEndpoint: server.URL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+	api := defaultTestClient(server.URL, testAPIKey)
 
 	members, err := api.ListAllMembers(testValidTeamID)
 	if err != nil {
@@ -407,7 +407,7 @@ func TestListAllMembersSuccessMultiplePages(t *testing.T) {
 }
 
 func TestListAllMembersError(t *testing.T) {
-	api := &Client{apiEndpoint: testBadURL, authToken: testAPIKey, HTTPClient: defaultHTTPClient}
+	api := defaultTestClient(testBadURL, testAPIKey)
 	members, err := api.ListAllMembers(testValidTeamID)
 	if err == nil {
 		t.Fatalf("Expected error, got nil")

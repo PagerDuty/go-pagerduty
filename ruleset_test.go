@@ -15,7 +15,7 @@ func TestRuleset_List(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rulesets": [{"id": "1"}]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.ListRulesets()
 	if err != nil {
@@ -42,7 +42,7 @@ func TestRuleset_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name": "foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := &Ruleset{
 		Name: "foo",
 	}
@@ -69,7 +69,7 @@ func TestRuleset_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ruleSetID := "1"
 
 	res, _, err := client.GetRuleset(ruleSetID)
@@ -95,7 +95,7 @@ func TestRuleset_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"ruleset": {"id": "1", "name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := &Ruleset{
 		ID:   "1",
 		Name: "foo",
@@ -122,7 +122,7 @@ func TestRuleset_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.DeleteRuleset(id)
 	if err != nil {
@@ -140,7 +140,7 @@ func TestRuleset_ListRules(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rules": [{"id": "1"}]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	rulesetID := "1"
 	res, err := client.ListRulesetRules(rulesetID)
@@ -168,7 +168,7 @@ func TestRuleset_GetRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	rulesetID := "1"
 	ruleID := "1"
@@ -193,7 +193,7 @@ func TestRuleset_CreateRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	rulesetID := "1"
 	rule := &RulesetRule{}
@@ -219,7 +219,7 @@ func TestRuleset_UpdateRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	rulesetID := "1"
 	ruleID := "1"
@@ -245,7 +245,7 @@ func TestRuleset_DeleteRule(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ruleID := "1"
 	rulesetID := "1"
 

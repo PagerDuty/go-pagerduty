@@ -16,7 +16,7 @@ func TestSchedule_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListSchedulesOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -51,7 +51,7 @@ func TestSchedule_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Schedule{
 		APIObject: APIObject{
 			ID:      "1",
@@ -84,7 +84,7 @@ func TestSchedule_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.DeleteSchedule(id)
 	if err != nil {
@@ -102,7 +102,7 @@ func TestSchedule_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 
 	input := "1"
@@ -137,7 +137,7 @@ func TestSchedule_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	id := "1"
 	sched := Schedule{
@@ -172,7 +172,7 @@ func TestSchedule_ListOverrides(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListOverridesOptions{
 		APIListObject: listObj,
 		Since:         "foo",
@@ -209,7 +209,7 @@ func TestSchedule_CreateOverride(t *testing.T) {
 		_, _ = w.Write([]byte(`{"override": {"id": "1", "start": "foo", "end": "bar"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Override{
 		Start: "foo",
 		End:   "bar",
@@ -239,7 +239,7 @@ func TestSchedule_DeleteOverride(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	schedID := "1"
 	overID := "1"
 	err := client.DeleteOverride(schedID, overID)
@@ -259,7 +259,7 @@ func TestSchedule_ListOnCallUsers(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListOnCallUsersOptions{
 		APIListObject: listObj,
 		Since:         "foo",

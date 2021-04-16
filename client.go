@@ -1,3 +1,11 @@
+// Package pagerduty is a Go API client for both the PagerDuty v2 REST and
+// Events API. Most methods should be implemented, and it's recommended to use
+// the WithContext variant of each method and to specify a context with a
+// timeout.
+//
+// To debug responses from the API, you can instruct the client to capture the
+// last response from the API. Please see the documentation for the
+// SetDebugFlag() and LastAPIResponse() methods for more details.
 package pagerduty
 
 import (
@@ -6,13 +14,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"path"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 )
+
+// Version is current version of this client.
+const Version = "1.5.0"
 
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
@@ -194,6 +207,10 @@ var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
 // Client wraps http client
 type Client struct {
+	debugFlag    *uint64
+	lastRequest  *atomic.Value
+	lastResponse *atomic.Value
+
 	authToken           string
 	apiEndpoint         string
 	v2EventsAPIEndpoint string
@@ -210,6 +227,9 @@ type Client struct {
 // NewClient creates an API client using an account/user API token
 func NewClient(authToken string, options ...ClientOptions) *Client {
 	client := Client{
+		debugFlag:           new(uint64),
+		lastRequest:         &atomic.Value{},
+		lastResponse:        &atomic.Value{},
 		authToken:           authToken,
 		apiEndpoint:         apiEndpoint,
 		v2EventsAPIEndpoint: v2EventsAPIEndpoint,
@@ -253,6 +273,119 @@ func WithOAuth() ClientOptions {
 	}
 }
 
+// DebugFlag represents a set of debug bit flags that can be bitwise-ORed
+// together to configure the different behaviors. This allows us to expand
+// functionality in the future without introducing breaking changes.
+type DebugFlag uint64
+
+const (
+	// DebugDisabled disables all debug behaviors.
+	DebugDisabled DebugFlag = 0
+
+	// DebugCaptureLastRequest captures the last HTTP request made to the API
+	// (if there was one) and makes it available via the LastAPIRequest()
+	// method.
+	//
+	// This may increase memory usage / GC, as we'll be making a copy of the
+	// full HTTP request body on each request and capturing it for inspection.
+	DebugCaptureLastRequest DebugFlag = 1 << 0
+
+	// DebugCaptureLastResponse captures the last HTTP response from the API (if
+	// there was one) and makes it available via the LastAPIReponse() method.
+	//
+	// This may increase memory usage / GC, as we'll be making a copy of the
+	// full HTTP response body on each request and capturing it for inspection.
+	DebugCaptureLastResponse DebugFlag = 1 << 1
+)
+
+// SetDebugFlag sets the DebugFlag of the client, which are just bit flags that
+// tell the client how to behave. They can be bitwise-ORed together to enable
+// multiple behaviors.
+func (c *Client) SetDebugFlag(flag DebugFlag) {
+	atomic.StoreUint64(c.debugFlag, uint64(flag))
+}
+
+func (c *Client) debugCaptureRequest() bool {
+	return atomic.LoadUint64(c.debugFlag)&uint64(DebugCaptureLastRequest) > 0
+}
+
+func (c *Client) debugCaptureResponse() bool {
+	return atomic.LoadUint64(c.debugFlag)&uint64(DebugCaptureLastResponse) > 0
+}
+
+// LastAPIRequest returns the last request sent to the API, if enabled. This can
+// be turned on by using the SetDebugFlag() method while providing the
+// DebugCaptureLastRequest flag.
+//
+// The bool value returned from this method is false if the request is unset or
+// is nil. If there was an error prepping the request to be sent to the server,
+// there will be no *http.Request to capture so this will return (<nil>, false).
+//
+// This is meant to help with debugging unexpected API interactions, so most
+// won't need to use it. Also, callers will need to ensure the *Client isn't
+// used concurrently, otherwise they might receive another method's *http.Request
+// and not the one they anticipated.
+//
+// The *http.Request made within the Do() method is not captured by the client,
+// and thus won't be returned by this method.
+func (c *Client) LastAPIRequest() (*http.Request, bool) {
+	v := c.lastRequest.Load()
+	if v == nil {
+		return nil, false
+	}
+
+	// comma ok idiom omitted, if this is something else explode
+	r := v.(*http.Request)
+	if r == nil {
+		return nil, false
+	}
+
+	return r, true
+}
+
+// LastAPIResponse returns the last response received from the API, if enabled.
+// This can be turned on by using the SetDebugFlag() method while providing the
+// DebugCaptureLastResponse flag.
+//
+// The bool value returned from this method is false if the response is unset or
+// is nil. If the HTTP exchange failed (e.g., there was a connection error)
+// there will be no *http.Response to capture so this will return (<nil>,
+// false).
+//
+// This is meant to help with debugging unexpected API interactions, so most
+// won't need to use it. Also, callers will need to ensure the *Client isn't
+// used concurrently, otherwise they might receive another method's *http.Response
+// and not the one they anticipated.
+//
+// The *http.Response from the Do() method is not captured by the client, and thus
+// won't be returned by this method.
+func (c *Client) LastAPIResponse() (*http.Response, bool) {
+	v := c.lastResponse.Load()
+	if v == nil {
+		return nil, false
+	}
+
+	// comma ok idiom omitted, if this is something else explode
+	r := v.(*http.Response)
+	if r == nil {
+		return nil, false
+	}
+
+	return r, true
+}
+
+// Do sets some headers on the request, before actioning it using the internal
+// HTTPClient. If the PagerDuty API you're communicating with requires
+// authentication, such as the REST API, set authRequired to true and the client
+// will set the proper authentication headers onto the request. This also
+// assumes any request body is in JSON format and sets the Content-Type to
+// application/json.
+func (c *Client) Do(r *http.Request, authRequired bool) (*http.Response, error) {
+	c.prepRequest(r, authRequired, nil)
+
+	return c.HTTPClient.Do(r)
+}
+
 func (c *Client) delete(ctx context.Context, path string) (*http.Response, error) {
 	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
@@ -280,14 +413,14 @@ func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
 	return c.do(ctx, http.MethodGet, path, nil, nil)
 }
 
-// needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
-func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers map[string]string) (*http.Response, error) {
-	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build request: %w", err)
-	}
+const (
+	userAgentHeader   = "go-pagerduty/" + Version
+	acceptHeader      = "application/vnd.pagerduty+json;version=2"
+	contentTypeHeader = "application/json"
+)
 
-	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
+func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[string]string) {
+	req.Header.Set("Accept", acceptHeader)
 
 	for k, v := range headers {
 		req.Header.Set(k, v)
@@ -302,10 +435,62 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		}
 	}
 
-	req.Header.Set("User-Agent", "go-pagerduty/"+Version)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", userAgentHeader)
+	req.Header.Set("Content-Type", contentTypeHeader)
+}
 
-	resp, err := c.HTTPClient.Do(req)
+func dupeRequest(r *http.Request) (*http.Request, error) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to copy request body: %w", err)
+	}
+
+	_ = r.Body.Close()
+
+	dreq := r.Clone(r.Context())
+
+	r.Body = ioutil.NopCloser(bytes.NewReader(data))
+	dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+
+	return dreq, nil
+}
+
+// needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
+func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers map[string]string) (*http.Response, error) {
+	var dreq *http.Request
+	var resp *http.Response
+
+	// so that the last request and response can be nil if there was an error
+	// before the request could be fully processed by the origin, we defer these
+	// calls here
+	if c.debugCaptureResponse() {
+		defer func() {
+			c.lastResponse.Store(resp)
+		}()
+	}
+
+	if c.debugCaptureRequest() {
+		defer func() {
+			c.lastRequest.Store(dreq)
+		}()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build request: %w", err)
+	}
+
+	c.prepRequest(req, authRequired, headers)
+
+	// if in debug mode, copy request before making it
+	if c.debugCaptureRequest() {
+		if dreq, err = dupeRequest(req); err != nil {
+			return nil, fmt.Errorf("failed to duplicate request for debug capture: %w", err)
+		}
+	}
+
+	resp, err = c.HTTPClient.Do(req)
+
 	return c.checkResponse(resp, err)
 }
 
@@ -314,10 +499,21 @@ func (c *Client) do(ctx context.Context, method, path string, body io.Reader, he
 }
 
 func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
-	defer func() { _ = resp.Body.Close() }() // explicitly discard error
+	// close the original response body, and not the copy we may make if
+	// debugCaptureResponse is true
+	orb := resp.Body
+	defer func() { _ = orb.Close() }() // explicitly discard error
 
-	decoder := json.NewDecoder(resp.Body)
-	return decoder.Decode(payload)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	if c.debugCaptureResponse() { // reset body as we capture the response elsewhere
+		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+	}
+
+	return json.Unmarshal(body, payload)
 }
 
 func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, error) {

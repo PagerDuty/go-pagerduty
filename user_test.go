@@ -16,7 +16,7 @@ func TestUser_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListUsersOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -52,7 +52,7 @@ func TestUser_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := User{
 		Email: "foo@bar.com",
 	}
@@ -80,7 +80,7 @@ func TestUser_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.DeleteUser(id)
 	if err != nil {
@@ -98,7 +98,7 @@ func TestUser_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	opts := GetUserOptions{
 		Includes: []string{},
@@ -128,7 +128,7 @@ func TestUser_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := User{
 		APIObject: APIObject{
 			ID: "1",
@@ -160,7 +160,7 @@ func TestUser_GetCurrent(t *testing.T) {
 		_, _ = w.Write([]byte(`{"user": {"id": "1", "email":"foo@bar.com"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := GetCurrentUserOptions{
 		Includes: []string{},
 	}
@@ -190,7 +190,7 @@ func TestUser_ListContactMethods(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ID := "1"
 
 	res, err := client.ListUserContactMethods(ID)
@@ -220,7 +220,7 @@ func TestUser_GetContactMethod(t *testing.T) {
 		_, _ = w.Write([]byte(`{"contact_method": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	methodID := "1"
 	userID := "1"
 
@@ -246,7 +246,7 @@ func TestUser_CreateContactMethod(t *testing.T) {
 		_, _ = w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	contactMethod := ContactMethod{
 		Type: "email_contact_method",
@@ -273,7 +273,7 @@ func TestUser_DeleteContactMethod(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	contactMethodID := "1"
 
@@ -293,7 +293,7 @@ func TestUser_UpdateContactMethod(t *testing.T) {
 		_, _ = w.Write([]byte(`{"contact_method": {"id": "1", "type": "email_contact_method"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	contactMethod := ContactMethod{
 		ID:   "1",
@@ -322,7 +322,7 @@ func TestUser_GetUserNotificationRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ruleID := "1"
 	userID := "1"
 
@@ -353,7 +353,7 @@ func TestUser_CreateUserNotificationRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	rule := NotificationRule{
 		Type: "email_contact_method",
@@ -386,7 +386,7 @@ func TestUser_ListUserNotificationRules(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ID := "1"
 
 	res, err := client.ListUserNotificationRules(ID)
@@ -421,7 +421,7 @@ func TestUser_UpdateUserNotificationRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"notification_rule": {"id": "1", "start_delay_in_minutes": 1, "urgency": "low", "contact_method": {"id": "1"}}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	userID := "1"
 	rule := NotificationRule{
 		ID:   "1",
@@ -455,7 +455,7 @@ func TestUser_DeleteUserNotificationRule(t *testing.T) {
 	userID := "1"
 	ruleID := "1"
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	if err := client.DeleteUserNotificationRule(userID, ruleID); err != nil {
 		t.Fatal(err)
 	}

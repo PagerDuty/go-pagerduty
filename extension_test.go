@@ -16,7 +16,7 @@ func TestExtension_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListExtensionOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -77,7 +77,7 @@ func TestExtension_Create(t *testing.T) {
 		}
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	want1 := &Extension{
 		Name: "foo",
@@ -116,7 +116,7 @@ func TestExtension_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	if err := client.DeleteExtension("1"); err != nil {
 		t.Fatal(err)
@@ -132,7 +132,7 @@ func TestExtension_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.GetExtension("1")
 
@@ -180,7 +180,7 @@ func TestExtension_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "2", "endpoint_url": "expected_url"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	want1 := &Extension{
 		Name: "foo",

@@ -16,7 +16,7 @@ func TestMaintenanceWindow_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListMaintenanceWindowsOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -58,7 +58,7 @@ func TestMaintenanceWindow_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.CreateMaintenanceWindow(from, input)
 
@@ -87,7 +87,7 @@ func TestMaintenanceWindow_Create_NoFrom(t *testing.T) {
 		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.CreateMaintenanceWindow(from, input)
 
@@ -113,7 +113,7 @@ func TestMaintenanceWindow_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNoContent)
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	err := client.DeleteMaintenanceWindow("1")
 	if err != nil {
 		t.Fatal(err)
@@ -130,7 +130,7 @@ func TestMaintenanceWindow_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	opts := GetMaintenanceWindowOptions{Includes: []string{}}
 	res, err := client.GetMaintenanceWindow(id, opts)
@@ -164,7 +164,7 @@ func TestMaintenanceWindow_Update(t *testing.T) {
 		testMethod(t, r, "PUT")
 		_, _ = w.Write([]byte(`{"maintenance_window": {"description": "foo", "id": "1"}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.UpdateMaintenanceWindow(input)
 

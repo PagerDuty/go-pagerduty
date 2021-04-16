@@ -16,7 +16,7 @@ func TestNotification_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListNotificationOptions{
 		APIListObject: listObj,
 		Includes:      []string{},

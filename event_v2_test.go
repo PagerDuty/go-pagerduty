@@ -13,18 +13,22 @@ func TestEventV2_ManageEvent(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"status": "ok", "dedup_key": "yes", "message": "ok"}`))
 	})
-	client := &Client{v2EventsAPIEndpoint: server.URL, apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+
+	client := defaultTestClient(server.URL, "foo")
 	evt := &V2Event{
 		RoutingKey: "abc123",
 	}
+
 	res, err := client.ManageEvent(evt)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	want := &V2EventResponse{
 		Status:   "ok",
 		DedupKey: "yes",
 		Message:  "ok",
 	}
+
 	testEqual(t, want, res)
 }

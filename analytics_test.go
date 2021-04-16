@@ -37,11 +37,7 @@ func TestAnalytics_GetAggregatedIncidentData(t *testing.T) {
 		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{
-		apiEndpoint: server.URL,
-		authToken:   "foo",
-		HTTPClient:  defaultHTTPClient,
-	}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.GetAggregatedIncidentData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
@@ -85,11 +81,7 @@ func TestAnalytics_GetAggregatedServiceData(t *testing.T) {
 		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{
-		apiEndpoint: server.URL,
-		authToken:   "foo",
-		HTTPClient:  defaultHTTPClient,
-	}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.GetAggregatedServiceData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{
@@ -133,11 +125,7 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 		_, _ = w.Write(bytesAnalyticsResponse)
 	})
 
-	client := &Client{
-		apiEndpoint: server.URL,
-		authToken:   "foo",
-		HTTPClient:  defaultHTTPClient,
-	}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.GetAggregatedTeamData(context.Background(), analyticsRequest)
 	want := AnalyticsResponse{

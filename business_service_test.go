@@ -18,7 +18,7 @@ func TestBusinessService_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListBusinessServiceOptions{
 		APIListObject: listObj,
 	}
@@ -47,7 +47,7 @@ func TestBusinessService_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name": "foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := &BusinessService{
 		Name: "foo",
 	}
@@ -74,7 +74,7 @@ func TestBusinessService_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ruleSetID := "1"
 
 	res, _, err := client.GetBusinessService(ruleSetID)
@@ -112,7 +112,7 @@ func TestBusinessService_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"business_service": {"id": "1", "name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := &BusinessService{
 		ID:   "1",
 		Name: "foo",
@@ -139,7 +139,7 @@ func TestBusinessService_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	ID := "1"
 	err := client.DeleteBusinessService(ID)
 	if err != nil {

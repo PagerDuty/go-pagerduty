@@ -15,7 +15,7 @@ func TestAbility_ListAbilities(t *testing.T) {
 		_, _ = w.Write([]byte(`{"abilities": ["sso"]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	want := &ListAbilityResponse{Abilities: []string{"sso"}}
 
 	res, err := client.ListAbilities()
@@ -34,7 +34,7 @@ func TestAbility_ListAbilitiesFailure(t *testing.T) {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	if _, err := client.ListAbilities(); err == nil {
 		t.Fatal("expected error; got nil")
@@ -50,7 +50,7 @@ func TestAbility_TestAbility(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	if err := client.TestAbility("sso"); err != nil {
 		t.Fatal(err)
@@ -66,7 +66,7 @@ func TestAbility_TestAbilityFailure(t *testing.T) {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	if err := client.TestAbility("sso"); err == nil {
 		t.Fatal("expected error; got nil")

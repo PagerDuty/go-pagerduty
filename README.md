@@ -42,8 +42,21 @@ An example of the `service` sub-command
 pd service list
 ```
 
-
 ### Client Library
+
+#### NOTICE: Breaking API Changes in master branch
+
+As part of the upcoming `v1.5.0` release, we will be fixing features that have
+never worked correctly and require a breaking API change to fix. One example is
+the issue reported in [\#232](https://github.com/PagerDuty/go-pagerduty/issues/232),
+as well as a handful of other examples within the
+[v1.5.0 milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2).
+
+As a result, the `master` branch now contains breaking changes since the last
+`v1.4.x` release. We will clearly highlight the breaking changes in the `v1.5.0`
+release notes when it's ready.
+
+#### Example Usage
 
 ```go
 package main
@@ -110,6 +123,53 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(user)
+}
+```
+
+#### Extending and Debugging Client
+
+##### Extending The Client
+
+The `*pagerduty.Client` has a `Do` method which allows consumers to wrap the
+client, and make their own requests to the PagerDuty API. The method signature
+is similar to that of the `http.Client.Do` method, except it also includes a
+`bool` to incidate whether the API endpoint is authenticated (i.e., the REST
+API). When the API is authenticated, the client will annotate the request with
+the appropriate headers to be authenticated by the API.
+
+If PagerDuty the client doesn't natively expose functionality that you wish to
+use, such as undocumented JSON fields, you can use the `Do()` method to issue
+your own request that you can parse the response of.
+
+Likewise, you can use it to issue requests to the API for the purposes of
+debugging. However, that's not the only mechanism for debugging.
+
+##### Debugging the Client
+
+The `*pagerduty.Client` has a method that allows consumers to enable debug
+functionality, including interception of PagerDuty API responses. This is done
+by using the `SetDebugFlag()` method using the `pagerduty.DebugFlag` unsigned
+integer type. There are also exported constants to help consumers enable
+specific debug behaviors.
+
+###### Capturing Last PagerDuty Response
+
+If you're not getting the response you expect from the PagerDuty Go client, you
+can enable the `DebugCaptureLastResponse` debug flag to capture the HTTP
+responses. You can then use one of the methods to make an API call, and then
+inspect the API response received. For example:
+
+```Go
+client := pagerduty.NewClient("exmaple")
+
+client.SetDebugFlag(pagerduty.DebugCaptureLastResponse)
+
+oncalls, err := client.ListOnCallsWithContext(ctx, pagerduty.ListOnCallOptions{})
+
+resp, ok := client.LastAPIReponse()
+if ok { // resp is an *http.Response we can inspect
+	body, err := ioutil.ReadAll(resp.Body)
+    // ...
 }
 ```
 

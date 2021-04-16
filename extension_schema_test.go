@@ -15,7 +15,7 @@ func TestExtensionSchema_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListExtensionSchemaOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -55,7 +55,7 @@ func TestExtensionSchema_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"extension_schema": {"name": "foo", "id": "1", "send_types": ["trigger", "acknowledge", "resolve"]}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.GetExtensionSchema("1")
 

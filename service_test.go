@@ -19,7 +19,7 @@ func TestService_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListServiceOptions{
 		APIListObject: listObj,
 		TeamIDs:       []string{},
@@ -71,7 +71,7 @@ func TestService_ListPaginated(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 1, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListServiceOptions{
 		APIListObject: listObj,
 		TeamIDs:       []string{},
@@ -111,7 +111,7 @@ func TestService_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	id := "1"
 	opts := &GetServiceOptions{
@@ -142,7 +142,7 @@ func TestService_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Service{
 		Name: "foo",
 	}
@@ -171,7 +171,7 @@ func TestService_CreateWithAlertGroupParamsTime(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -206,7 +206,7 @@ func TestService_CreateWithAlertGroupParamsContentBased(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -242,7 +242,7 @@ func TestService_CreateWithAlertGroupParamsIntelligent(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Service{
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
@@ -274,7 +274,7 @@ func TestService_Update(t *testing.T) {
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	input := Service{
 		APIObject: APIObject{
@@ -306,7 +306,7 @@ func TestService_Delete(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.DeleteService(id)
 	if err != nil {
@@ -324,7 +324,7 @@ func TestService_CreateIntegration(t *testing.T) {
 		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Integration{
 		Name: "foo",
 	}
@@ -355,7 +355,7 @@ func TestService_GetIntegration(t *testing.T) {
 		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := GetIntegrationOptions{
 		Includes: []string{},
 	}
@@ -387,7 +387,7 @@ func TestService_UpdateIntegration(t *testing.T) {
 		_, _ = w.Write([]byte(`{"integration": {"id": "1","name":"foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	input := Integration{
 		APIObject: APIObject{
 			ID: "1",
@@ -420,7 +420,7 @@ func TestService_DeleteIntegration(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	servID := "1"
 	intID := "1"
 	err := client.DeleteIntegration(servID, intID)
@@ -439,7 +439,7 @@ func TestService_ListRules(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rules": [{"id": "1"}]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	serviceID := "1"
 	res, err := client.ListServiceRulesPaginated(context.Background(), serviceID)
@@ -461,7 +461,7 @@ func TestService_CreateServiceRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	serviceID := "1"
 	rule := ServiceRule{}
@@ -487,7 +487,7 @@ func TestService_GetServiceRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	serviceID := "1"
 	ruleID := "1"
@@ -512,7 +512,7 @@ func TestService_UpdateServiceRule(t *testing.T) {
 		_, _ = w.Write([]byte(`{"rule": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	serviceID := "1"
 	ruleID := "1"
@@ -538,7 +538,7 @@ func TestService_DeleteServiceRule(t *testing.T) {
 		testMethod(t, r, "DELETE")
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	serviceID := "1"
 	ruleID := "1"
 

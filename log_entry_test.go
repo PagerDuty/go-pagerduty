@@ -16,7 +16,7 @@ func TestLogEntry_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	entriesOpts := ListLogEntriesOptions{
 		APIListObject: listObj,
 		Includes:      []string{},
@@ -54,7 +54,7 @@ func TestLogEntry_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"log_entry": {"id": "1", "summary": "foo"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	opts := GetLogEntryOptions{TimeZone: "UTC", Includes: []string{}}
 	res, err := client.GetLogEntry(id, opts)
