@@ -89,7 +89,7 @@ func (c *Client) AssociateServiceDependenciesWithContext(ctx context.Context, de
 }
 
 func (c *Client) associateServiceDependenciesWithContext(ctx context.Context, dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.post(context.TODO(), "/service_dependencies/associate", dependencies, nil)
+	resp, err := c.post(ctx, "/service_dependencies/associate", dependencies, nil)
 	if err != nil {
 		return nil, nil, err
 	}

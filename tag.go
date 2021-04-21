@@ -122,9 +122,15 @@ func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, *http.
 	return getTagFromResponse(c, resp, err)
 }
 
-// AssignTags adds and removes tag assignments with entities
+// AssignTags adds and removes tag assignments with entities. It's recommended
+// to use AssignTagsWithContext instead.
 func (c *Client) AssignTags(e, eid string, a *TagAssignments) (*http.Response, error) {
-	resp, err := c.post(context.TODO(), "/"+e+"/"+eid+"/change_tags", a, nil)
+	return c.AssignTagsWithContext(context.Background(), e, eid, a)
+}
+
+// AssignTagsWithContext adds and removes tag assignments with entities.
+func (c *Client) AssignTagsWithContext(ctx context.Context, e, eid string, a *TagAssignments) (*http.Response, error) {
+	resp, err := c.post(ctx, "/"+e+"/"+eid+"/change_tags", a, nil)
 	if err != nil {
 		return nil, err
 	}
