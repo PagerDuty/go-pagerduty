@@ -1,5 +1,61 @@
 # Changelog
 
+## [v1.4.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.0) (2021-04-23)
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/3)
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.3.0...v1.4.0)
+
+**Highlights**
+
+- Add support for passing a `context.Context` to all methods in package (in non-breaking way)
+- Add new `APIError` type, that allows for [richer inspection of errors returned from API](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.0#api-error-responses).
+- Add support for the V2 Events API, Analytics, and Change Events.
+- Miscellaneous bug fixes, including some that may result in incorrect API request/response handling.
+
+**Closed issues**
+
+- CreateEventWithHTTPClient nil pointer dereference [\#274](https://github.com/PagerDuty/go-pagerduty/issues/274) ([blockpane](https://github.com/blockpane))
+- ManageIncidents - support set resolution [\#243](https://github.com/PagerDuty/go-pagerduty/issues/243) ([hagaishapira](https://github.com/hagaishapira))
+- Exposing context.Context in exported API without requiring major version bump [\#267](https://github.com/PagerDuty/go-pagerduty/issues/267) ([theckman](https://github.com/theckman/))
+- Fix any linter issues and add missing GoDoc comments [\#317](https://github.com/PagerDuty/go-pagerduty/issues/317) ([theckman](https://github.com/theckman))
+
+**Merged pull requests**
+
+- Fix rulset rule not respecting position "0" [\#236](https://github.com/PagerDuty/go-pagerduty/pull/236) ([zane-deg](https://github.com/zane-deg))
+- Event v2 client [\#241](https://github.com/PagerDuty/go-pagerduty/pull/241) ([goatherder](https://github.com/goatherder))
+- Add Support For Change Events [\#246](https://github.com/PagerDuty/go-pagerduty/pull/246) ([Sjeanpierre](https://github.com/Sjeanpierre))
+- Correct namespacing of Change Event resource [\#248](https://github.com/PagerDuty/go-pagerduty/pull/248) ([Sjeanpierre](https://github.com/Sjeanpierre))
+- add tag and tag_test [\#252](https://github.com/PagerDuty/go-pagerduty/pull/252) ([stmcallister](https://github.com/stmcallister))
+- allow creating services with no scheduled actions [\#234](https://github.com/PagerDuty/go-pagerduty/pull/234) ([cluarkhpe](https://github.com/cluarkhpe))
+- business_service: clean b.ID before calling UPDATE [\#253](https://github.com/PagerDuty/go-pagerduty/pull/253) ([GiedriusS](https://github.com/GiedriusS))
+- service_dependency: fix (dis-)associate operations [\#254](https://github.com/PagerDuty/go-pagerduty/pull/254) ([GiedriusS](https://github.com/GiedriusS))
+- ruleset: remove omitempty from Route [\#256](https://github.com/PagerDuty/go-pagerduty/pull/256) ([GiedriusS](https://github.com/GiedriusS))
+- add service.alert_grouping_params field [\#257](https://github.com/PagerDuty/go-pagerduty/pull/257) ([stmcallister](https://github.com/stmcallister))
+- fix creating services that don't use support hours [\#255](https://github.com/PagerDuty/go-pagerduty/pull/255) ([cluarkhpe](https://github.com/cluarkhpe))
+- Provide a method for ferryign API errors back to the caller [#\265](https://github.com/PagerDuty/go-pagerduty/pull/265) ([theckman](https://github.com/theckman))
+- Prepare internals for exposing context.Context in exported API [#\266](https://github.com/PagerDuty/go-pagerduty/pull/266) ([theckman](https://github.com/theckman))
+- Update APIError struct to use new NullAPIErrorObject type for safety [#\272](https://github.com/PagerDuty/go-pagerduty/pull/272) ([theckman](https://github.com/theckman))
+- Update internal HTTP methods to not take pointer to map as argument [#\269](https://github.com/PagerDuty/go-pagerduty/pull/269) ([theckman](https://github.com/theckman))
+- Fix tags on log entry options struct [\#275](https://github.com/PagerDuty/go-pagerduty/pull/275) ([evnsio](https://github.com/evnsio))
+- Add alerts to IncidentDetails struct [\#276](https://github.com/PagerDuty/go-pagerduty/pull/276) ([StupidScience](https://github.com/StupidScience))
+- Fix logentry.channel json marshaling/unmarshaling [\#264](https://github.com/PagerDuty/go-pagerduty/pull/264) ([StupidScience](https://github.com/StupidScience))
+- Fixed CreateRuleSet docs typo [\#281](https://github.com/PagerDuty/go-pagerduty/pull/281) ([neufeldtech](https://github.com/neufeldtech))
+- Omitting EndpointURL from Extension if empty [\#282](https://github.com/PagerDuty/go-pagerduty/pull/282) ([au-akash](https://github.com/au-akash))
+- add ListServicesPaginated to services api (and tests) [\#260](https://github.com/PagerDuty/go-pagerduty/pull/260) ([c6h12o6](https://github.com/c6h12o6))
+- return nil instead of resp on error [\#278](https://github.com/PagerDuty/go-pagerduty/pull/278) (fixes [\#274](https://github.com/PagerDuty/go-pagerduty/issues/274)) ([blockpane](https://github.com/blockpane))
+- Analytics [\#261](https://github.com/PagerDuty/go-pagerduty/pull/261) ([melchiormoulin](https://github.com/melchiormoulin))
+- Add context.Context support to * (fixes [\#267](https://github.com/PagerDuty/go-pagerduty/issues/267)) ([theckman](https://github.com/theckman/))
+  - [\#283](https://github.com/PagerDuty/go-pagerduty/pull/283), [\#284](https://github.com/PagerDuty/go-pagerduty/pull/284), [\#285](https://github.com/PagerDuty/go-pagerduty/pull/285), [\#286](https://github.com/PagerDuty/go-pagerduty/pull/286), [\#287](https://github.com/PagerDuty/go-pagerduty/pull/287), [\#288](https://github.com/PagerDuty/go-pagerduty/pull/288)
+  - [\#289](https://github.com/PagerDuty/go-pagerduty/pull/289), [\#290](https://github.com/PagerDuty/go-pagerduty/pull/290), [\#291](https://github.com/PagerDuty/go-pagerduty/pull/291), [\#292](https://github.com/PagerDuty/go-pagerduty/pull/292), [\#293](https://github.com/PagerDuty/go-pagerduty/pull/293), [\#294](https://github.com/PagerDuty/go-pagerduty/pull/294)
+  - [\#297](https://github.com/PagerDuty/go-pagerduty/pull/297), [\#298](https://github.com/PagerDuty/go-pagerduty/pull/298), [\#299](https://github.com/PagerDuty/go-pagerduty/pull/299), [\#300](https://github.com/PagerDuty/go-pagerduty/pull/300), [\#301](https://github.com/PagerDuty/go-pagerduty/pull/301), [\#303](https://github.com/PagerDuty/go-pagerduty/pull/303) 
+  - [\#306](https://github.com/PagerDuty/go-pagerduty/pull/306), [\#307](https://github.com/PagerDuty/go-pagerduty/pull/307), [\#308](https://github.com/PagerDuty/go-pagerduty/pull/308), [\#309](https://github.com/PagerDuty/go-pagerduty/pull/309), [\#322](https://github.com/PagerDuty/go-pagerduty/pull/322)
+- Add support for Service Event Rules [\#304](https://github.com/PagerDuty/go-pagerduty/pull/304) ([mrzacarias](https://github.com/mrzacarias))
+- teams and services analytics endpoints [\#312](https://github.com/PagerDuty/go-pagerduty/pull/312) ([newbootz](https://github.com/newbootz))
+- Add Resolution string to ManageIncidentsOptions struct [\#313](https://github.com/PagerDuty/go-pagerduty/pull/313) (fixes [\#243](https://github.com/PagerDuty/go-pagerduty/issues/243)) ([theckman](https://github.com/theckman/))
+- Fix invalid JSON struct tag, other linter issues [\#319](https://github.com/PagerDuty/go-pagerduty/pull/319) (fixes [\#317](https://github.com/PagerDuty/go-pagerduty/issues/317)) ([theckman](https://github.com/theckman))
+- Add ability to set Escalation Policy when managing incidents [\#323](https://github.com/PagerDuty/go-pagerduty/pull/323) ([theckman](https://github.com/theckman)) superseded: [\#273](https://github.com/PagerDuty/go-pagerduty/pull/273) ([evnsio](https://github.com/evnsio))
+
+
 ## [v1.3.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.3.0) (2020-09-08)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.2.0...v1.3.0)
