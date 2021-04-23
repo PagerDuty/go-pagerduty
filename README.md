@@ -173,6 +173,14 @@ if ok { // resp is an *http.Response we can inspect
 }
 ```
 
+#### Included Packages
+
+##### webhookv3
+
+Support for V3 of PagerDuty Webhooks is provided via the `webhookv3` package.
+The intent is for this package to provide signature verification and decoding
+helpers.
+
 ## Contributing
 
 1. Fork it ( https://github.com/PagerDuty/go-pagerduty/fork )
