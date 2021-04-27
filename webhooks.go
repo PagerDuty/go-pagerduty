@@ -8,13 +8,12 @@ import (
 	"strings"
 )
 
-const (
-	currentSignaturePrefix = "v1="
-)
+const currentSignaturePrefix = "v1="
 
-var (
-	ErrNoValidSignature = errors.New("invalid webhook signature")
-)
+// ErrNoValidSignature is returned when a webhook is not properly signed
+// with the expected signature. When receiving this error, it is reccommended that
+// the server return HTTP 403 to prevent redelivery.
+var ErrNoValidSignature = errors.New("invalid webhook signature")
 
 // VerifySignature compares the provided signature of a PagerDuty v3 Webhook
 // against the expected value and returns an error if the values do not match.
