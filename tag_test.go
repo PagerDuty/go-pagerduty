@@ -12,6 +12,7 @@ func TestTag_List(t *testing.T) {
 
 	mux.HandleFunc("/tags/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["query"], []string{"MyTag"})
 		_, _ = w.Write([]byte(`{"tags": [{"id": "1","label":"MyTag"}]}`))
 	})
 
@@ -19,6 +20,7 @@ func TestTag_List(t *testing.T) {
 	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 	opts := ListTagOptions{
 		APIListObject: listObj,
+		Query:         "MyTag",
 	}
 	res, err := client.ListTags(opts)
 	if err != nil {

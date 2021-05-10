@@ -358,7 +358,7 @@ func getTagList(ctx context.Context, c *Client, entityType, entityID string, o L
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, path+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, path+"?"+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 
