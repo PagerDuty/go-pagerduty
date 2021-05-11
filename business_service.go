@@ -92,7 +92,7 @@ func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusine
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, "/business_services"+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/business_services?"+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 
