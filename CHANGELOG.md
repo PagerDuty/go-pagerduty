@@ -1,8 +1,21 @@
 # Changelog
 
+## [v1.4.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.1) (2021-05-13)
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/4)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.0...v1.4.1)
+
+**Highlights**
+- Fix bugs that impacted pagination of both tags and business services
+
+**Merged pull requests**
+
+- Fix query params on tags [\#329](https://github.com/PagerDuty/go-pagerduty/pull/329) ([jfmyers9](https://github.com/jfmyers9))
+- Fix pagination within ListBusinessServices + Paginated [\#330](https://github.com/PagerDuty/go-pagerduty/pull/330) ([theckman](https://github.com/theckman))
+
 ## [v1.4.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.0) (2021-04-23)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/3)
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/3)  
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.3.0...v1.4.0)
 
 **Highlights**
