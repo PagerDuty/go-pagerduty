@@ -15,7 +15,6 @@ type Integration struct {
 	Service          *APIObject `json:"service,omitempty"`
 	CreatedAt        string     `json:"created_at,omitempty"`
 	Vendor           *APIObject `json:"vendor,omitempty"`
-	Type             string     `json:"type,omitempty"`
 	IntegrationKey   string     `json:"integration_key,omitempty"`
 	IntegrationEmail string     `json:"integration_email,omitempty"`
 }
