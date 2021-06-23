@@ -625,18 +625,23 @@ func (c *Client) getIncidentAlertWithContext(ctx context.Context, incidentID, al
 
 // ManageIncidentAlerts allows you to manage the alerts of an incident. It's
 // recommended to use ManageIncidentAlertsWithContext instead.
-func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
-	return c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
+func (c *Client) ManageIncidentAlerts(from string, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
+	return c.manageIncidentAlertsWithContext(context.Background(), from, incidentID, alerts)
 }
 
 // ManageIncidentAlertsWithContext allows you to manage the alerts of an incident.
-func (c *Client) ManageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
-	lar, _, err := c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
+func (c *Client) ManageIncidentAlertsWithContext(ctx context.Context, from string, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
+	lar, _, err := c.manageIncidentAlertsWithContext(context.Background(), from, incidentID, alerts)
 	return lar, err
 }
 
-func (c *Client) manageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
-	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, nil)
+func (c *Client) manageIncidentAlertsWithContext(ctx context.Context, from string, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
+
+	h := map[string]string{
+		"From": from,
+	}
+
+	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, h)
 	if err != nil {
 		return nil, nil, err
 	}

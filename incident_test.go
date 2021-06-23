@@ -635,7 +635,7 @@ func TestIncident_ManageAlerts(t *testing.T) {
 		testMethod(t, r, "PUT")
 		_, _ = w.Write([]byte(`{"alerts": [{"id": "1"}]}`))
 	})
-
+	from := "foo@bar.com"
 	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
 
 	incidentID := "1"
@@ -649,7 +649,7 @@ func TestIncident_ManageAlerts(t *testing.T) {
 			},
 		},
 	}
-	res, _, err := client.ManageIncidentAlerts(incidentID, input)
+	res, _, err := client.ManageIncidentAlerts(from, incidentID, input)
 
 	want := &ListAlertsResponse{
 		Alerts: []IncidentAlert{
