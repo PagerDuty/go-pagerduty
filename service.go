@@ -138,8 +138,9 @@ type ListServiceResponse struct {
 	Services []Service
 }
 
-// ListServices lists existing services. It's recommended to use
-// ListServicesWithContext instead.
+// ListServices lists existing services.
+//
+// Deprecated: Use ListServicesWithContext instead.
 func (c *Client) ListServices(o ListServiceOptions) (*ListServiceResponse, error) {
 	return c.ListServicesWithContext(context.Background(), o)
 }
@@ -200,8 +201,9 @@ type GetServiceOptions struct {
 	Includes []string `url:"include,brackets,omitempty"`
 }
 
-// GetService gets details about an existing service. It's recommended to use
-// GetServiceWithContext instead.
+// GetService gets details about an existing service.
+//
+// Deprecated: Use GetServiceWithContext instead.
 func (c *Client) GetService(id string, o *GetServiceOptions) (*Service, error) {
 	return c.GetServiceWithContext(context.Background(), id, o)
 }
@@ -217,8 +219,9 @@ func (c *Client) GetServiceWithContext(ctx context.Context, id string, o *GetSer
 	return getServiceFromResponse(c, resp, err)
 }
 
-// CreateService creates a new service. It's recommended to use
-// CreateServiceWithContext instead.
+// CreateService creates a new service.
+//
+// Deprecated: Use CreateServiceWithContext instead.
 func (c *Client) CreateService(s Service) (*Service, error) {
 	return c.CreateServiceWithContext(context.Background(), s)
 }
@@ -233,8 +236,9 @@ func (c *Client) CreateServiceWithContext(ctx context.Context, s Service) (*Serv
 	return getServiceFromResponse(c, resp, err)
 }
 
-// UpdateService updates an existing service. It's recommended to use
-// UpdateServiceWithContext instead.
+// UpdateService updates an existing service.
+//
+// Deprecated: Use UpdateServiceWithContext instead.
 func (c *Client) UpdateService(s Service) (*Service, error) {
 	return c.UpdateServiceWithContext(context.Background(), s)
 }
@@ -249,8 +253,9 @@ func (c *Client) UpdateServiceWithContext(ctx context.Context, s Service) (*Serv
 	return getServiceFromResponse(c, resp, err)
 }
 
-// DeleteService deletes an existing service. It's recommended to use
-// DeleteServiceWithContext instead.
+// DeleteService deletes an existing service.
+//
+// Deprecated: Use DeleteServiceWithContext instead.
 func (c *Client) DeleteService(id string) error {
 	return c.DeleteServiceWithContext(context.Background(), id)
 }
@@ -261,8 +266,9 @@ func (c *Client) DeleteServiceWithContext(ctx context.Context, id string) error 
 	return err
 }
 
-// CreateIntegration creates a new integration belonging to a service. It's
-// recommended to use CreateIntegrationWithContext instead.
+// CreateIntegration creates a new integration belonging to a service.
+//
+// Deprecated: Use CreateIntegrationWithContext instead.
 func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
 	return c.CreateIntegrationWithContext(context.Background(), id, i)
 }
@@ -282,8 +288,9 @@ type GetIntegrationOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// GetIntegration gets details about an integration belonging to a service. It's
-// recommended to use GetIntegrationWithContext instead.
+// GetIntegration gets details about an integration belonging to a service.
+//
+// Deprecated: Use GetIntegrationWithContext instead.
 func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
 	return c.GetIntegrationWithContext(context.Background(), serviceID, integrationID, o)
 }
@@ -299,8 +306,9 @@ func (c *Client) GetIntegrationWithContext(ctx context.Context, serviceID, integ
 	return getIntegrationFromResponse(c, resp, err)
 }
 
-// UpdateIntegration updates an integration belonging to a service. It's
-// recommended to use UpdateIntegrationWithContext instead.
+// UpdateIntegration updates an integration belonging to a service.
+//
+// Deprecated: Use UpdateIntegrationWithContext instead.
 func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
 	return c.UpdateIntegrationWithContext(context.Background(), serviceID, i)
 }
@@ -311,8 +319,9 @@ func (c *Client) UpdateIntegrationWithContext(ctx context.Context, serviceID str
 	return getIntegrationFromResponse(c, resp, err)
 }
 
-// DeleteIntegration deletes an existing integration. It's recommended to use
-// DeleteIntegrationWithContext instead.
+// DeleteIntegration deletes an existing integration.
+//
+// Deprecated: Use DeleteIntegrationWithContext instead.
 func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
 	return c.DeleteIntegrationWithContext(context.Background(), serviceID, integrationID)
 }

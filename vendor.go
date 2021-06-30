@@ -37,8 +37,9 @@ type ListVendorOptions struct {
 	Query string `url:"query,omitempty"`
 }
 
-// ListVendors lists existing vendors. It's recommended to use
-// ListVendorsWithContext instead.
+// ListVendors lists existing vendors.
+//
+// Deprecated: Use ListVendorsWithContext instead.
 func (c *Client) ListVendors(o ListVendorOptions) (*ListVendorResponse, error) {
 	return c.ListVendorsWithContext(context.Background(), o)
 }
@@ -63,8 +64,9 @@ func (c *Client) ListVendorsWithContext(ctx context.Context, o ListVendorOptions
 	return &result, nil
 }
 
-// GetVendor gets details about an existing vendor. It's recommended to use
-// GetVendorWithContext instead.
+// GetVendor gets details about an existing vendor.
+//
+// Deprecated: Use GetVendorWithContext instead.
 func (c *Client) GetVendor(id string) (*Vendor, error) {
 	return c.GetVendorWithContext(context.Background(), id)
 }

@@ -99,8 +99,9 @@ func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusine
 	return businessServices, nil
 }
 
-// CreateBusinessService creates a new business service. It's recommended to use
-// CreateBusinessServiceWithContext instead
+// CreateBusinessService creates a new business service.
+//
+// Deprecated: Use CreateBusinessServiceWithContext instead
 func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
 	return c.createBusinessServiceWithContext(context.Background(), b)
 }
@@ -120,8 +121,9 @@ func (c *Client) createBusinessServiceWithContext(ctx context.Context, b *Busine
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
-// GetBusinessService gets details about a business service. It's recommended to
-// use GetBusinessServiceWithContext instead.
+// GetBusinessService gets details about a business service.
+//
+// Deprecated: Use GetBusinessServiceWithContext instead.
 func (c *Client) GetBusinessService(id string) (*BusinessService, *http.Response, error) {
 	return c.getBusinessServiceWithContext(context.Background(), id)
 }
@@ -137,8 +139,9 @@ func (c *Client) getBusinessServiceWithContext(ctx context.Context, id string) (
 	return getBusinessServiceFromResponse(c, resp, err)
 }
 
-// DeleteBusinessService deletes a business_service. It's recommended to use
-// DeleteBusinessServiceWithContext instead.
+// DeleteBusinessService deletes a business_service.
+//
+// Deprecated: Use DeleteBusinessServiceWithContext instead.
 func (c *Client) DeleteBusinessService(id string) error {
 	return c.DeleteBusinessServiceWithContext(context.Background(), id)
 }
@@ -149,8 +152,9 @@ func (c *Client) DeleteBusinessServiceWithContext(ctx context.Context, id string
 	return err
 }
 
-// UpdateBusinessService updates a business_service. It's recommended to use
-// UpdateBusinessServiceWithContext instead.
+// UpdateBusinessService updates a business_service.
+//
+// Deprecated: Use UpdateBusinessServiceWithContext instead.
 func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
 	return c.updateBusinessServiceWithContext(context.Background(), b)
 }

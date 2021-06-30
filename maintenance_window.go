@@ -38,7 +38,9 @@ type ListMaintenanceWindowsOptions struct {
 
 // ListMaintenanceWindows lists existing maintenance windows, optionally
 // filtered by service and/or team, or whether they are from the past, present
-// or future. It's recommended to use ListMaintenanceWindowsWithContext instead.
+// or future.
+//
+// Deprecated: Use ListMaintenanceWindowsWithContext instead.
 func (c *Client) ListMaintenanceWindows(o ListMaintenanceWindowsOptions) (*ListMaintenanceWindowsResponse, error) {
 	return c.ListMaintenanceWindowsWithContext(context.Background(), o)
 }
@@ -66,7 +68,9 @@ func (c *Client) ListMaintenanceWindowsWithContext(ctx context.Context, o ListMa
 }
 
 // CreateMaintenanceWindow creates a new maintenance window for the specified
-// services. It's recommended to use CreateMaintenanceWindowWithContext instead.
+// services.
+//
+// Deprecated: Use CreateMaintenanceWindowWithContext instead.
 func (c *Client) CreateMaintenanceWindow(from string, o MaintenanceWindow) (*MaintenanceWindow, error) {
 	return c.CreateMaintenanceWindowWithContext(context.Background(), from, o)
 }
@@ -91,14 +95,16 @@ func (c *Client) CreateMaintenanceWindowWithContext(ctx context.Context, from st
 }
 
 // CreateMaintenanceWindows creates a new maintenance window for the specified services.
-// Deprecated: Use `CreateMaintenanceWindowWithContext` instead.
+//
+// Deprecated: Use CreateMaintenanceWindowWithContext instead.
 func (c *Client) CreateMaintenanceWindows(o MaintenanceWindow) (*MaintenanceWindow, error) {
 	return c.CreateMaintenanceWindowWithContext(context.Background(), "", o)
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the
-// future, or ends it if it's currently on-going. It's recommended to use
-// DeleteMaintenanceWindowWithContext instead.
+// future, or ends it if it's currently on-going.
+//
+// Deprecated: Use DeleteMaintenanceWindowWithContext instead.
 func (c *Client) DeleteMaintenanceWindow(id string) error {
 	return c.DeleteMaintenanceWindowWithContext(context.Background(), id)
 }
@@ -115,8 +121,9 @@ type GetMaintenanceWindowOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// GetMaintenanceWindow gets an existing maintenance window. It's recommended to
-// use GetMaintenanceWindowWithContext instead.
+// GetMaintenanceWindow gets an existing maintenance window.
+//
+// Deprecated: Use GetMaintenanceWindowWithContext instead.
 func (c *Client) GetMaintenanceWindow(id string, o GetMaintenanceWindowOptions) (*MaintenanceWindow, error) {
 	return c.GetMaintenanceWindowWithContext(context.Background(), id, o)
 }
@@ -132,8 +139,9 @@ func (c *Client) GetMaintenanceWindowWithContext(ctx context.Context, id string,
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 
-// UpdateMaintenanceWindow updates an existing maintenance window. It's
-// recommended to use UpdateMaintenanceWindowWithContext instead.
+// UpdateMaintenanceWindow updates an existing maintenance window.
+//
+// Deprecated: Use UpdateMaintenanceWindowWithContext instead.
 func (c *Client) UpdateMaintenanceWindow(m MaintenanceWindow) (*MaintenanceWindow, error) {
 	return c.UpdateMaintenanceWindowWithContext(context.Background(), m)
 }

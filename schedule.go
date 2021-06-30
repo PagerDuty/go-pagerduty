@@ -68,8 +68,9 @@ type UserReference struct {
 	User APIObject `json:"user"`
 }
 
-// ListSchedules lists the on-call schedules. It's recommended to use
-// ListSchedulesWithContext instead.
+// ListSchedules lists the on-call schedules.
+//
+// Deprecated: Use ListSchedulesWithContext instead.
 func (c *Client) ListSchedules(o ListSchedulesOptions) (*ListSchedulesResponse, error) {
 	return c.ListSchedulesWithContext(context.Background(), o)
 }
@@ -94,8 +95,9 @@ func (c *Client) ListSchedulesWithContext(ctx context.Context, o ListSchedulesOp
 	return &result, nil
 }
 
-// CreateSchedule creates a new on-call schedule. It's recommended to use
-// CreateScheduleWithContext instead.
+// CreateSchedule creates a new on-call schedule.
+//
+// Deprecated: Use CreateScheduleWithContext instead.
 func (c *Client) CreateSchedule(s Schedule) (*Schedule, error) {
 	return c.CreateScheduleWithContext(context.Background(), s)
 }
@@ -119,7 +121,9 @@ type PreviewScheduleOptions struct {
 }
 
 // PreviewSchedule previews what an on-call schedule would look like without
-// saving it. It's recommended to use PreviewScheduleWithContext instead.
+// saving it.
+//
+// Deprecated: Use PreviewScheduleWithContext instead.
 func (c *Client) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
 	return c.PreviewScheduleWithContext(context.Background(), s, o)
 }
@@ -140,8 +144,9 @@ func (c *Client) PreviewScheduleWithContext(ctx context.Context, s Schedule, o P
 	return err
 }
 
-// DeleteSchedule deletes an on-call schedule. It's recommended to use
-// DeleteScheduleWithContext instead.
+// DeleteSchedule deletes an on-call schedule.
+//
+// Deprecated: Use DeleteScheduleWithContext instead.
 func (c *Client) DeleteSchedule(id string) error {
 	return c.DeleteScheduleWithContext(context.Background(), id)
 }
@@ -161,8 +166,9 @@ type GetScheduleOptions struct {
 }
 
 // GetSchedule shows detailed information about a schedule, including entries
-// for each layer and sub-schedule. It's recommended to use
-// GetScheduleWithContext instead.
+// for each layer and sub-schedule.
+//
+// Deprecated: Use GetScheduleWithContext instead.
 func (c *Client) GetSchedule(id string, o GetScheduleOptions) (*Schedule, error) {
 	return c.GetScheduleWithContext(context.Background(), id, o)
 }
@@ -184,8 +190,9 @@ type UpdateScheduleOptions struct {
 	Overflow bool `url:"overflow,omitempty"`
 }
 
-// UpdateSchedule updates an existing on-call schedule. It's recommended to use
-// UpdateScheduleWithContext instead.
+// UpdateSchedule updates an existing on-call schedule.
+//
+// Deprecated: Use UpdateScheduleWithContext instead.
 func (c *Client) UpdateSchedule(id string, s Schedule) (*Schedule, error) {
 	return c.UpdateScheduleWithContext(context.Background(), id, s)
 }
@@ -223,8 +230,9 @@ type Override struct {
 	User  APIObject `json:"user,omitempty"`
 }
 
-// ListOverrides lists overrides for a given time range. It's recommended to use
-// ListOverridesWithContext instead.
+// ListOverrides lists overrides for a given time range.
+//
+// Deprecated: Use ListOverridesWithContext instead.
 func (c *Client) ListOverrides(id string, o ListOverridesOptions) (*ListOverridesResponse, error) {
 	return c.ListOverridesWithContext(context.Background(), id, o)
 }
@@ -250,7 +258,9 @@ func (c *Client) ListOverridesWithContext(ctx context.Context, id string, o List
 }
 
 // CreateOverride creates an override for a specific user covering the specified
-// time range. It's recommended to use CreateOverrideWithContext instead.
+// time range.
+//
+// Deprecated: Use CreateOverrideWithContext instead.
 func (c *Client) CreateOverride(id string, o Override) (*Override, error) {
 	return c.CreateOverrideWithContext(context.Background(), id, o)
 }
@@ -270,8 +280,9 @@ func (c *Client) CreateOverrideWithContext(ctx context.Context, id string, o Ove
 	return getOverrideFromResponse(c, resp)
 }
 
-// DeleteOverride removes an override. It's recommended to use
-// DeleteOverrideWithContext instead.
+// DeleteOverride removes an override.
+//
+// Deprecated: Use DeleteOverrideWithContext instead.
 func (c *Client) DeleteOverride(scheduleID, overrideID string) error {
 	return c.DeleteOverrideWithContext(context.Background(), scheduleID, overrideID)
 }
@@ -290,7 +301,9 @@ type ListOnCallUsersOptions struct {
 }
 
 // ListOnCallUsers lists all of the users on call in a given schedule for a
-// given time range. It's recommended to use ListOnCallUsersWithContext instead.
+// given time range.
+//
+// Deprecated: Use ListOnCallUsersWithContext instead.
 func (c *Client) ListOnCallUsers(id string, o ListOnCallUsersOptions) ([]User, error) {
 	return c.ListOnCallUsersWithContext(context.Background(), id, o)
 }

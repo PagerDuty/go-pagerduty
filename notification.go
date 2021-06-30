@@ -33,7 +33,9 @@ type ListNotificationsResponse struct {
 
 // ListNotifications lists notifications for a given time range, optionally
 // filtered by type (sms_notification, email_notification, phone_notification,
-// or push_notification). It's recommended to use ListNotificationsWithContext instead.
+// or push_notification).
+//
+// Deprecated: Use ListNotificationsWithContext instead.
 func (c *Client) ListNotifications(o ListNotificationOptions) (*ListNotificationsResponse, error) {
 	return c.ListNotificationsWithContext(context.Background(), o)
 }

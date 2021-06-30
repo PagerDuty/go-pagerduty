@@ -44,7 +44,9 @@ type V2EventResponse struct {
 const v2eventEndPoint = "https://events.pagerduty.com/v2/enqueue"
 
 // ManageEvent handles the trigger, acknowledge, and resolve methods for an
-// event. It's recommended to use ManageEventWithContext instead.
+// event.
+//
+// Deprecated: Use ManageEventWithContext instead.
 func ManageEvent(e V2Event) (*V2EventResponse, error) {
 	return ManageEventWithContext(context.Background(), e)
 }
@@ -90,7 +92,9 @@ func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, e
 }
 
 // ManageEvent handles the trigger, acknowledge, and resolve methods for an
-// event. It's recommended to use ManageEventWithContext instead.
+// event.
+//
+// Deprecated: Use ManageEventWithContext instead.
 func (c *Client) ManageEvent(e *V2Event) (*V2EventResponse, error) {
 	return c.ManageEventWithContext(context.Background(), e)
 }

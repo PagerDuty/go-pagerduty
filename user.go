@@ -90,7 +90,9 @@ type GetCurrentUserOptions struct {
 }
 
 // ListUsers lists users of your PagerDuty account, optionally filtered by a
-// search query. It's recommended to use ListUsersWithContext instead.
+// search query.
+//
+// Deprecated: Use ListUsersWithContext instead.
 func (c *Client) ListUsers(o ListUsersOptions) (*ListUsersResponse, error) {
 	return c.ListUsersWithContext(context.Background(), o)
 }
@@ -115,8 +117,9 @@ func (c *Client) ListUsersWithContext(ctx context.Context, o ListUsersOptions) (
 	return &result, nil
 }
 
-// CreateUser creates a new user. It's recommended to use CreateUserWithContext
-// instead.
+// CreateUser creates a new user.
+//
+// Deprecated: Use CreateUserWithContext instead.
 func (c *Client) CreateUser(u User) (*User, error) {
 	return c.CreateUserWithContext(context.Background(), u)
 }
@@ -131,8 +134,9 @@ func (c *Client) CreateUserWithContext(ctx context.Context, u User) (*User, erro
 	return getUserFromResponse(c, resp, err)
 }
 
-// DeleteUser deletes a user. It's recommended to use DeleteUserWithContext
-// instead.
+// DeleteUser deletes a user.
+//
+// Deprecated: Use DeleteUserWithContext instead.
 func (c *Client) DeleteUser(id string) error {
 	return c.DeleteUserWithContext(context.Background(), id)
 }
@@ -143,8 +147,9 @@ func (c *Client) DeleteUserWithContext(ctx context.Context, id string) error {
 	return err
 }
 
-// GetUser gets details about an existing user. It's recommended to use
-// GetUserWithContext instead.
+// GetUser gets details about an existing user.
+//
+// Deprecated: Use GetUserWithContext instead.
 func (c *Client) GetUser(id string, o GetUserOptions) (*User, error) {
 	return c.GetUserWithContext(context.Background(), id, o)
 }
@@ -160,8 +165,9 @@ func (c *Client) GetUserWithContext(ctx context.Context, id string, o GetUserOpt
 	return getUserFromResponse(c, resp, err)
 }
 
-// UpdateUser updates an existing user. It's recommended to use
-// UpdateUserWithContext instead.
+// UpdateUser updates an existing user.
+//
+// Deprecated: Use UpdateUserWithContext instead.
 func (c *Client) UpdateUser(u User) (*User, error) {
 	return c.UpdateUserWithContext(context.Background(), u)
 }
@@ -177,8 +183,9 @@ func (c *Client) UpdateUserWithContext(ctx context.Context, u User) (*User, erro
 }
 
 // GetCurrentUser gets details about the authenticated user when using a
-// user-level API key or OAuth token. It's recommended to use
-// GetCurrentUserWithContext instead.
+// user-level API key or OAuth token.
+//
+// Deprecated: Use GetCurrentUserWithContext instead.
 func (c *Client) GetCurrentUser(o GetCurrentUserOptions) (*User, error) {
 	return c.GetCurrentUserWithContext(context.Background(), o)
 }
@@ -215,8 +222,9 @@ func getUserFromResponse(c *Client, resp *http.Response, err error) (*User, erro
 	return &t, nil
 }
 
-// ListUserContactMethods fetches contact methods of the existing user. It's
-// recommended to use ListUserContactMethodsWithContext instead.
+// ListUserContactMethods fetches contact methods of the existing user.
+//
+// Deprecated: Use ListUserContactMethodsWithContext instead.
 func (c *Client) ListUserContactMethods(userID string) (*ListContactMethodsResponse, error) {
 	return c.ListUserContactMethodsWithContext(context.Background(), userID)
 }
@@ -236,8 +244,9 @@ func (c *Client) ListUserContactMethodsWithContext(ctx context.Context, userID s
 	return &result, nil
 }
 
-// GetUserContactMethod gets details about a contact method. It's recommended to
-// use GetUserContactMethodWithContext instead.
+// GetUserContactMethod gets details about a contact method.
+//
+// Deprecated: Use GetUserContactMethodWithContext instead.
 func (c *Client) GetUserContactMethod(userID, contactMethodID string) (*ContactMethod, error) {
 	return c.GetUserContactMethodWithContext(context.Background(), userID, contactMethodID)
 }
@@ -248,8 +257,9 @@ func (c *Client) GetUserContactMethodWithContext(ctx context.Context, userID, co
 	return getContactMethodFromResponse(c, resp, err)
 }
 
-// DeleteUserContactMethod deletes a user. It's recommended to use
-// DeleteUserContactMethodWithContext instead.
+// DeleteUserContactMethod deletes a user.
+//
+// Deprecated: Use DeleteUserContactMethodWithContext instead.
 func (c *Client) DeleteUserContactMethod(userID, contactMethodID string) error {
 	return c.DeleteUserContactMethodWithContext(context.Background(), userID, contactMethodID)
 }
@@ -260,8 +270,9 @@ func (c *Client) DeleteUserContactMethodWithContext(ctx context.Context, userID,
 	return err
 }
 
-// CreateUserContactMethod creates a new contact method for user. It's
-// recommended to use CreateUserContactMethodWithContext instead.
+// CreateUserContactMethod creates a new contact method for user.
+//
+// Deprecated: Use CreateUserContactMethodWithContext instead.
 func (c *Client) CreateUserContactMethod(userID string, cm ContactMethod) (*ContactMethod, error) {
 	return c.CreateUserContactMethodWithContext(context.Background(), userID, cm)
 }
@@ -312,8 +323,9 @@ func getContactMethodFromResponse(c *Client, resp *http.Response, err error) (*C
 	return &t, nil
 }
 
-// GetUserNotificationRule gets details about a notification rule. It's
-// recommended to use GetUserNotificationRuleWithContext instead.
+// GetUserNotificationRule gets details about a notification rule.
+//
+// Deprecated: Use GetUserNotificationRuleWithContext instead.
 func (c *Client) GetUserNotificationRule(userID, ruleID string) (*NotificationRule, error) {
 	return c.GetUserNotificationRuleWithContext(context.Background(), userID, ruleID)
 }
@@ -324,8 +336,9 @@ func (c *Client) GetUserNotificationRuleWithContext(ctx context.Context, userID,
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
-// CreateUserNotificationRule creates a new notification rule for a user. It's
-// recommended to use CreateUserNotificationRuleWithContext instead.
+// CreateUserNotificationRule creates a new notification rule for a user.
+//
+// Deprecated: Use CreateUserNotificationRuleWithContext instead.
 func (c *Client) CreateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
 	return c.CreateUserNotificationRuleWithContext(context.Background(), userID, rule)
 }
@@ -340,8 +353,9 @@ func (c *Client) CreateUserNotificationRuleWithContext(ctx context.Context, user
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
-// UpdateUserNotificationRule updates a notification rule for a user. It's
-// recommended to use UpdateUserNotificationRuleWithContext instead.
+// UpdateUserNotificationRule updates a notification rule for a user.
+//
+// Deprecated: Use UpdateUserNotificationRuleWithContext instead.
 func (c *Client) UpdateUserNotificationRule(userID string, rule NotificationRule) (*NotificationRule, error) {
 	return c.UpdateUserNotificationRuleWithContext(context.Background(), userID, rule)
 }
@@ -356,8 +370,9 @@ func (c *Client) UpdateUserNotificationRuleWithContext(ctx context.Context, user
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
-// DeleteUserNotificationRule deletes a notification rule for a user. It's
-// recommended to use DeleteUserNotificationRuleWithContext instead.
+// DeleteUserNotificationRule deletes a notification rule for a user.
+//
+// Deprecated: Use DeleteUserNotificationRuleWithContext instead.
 func (c *Client) DeleteUserNotificationRule(userID, ruleID string) error {
 	return c.DeleteUserNotificationRuleWithContext(context.Background(), userID, ruleID)
 }
@@ -369,6 +384,8 @@ func (c *Client) DeleteUserNotificationRuleWithContext(ctx context.Context, user
 }
 
 // ListUserNotificationRules fetches notification rules of the existing user.
+//
+// Deprecated: Use ListUserNotificationRulesWithContext instead.
 func (c *Client) ListUserNotificationRules(userID string) (*ListUserNotificationRulesResponse, error) {
 	return c.ListUserNotificationRulesWithContext(context.Background(), userID)
 }
