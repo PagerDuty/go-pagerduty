@@ -30,8 +30,9 @@ type ListAddonResponse struct {
 	Addons []Addon `json:"addons"`
 }
 
-// ListAddons lists all of the add-ons installed on your account. It's
-// recommended to use ListAddonsWithContext instead.
+// ListAddons lists all of the add-ons installed on your account.
+//
+// Deprecated: Use ListAddonsWithContext instead.
 func (c *Client) ListAddons(o ListAddonOptions) (*ListAddonResponse, error) {
 	return c.ListAddonsWithContext(context.Background(), o)
 }
@@ -56,8 +57,9 @@ func (c *Client) ListAddonsWithContext(ctx context.Context, o ListAddonOptions) 
 	return &result, nil
 }
 
-// InstallAddon installs an add-on for your account. It's recommended to use
-// InstallAddonWithContext instead.
+// InstallAddon installs an add-on for your account.
+//
+// Deprecated: Use InstallAddonWithContext instead.
 func (c *Client) InstallAddon(a Addon) (*Addon, error) {
 	return c.InstallAddonWithContext(context.Background(), a)
 }
@@ -80,8 +82,9 @@ func (c *Client) InstallAddonWithContext(ctx context.Context, a Addon) (*Addon, 
 	return getAddonFromResponse(c, resp)
 }
 
-// DeleteAddon deletes an add-on from your account. It's recommended to use
-// DeleteAddonWithContext instead.
+// DeleteAddon deletes an add-on from your account.
+//
+// Deprecated: Use DeleteAddonWithContext instead.
 func (c *Client) DeleteAddon(id string) error {
 	return c.DeleteAddonWithContext(context.Background(), id)
 }
@@ -92,8 +95,9 @@ func (c *Client) DeleteAddonWithContext(ctx context.Context, id string) error {
 	return err
 }
 
-// GetAddon gets details about an existing add-on. It's recommended to use
-// GetAddonWithContext instead.
+// GetAddon gets details about an existing add-on.
+//
+// Deprecated: Use GetAddonWithContext instead.
 func (c *Client) GetAddon(id string) (*Addon, error) {
 	return c.GetAddonWithContext(context.Background(), id)
 }
@@ -108,8 +112,9 @@ func (c *Client) GetAddonWithContext(ctx context.Context, id string) (*Addon, er
 	return getAddonFromResponse(c, resp)
 }
 
-// UpdateAddon updates an existing add-on. It's recommended to use
-// UpdateAddonWithContext instead.
+// UpdateAddon updates an existing add-on.
+//
+// Deprecated: Use UpdateAddonWithContext instead.
 func (c *Client) UpdateAddon(id string, a Addon) (*Addon, error) {
 	return c.UpdateAddonWithContext(context.Background(), id, a)
 }

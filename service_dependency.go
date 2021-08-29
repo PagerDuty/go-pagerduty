@@ -25,7 +25,8 @@ type ListServiceDependencies struct {
 }
 
 // ListBusinessServiceDependencies lists dependencies of a business service.
-// It's recommended to use ListBusinessServiceDependenciesWithContext instead.
+//
+// Deprecated: Use ListBusinessServiceDependenciesWithContext instead.
 func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*ListServiceDependencies, *http.Response, error) {
 	return c.listBusinessServiceDependenciesWithContext(context.Background(), businessServiceID)
 }
@@ -51,7 +52,8 @@ func (c *Client) listBusinessServiceDependenciesWithContext(ctx context.Context,
 }
 
 // ListTechnicalServiceDependencies lists dependencies of a technical service.
-// It's recommended to use ListTechnicalServiceDependenciesWithContext instead.
+//
+// Deprecated: Use ListTechnicalServiceDependenciesWithContext instead.
 func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServiceDependencies, *http.Response, error) {
 	return c.listTechnicalServiceDependenciesWithContext(context.Background(), serviceID)
 }
@@ -77,7 +79,8 @@ func (c *Client) listTechnicalServiceDependenciesWithContext(ctx context.Context
 }
 
 // AssociateServiceDependencies Create new dependencies between two services.
-// It's recommended to use AssociateServiceDependenciesWithContext instead.
+//
+// Deprecated: Use AssociateServiceDependenciesWithContext instead.
 func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
 	return c.associateServiceDependenciesWithContext(context.Background(), dependencies)
 }
@@ -103,6 +106,8 @@ func (c *Client) associateServiceDependenciesWithContext(ctx context.Context, de
 }
 
 // DisassociateServiceDependencies Disassociate dependencies between two services.
+//
+// Deprecated: Use DisassociateServiceDependenciesWithContext instead.
 func (c *Client) DisassociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
 	return c.disassociateServiceDependenciesWithContext(context.Background(), dependencies)
 }

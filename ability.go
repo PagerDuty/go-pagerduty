@@ -7,8 +7,9 @@ type ListAbilityResponse struct {
 	Abilities []string `json:"abilities"`
 }
 
-// ListAbilities lists all abilities on your account. It's recommended to use
-// ListAbilitiesWithContext instead.
+// ListAbilities lists all abilities on your account.
+//
+// Deprecated: Use ListAbilitiesWithContext instead.
 func (c *Client) ListAbilities() (*ListAbilityResponse, error) {
 	return c.ListAbilitiesWithContext(context.Background())
 }
@@ -29,6 +30,8 @@ func (c *Client) ListAbilitiesWithContext(ctx context.Context) (*ListAbilityResp
 }
 
 // TestAbility checks if your account has the given ability.
+//
+// Deprecated: Use TestAbilityWithContext instead.
 func (c *Client) TestAbility(ability string) error {
 	return c.TestAbilityWithContext(context.Background(), ability)
 }

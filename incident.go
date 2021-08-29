@@ -120,8 +120,9 @@ type ConferenceBridge struct {
 	ConferenceURL    string `json:"conference_url,omitempty"`
 }
 
-// ListIncidents lists existing incidents. It's recommended to use
-// ListIncidentsWithContext instead.
+// ListIncidents lists existing incidents.
+//
+// Deprecated: Use ListIncidentsWithContext instead.
 func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, error) {
 	return c.ListIncidentsWithContext(context.Background(), o)
 }
@@ -182,8 +183,9 @@ type MergeIncidentsOptions struct {
 }
 
 // CreateIncident creates an incident synchronously without a corresponding
-// event from a monitoring service. It's recommended to use
-// CreateIncidentWithContext instead.
+// event from a monitoring service.
+//
+// Deprecated: Use CreateIncidentWithContext instead.
 func (c *Client) CreateIncident(from string, o *CreateIncidentOptions) (*Incident, error) {
 	return c.CreateIncidentWithContext(context.Background(), from, o)
 }
@@ -213,7 +215,9 @@ func (c *Client) CreateIncidentWithContext(ctx context.Context, from string, o *
 }
 
 // ManageIncidents acknowledges, resolves, escalates, or reassigns one or more
-// incidents. It's recommended to use ManageIncidentsWithContext instead.
+// incidents.
+//
+// Deprecated: Use ManageIncidentsWithContext instead.
 func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
 	return c.ManageIncidentsWithContext(context.Background(), from, incidents)
 }
@@ -243,7 +247,8 @@ func (c *Client) ManageIncidentsWithContext(ctx context.Context, from string, in
 }
 
 // MergeIncidents merges a list of source incidents into a specified incident.
-// It's recommended to use MergeIncidentsWithContext instead.
+//
+// Deprecated: Use MergeIncidentsWithContext instead.
 func (c *Client) MergeIncidents(from string, id string, sourceIncidents []MergeIncidentsOptions) (*Incident, error) {
 	return c.MergeIncidentsWithContext(context.Background(), from, id, sourceIncidents)
 }
@@ -271,8 +276,9 @@ func (c *Client) MergeIncidentsWithContext(ctx context.Context, from, id string,
 	return &result.Incident, nil
 }
 
-// GetIncident shows detailed information about an incident. It's recommended to
-// use GetIncidentWithContext instead.
+// GetIncident shows detailed information about an incident.
+//
+// Deprecated: Use GetIncidentWithContext instead.
 func (c *Client) GetIncident(id string) (*Incident, error) {
 	return c.GetIncidentWithContext(context.Background(), id)
 }
@@ -310,8 +316,9 @@ type CreateIncidentNoteResponse struct {
 	IncidentNote IncidentNote `json:"note"`
 }
 
-// ListIncidentNotes lists existing notes for the specified incident. It's
-// recommended to use ListIncidentNotesWithContext instead.
+// ListIncidentNotes lists existing notes for the specified incident.
+//
+// Deprecated: Use ListIncidentNotesWithContext instead.
 func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 	return c.ListIncidentNotesWithContext(context.Background(), id)
 }
@@ -381,7 +388,8 @@ func (c *Client) ListIncidentAlerts(id string) (*ListAlertsResponse, error) {
 }
 
 // ListIncidentAlertsWithOpts lists existing alerts for the specified incident.
-// It's recommended to use ListIncidentAlertsWithContext instead.
+//
+// Deprecated: Use ListIncidentAlertsWithContext instead.
 func (c *Client) ListIncidentAlertsWithOpts(id string, o ListIncidentAlertsOptions) (*ListAlertsResponse, error) {
 	return c.ListIncidentAlertsWithContext(context.Background(), id, o)
 }
@@ -409,7 +417,8 @@ func (c *Client) ListIncidentAlertsWithContext(ctx context.Context, id string, o
 }
 
 // CreateIncidentNoteWithResponse creates a new note for the specified incident.
-// It's recommended to use CreateIncidentNoteWithContext instead.
+//
+// Deprecated: Use CreateIncidentNoteWithContext instead.
 func (c *Client) CreateIncidentNoteWithResponse(id string, note IncidentNote) (*IncidentNote, error) {
 	return c.CreateIncidentNoteWithContext(context.Background(), id, note)
 }
@@ -439,7 +448,7 @@ func (c *Client) CreateIncidentNoteWithContext(ctx context.Context, id string, n
 
 // CreateIncidentNote creates a new note for the specified incident.
 //
-// Deprecated: please use CreateIncidentNoteWithContext going forward
+// Deprecated: Use CreateIncidentNoteWithContext instead.
 func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 	data := make(map[string]IncidentNote)
 	headers := make(map[string]string)
@@ -450,7 +459,9 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 }
 
 // SnoozeIncidentWithResponse sets an incident to not alert for a specified
-// period of time. It's recommended to use SnoozeIncidentWithContext instead.
+// period of time.
+//
+// Deprecated: Use SnoozeIncidentWithContext instead.
 func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
 	return c.SnoozeIncidentWithContext(context.Background(), id, duration)
 }
@@ -476,7 +487,7 @@ func (c *Client) SnoozeIncidentWithContext(ctx context.Context, id string, durat
 
 // SnoozeIncident sets an incident to not alert for a specified period of time.
 //
-// Deprecated: please use SnoozeIncidentWithContext going forward
+// Deprecated: Use SnoozeIncidentWithContext instead.
 func (c *Client) SnoozeIncident(id string, duration uint) error {
 	data := make(map[string]uint)
 	data["duration"] = duration
@@ -501,7 +512,8 @@ type ListIncidentLogEntriesOptions struct {
 }
 
 // ListIncidentLogEntries lists existing log entries for the specified incident.
-// It's recommended to use ListIncidentLogEntriesWithContext instead.
+//
+// Deprecated: Use ListIncidentLogEntriesWithContext instead.
 func (c *Client) ListIncidentLogEntries(id string, o ListIncidentLogEntriesOptions) (*ListIncidentLogEntriesResponse, error) {
 	return c.ListIncidentLogEntriesWithContext(context.Background(), id, o)
 }
@@ -573,7 +585,8 @@ type ResponderRequest struct {
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.
-// It's recommended to use ResponderRequestWithContext instead.
+//
+// Deprecated: Use ResponderRequestWithContext instead.
 func (c *Client) ResponderRequest(id string, o ResponderRequestOptions) (*ResponderRequestResponse, error) {
 	return c.ResponderRequestWithContext(context.Background(), id, o)
 }
@@ -597,8 +610,9 @@ func (c *Client) ResponderRequestWithContext(ctx context.Context, id string, o R
 	return &result, nil
 }
 
-// GetIncidentAlert gets the alert that triggered the incident. It's recommended
-// to use GetIncidentAlertWithContext instead.
+// GetIncidentAlert gets the alert that triggered the incident.
+//
+// Deprecated: Use GetIncidentAlertWithContext instead.
 func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
 	return c.getIncidentAlertWithContext(context.Background(), incidentID, alertID)
 }
@@ -623,8 +637,9 @@ func (c *Client) getIncidentAlertWithContext(ctx context.Context, incidentID, al
 	return &result, resp, nil
 }
 
-// ManageIncidentAlerts allows you to manage the alerts of an incident. It's
-// recommended to use ManageIncidentAlertsWithContext instead.
+// ManageIncidentAlerts allows you to manage the alerts of an incident.
+//
+// Deprecated: Use ManageIncidentAlertsWithContext instead.
 func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
 	return c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
 }

@@ -59,8 +59,9 @@ type GetEscalationRuleOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// ListEscalationPolicies lists all of the existing escalation policies. It's
-// recommended to use ListEscalationPoliciesWithContext instead.
+// ListEscalationPolicies lists all of the existing escalation policies.
+//
+// Deprecated: Use ListEscalationPoliciesWithContext instead.
 func (c *Client) ListEscalationPolicies(o ListEscalationPoliciesOptions) (*ListEscalationPoliciesResponse, error) {
 	return c.ListEscalationPoliciesWithContext(context.Background(), o)
 }
@@ -85,8 +86,9 @@ func (c *Client) ListEscalationPoliciesWithContext(ctx context.Context, o ListEs
 	return &result, nil
 }
 
-// CreateEscalationPolicy creates a new escalation policy. It's recommended to
-// use CreateEscalationPolicyWithContext instead.
+// CreateEscalationPolicy creates a new escalation policy.
+//
+// Deprecated: Use CreateEscalationPolicyWithContext instead.
 func (c *Client) CreateEscalationPolicy(e EscalationPolicy) (*EscalationPolicy, error) {
 	return c.CreateEscalationPolicyWithContext(context.Background(), e)
 }
@@ -101,8 +103,9 @@ func (c *Client) CreateEscalationPolicyWithContext(ctx context.Context, e Escala
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
-// DeleteEscalationPolicy deletes an existing escalation policy and rules. It's
-// recommended to use DeleteEscalationPolicyWithContext instead.
+// DeleteEscalationPolicy deletes an existing escalation policy and rules.
+//
+// Deprecated: Use DeleteEscalationPolicyWithContext instead.
 func (c *Client) DeleteEscalationPolicy(id string) error {
 	return c.DeleteEscalationPolicyWithContext(context.Background(), id)
 }
@@ -119,7 +122,9 @@ type GetEscalationPolicyOptions struct {
 }
 
 // GetEscalationPolicy gets information about an existing escalation policy and
-// its rules. It's recommended to use GetEscalationPolicyWithContext instead.
+// its rules.
+//
+// Deprecated: Use GetEscalationPolicyWithContext instead.
 func (c *Client) GetEscalationPolicy(id string, o *GetEscalationPolicyOptions) (*EscalationPolicy, error) {
 	return c.GetEscalationPolicyWithContext(context.Background(), id, o)
 }
@@ -137,7 +142,8 @@ func (c *Client) GetEscalationPolicyWithContext(ctx context.Context, id string, 
 }
 
 // UpdateEscalationPolicy updates an existing escalation policy and its rules.
-// It's recommended to use UpdateEscalationPolicyWithContext instead.
+//
+// Deprecated: Use UpdateEscalationPolicyWithContext instead.
 func (c *Client) UpdateEscalationPolicy(id string, e *EscalationPolicy) (*EscalationPolicy, error) {
 	return c.UpdateEscalationPolicyWithContext(context.Background(), id, *e)
 }
@@ -153,8 +159,9 @@ func (c *Client) UpdateEscalationPolicyWithContext(ctx context.Context, id strin
 }
 
 // CreateEscalationRule creates a new escalation rule for an escalation policy
-// and appends it to the end of the existing escalation rules. It's recommended
-// to use CreateEscalationRuleWithContext instead.
+// and appends it to the end of the existing escalation rules.
+//
+// Deprecated: Use CreateEscalationRuleWithContext instead.
 func (c *Client) CreateEscalationRule(escID string, e EscalationRule) (*EscalationRule, error) {
 	return c.CreateEscalationRuleWithContext(context.Background(), escID, e)
 }
@@ -170,8 +177,9 @@ func (c *Client) CreateEscalationRuleWithContext(ctx context.Context, escID stri
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
-// GetEscalationRule gets information about an existing escalation rule. It's
-// recommended to use GetEscalationRuleWithContext instead.
+// GetEscalationRule gets information about an existing escalation rule.
+//
+// Deprecated: Use GetEscalationRuleWithContext instead.
 func (c *Client) GetEscalationRule(escID string, id string, o *GetEscalationRuleOptions) (*EscalationRule, error) {
 	return c.GetEscalationRuleWithContext(context.Background(), escID, id, o)
 }
@@ -187,8 +195,9 @@ func (c *Client) GetEscalationRuleWithContext(ctx context.Context, escID string,
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
-// DeleteEscalationRule deletes an existing escalation rule. It's recommended to
-// use DeleteEscalationRuleWithContext instead.
+// DeleteEscalationRule deletes an existing escalation rule.
+//
+// Deprecated: Use DeleteEscalationRuleWithContext instead.
 func (c *Client) DeleteEscalationRule(escID string, id string) error {
 	return c.DeleteEscalationRuleWithContext(context.Background(), escID, id)
 }
@@ -199,8 +208,9 @@ func (c *Client) DeleteEscalationRuleWithContext(ctx context.Context, escID stri
 	return err
 }
 
-// UpdateEscalationRule updates an existing escalation rule. It's recommended to
-// use UpdateEscalationRuleWithContext instead.
+// UpdateEscalationRule updates an existing escalation rule.
+//
+// Deprecated: Use UpdateEscalationRuleWithContext instead.
 func (c *Client) UpdateEscalationRule(escID string, id string, e *EscalationRule) (*EscalationRule, error) {
 	return c.UpdateEscalationRuleWithContext(context.Background(), escID, id, *e)
 }
@@ -216,8 +226,9 @@ func (c *Client) UpdateEscalationRuleWithContext(ctx context.Context, escID stri
 }
 
 // ListEscalationRules lists all of the escalation rules for an existing
-// escalation policy. It's recommended to use ListEscalationRulesWithContext
-// instead.
+// escalation policy.
+//
+// Deprecated: Use ListEscalationRulesWithContext instead.
 func (c *Client) ListEscalationRules(escID string) (*ListEscalationRulesResponse, error) {
 	return c.ListEscalationRulesWithContext(context.Background(), escID)
 }

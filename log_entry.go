@@ -61,7 +61,9 @@ type ListLogEntriesOptions struct {
 }
 
 // ListLogEntries lists all of the incident log entries across the entire
-// account. It's recommended to use ListLogEntriesWithContext instead.
+// account.
+//
+// Deprecated: Use ListLogEntriesWithContext instead.
 func (c *Client) ListLogEntries(o ListLogEntriesOptions) (*ListLogEntryResponse, error) {
 	return c.ListLogEntriesWithContext(context.Background(), o)
 }
@@ -92,8 +94,9 @@ type GetLogEntryOptions struct {
 	Includes []string `url:"include,omitempty,brackets"`
 }
 
-// GetLogEntry list log entries for the specified incident. It's recommended to
-// use GetLogEntryWithContext instead.
+// GetLogEntry list log entries for the specified incident.
+//
+// Deprecated: Use GetLogEntryWithContext instead.
 func (c *Client) GetLogEntry(id string, o GetLogEntryOptions) (*LogEntry, error) {
 	return c.GetLogEntryWithContext(context.Background(), id, o)
 }

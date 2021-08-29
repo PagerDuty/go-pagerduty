@@ -28,7 +28,9 @@ type ListTeamOptions struct {
 }
 
 // ListTeams lists teams of your PagerDuty account, optionally filtered by a
-// search query. It's recommended to use ListTeamsWithContext instead.
+// search query.
+//
+// Deprecated: Use ListTeamsWithContext instead.
 func (c *Client) ListTeams(o ListTeamOptions) (*ListTeamResponse, error) {
 	return c.ListTeamsWithContext(context.Background(), o)
 }
@@ -54,8 +56,9 @@ func (c *Client) ListTeamsWithContext(ctx context.Context, o ListTeamOptions) (*
 	return &result, nil
 }
 
-// CreateTeam creates a new team. It's recommended to use CreateTeamWithContext
-// instead.
+// CreateTeam creates a new team.
+//
+// Deprecated: Use CreateTeamWithContext instead.
 func (c *Client) CreateTeam(t *Team) (*Team, error) {
 	return c.CreateTeamWithContext(context.Background(), t)
 }
@@ -66,8 +69,9 @@ func (c *Client) CreateTeamWithContext(ctx context.Context, t *Team) (*Team, err
 	return getTeamFromResponse(c, resp, err)
 }
 
-// DeleteTeam removes an existing team. It's recommended to use
-// DeleteTeamWithContext instead.
+// DeleteTeam removes an existing team.
+//
+// Deprecated: Use DeleteTeamWithContext instead.
 func (c *Client) DeleteTeam(id string) error {
 	return c.DeleteTeamWithContext(context.Background(), id)
 }
@@ -78,8 +82,9 @@ func (c *Client) DeleteTeamWithContext(ctx context.Context, id string) error {
 	return err
 }
 
-// GetTeam gets details about an existing team. It's recommended to use
-// GetTeamWithContext instead.
+// GetTeam gets details about an existing team.
+//
+// Deprecated: Use GetTeamWithContext instead.
 func (c *Client) GetTeam(id string) (*Team, error) {
 	return c.GetTeamWithContext(context.Background(), id)
 }
@@ -90,8 +95,9 @@ func (c *Client) GetTeamWithContext(ctx context.Context, id string) (*Team, erro
 	return getTeamFromResponse(c, resp, err)
 }
 
-// UpdateTeam updates an existing team. It's recommended to use
-// UpdateTeamWithContext instead.
+// UpdateTeam updates an existing team.
+//
+// Deprecated: Use UpdateTeamWithContext instead.
 func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
 	return c.UpdateTeamWithContext(context.Background(), id, t)
 }
@@ -102,8 +108,9 @@ func (c *Client) UpdateTeamWithContext(ctx context.Context, id string, t *Team) 
 	return getTeamFromResponse(c, resp, err)
 }
 
-// RemoveEscalationPolicyFromTeam removes an escalation policy from a team. It's
-// recommended to use RemoveEscalationPolicyFromTeamWithContext instead.
+// RemoveEscalationPolicyFromTeam removes an escalation policy from a team.
+//
+// Deprecated: Use RemoveEscalationPolicyFromTeamWithContext instead.
 func (c *Client) RemoveEscalationPolicyFromTeam(teamID, epID string) error {
 	return c.RemoveEscalationPolicyFromTeamWithContext(context.Background(), teamID, epID)
 }
@@ -114,8 +121,9 @@ func (c *Client) RemoveEscalationPolicyFromTeamWithContext(ctx context.Context, 
 	return err
 }
 
-// AddEscalationPolicyToTeam adds an escalation policy to a team. It's
-// recommended to use AddEscalationPolicyToTeamWithContext instead.
+// AddEscalationPolicyToTeam adds an escalation policy to a team.
+//
+// Deprecated: Use AddEscalationPolicyToTeamWithContext instead.
 func (c *Client) AddEscalationPolicyToTeam(teamID, epID string) error {
 	return c.AddEscalationPolicyToTeamWithContext(context.Background(), teamID, epID)
 }
@@ -126,8 +134,9 @@ func (c *Client) AddEscalationPolicyToTeamWithContext(ctx context.Context, teamI
 	return err
 }
 
-// RemoveUserFromTeam removes a user from a team. It's recommended to use
-// RemoveUserFromTeamWithContext instead.
+// RemoveUserFromTeam removes a user from a team.
+//
+// Deprecated: Use RemoveUserFromTeamWithContext instead.
 func (c *Client) RemoveUserFromTeam(teamID, userID string) error {
 	return c.RemoveUserFromTeamWithContext(context.Background(), teamID, userID)
 }
@@ -139,6 +148,8 @@ func (c *Client) RemoveUserFromTeamWithContext(ctx context.Context, teamID, user
 }
 
 // AddUserToTeam adds a user to a team.
+//
+// Deprecated: Use AddUserToTeamWithContext instead.
 func (c *Client) AddUserToTeam(teamID, userID string) error {
 	return c.AddUserToTeamWithContext(context.Background(), AddUserToTeamOptions{TeamID: teamID, UserID: userID})
 }
@@ -220,7 +231,8 @@ type ListMembersResponse struct {
 }
 
 // ListMembers gets the first page of users associated with the specified team.
-// It's recommended to use ListMembersWithContext instead.
+//
+// Deprecated: Use ListMembersWithContext instead.
 func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersResponse, error) {
 	return c.ListMembersWithContext(context.Background(), teamID, o)
 }

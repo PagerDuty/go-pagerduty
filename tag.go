@@ -82,8 +82,9 @@ func (c *Client) ListTagsPaginated(ctx context.Context, o ListTagOptions) ([]*Ta
 	return tags, nil
 }
 
-// CreateTag creates a new tag. It's recommended to use CreateTagWithContext
-// instead.
+// CreateTag creates a new tag.
+//
+// Deprecated: Use CreateTagWithContext instead.
 func (c *Client) CreateTag(t *Tag) (*Tag, *http.Response, error) {
 	return c.CreateTagWithContext(context.Background(), t)
 }
@@ -98,8 +99,9 @@ func (c *Client) CreateTagWithContext(ctx context.Context, t *Tag) (*Tag, *http.
 	return getTagFromResponse(c, resp, err)
 }
 
-// DeleteTag removes an existing tag. It's recommended to use
-// DeleteTagWithContext instead.
+// DeleteTag removes an existing tag.
+//
+// Deprecated: Use DeleteTagWithContext instead.
 func (c *Client) DeleteTag(id string) error {
 	return c.DeleteTagWithContext(context.Background(), id)
 }
@@ -110,8 +112,9 @@ func (c *Client) DeleteTagWithContext(ctx context.Context, id string) error {
 	return err
 }
 
-// GetTag gets details about an existing tag. It's recommended to use
-// GetTagWithContext instead.
+// GetTag gets details about an existing tag.
+//
+// Deprecated: Use GetTagWithContext instead.
 func (c *Client) GetTag(id string) (*Tag, *http.Response, error) {
 	return c.GetTagWithContext(context.Background(), id)
 }
@@ -122,8 +125,9 @@ func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, *http.
 	return getTagFromResponse(c, resp, err)
 }
 
-// AssignTags adds and removes tag assignments with entities. It's recommended
-// to use AssignTagsWithContext instead.
+// AssignTags adds and removes tag assignments with entities.
+//
+// Deprecated: Use AssignTagsWithContext instead.
 func (c *Client) AssignTags(e, eid string, a *TagAssignments) (*http.Response, error) {
 	return c.AssignTagsWithContext(context.Background(), e, eid, a)
 }

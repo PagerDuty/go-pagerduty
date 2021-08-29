@@ -45,7 +45,7 @@ type ChangeEventResponse struct {
 // The v2EventsAPIEndpoint parameter must be set on the client
 // Documentation can be found at https://developer.pagerduty.com/docs/events-api-v2/send-change-events
 //
-// It's recommended to use CreateChangeEventWithContext instead.
+// Deprecated: Use CreateChangeEventWithContext instead.
 func (c *Client) CreateChangeEvent(e ChangeEvent) (*ChangeEventResponse, error) {
 	return c.CreateChangeEventWithContext(context.Background(), e)
 }

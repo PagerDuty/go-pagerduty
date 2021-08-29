@@ -37,8 +37,9 @@ type ListExtensionSchemaOptions struct {
 }
 
 // ListExtensionSchemas lists all of the extension schemas. Each schema
-// represents a specific type of outbound extension. It's recommended to use
-// ListExtensionSchemasWithContext instead.
+// represents a specific type of outbound extension.
+//
+// Deprecated: Use ListExtensionSchemasWithContext instead.
 func (c *Client) ListExtensionSchemas(o ListExtensionSchemaOptions) (*ListExtensionSchemaResponse, error) {
 	return c.ListExtensionSchemasWithContext(context.Background(), o)
 }
@@ -64,8 +65,9 @@ func (c *Client) ListExtensionSchemasWithContext(ctx context.Context, o ListExte
 	return &result, nil
 }
 
-// GetExtensionSchema gets a single extension schema. It's recommended to use
-// GetExtensionSchemaWithContext instead.
+// GetExtensionSchema gets a single extension schema.
+//
+// Deprecated: Use GetExtensionSchemaWithContext instead.
 func (c *Client) GetExtensionSchema(id string) (*ExtensionSchema, error) {
 	return c.GetExtensionSchemaWithContext(context.Background(), id)
 }

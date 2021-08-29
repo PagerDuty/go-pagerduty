@@ -184,8 +184,9 @@ func (c *Client) ListRulesetsPaginated(ctx context.Context) ([]*Ruleset, error) 
 	return rulesets, nil
 }
 
-// CreateRuleset creates a new ruleset. It's recommended to use
-// CreateRulesetWithContext instead.
+// CreateRuleset creates a new ruleset.
+//
+// Deprecated: Use CreateRulesetWithContext instead.
 func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	return c.createRulesetWithContext(context.Background(), r)
 }
@@ -205,8 +206,9 @@ func (c *Client) createRulesetWithContext(ctx context.Context, r *Ruleset) (*Rul
 	return getRulesetFromResponse(c, resp, err)
 }
 
-// DeleteRuleset deletes a ruleset. It's recommended to use
-// DeleteRulesetWithContext instead.
+// DeleteRuleset deletes a ruleset.
+//
+// Deprecated: Use DeleteRulesetWithContext instead.
 func (c *Client) DeleteRuleset(id string) error {
 	return c.DeleteRulesetWithContext(context.Background(), id)
 }
@@ -218,6 +220,8 @@ func (c *Client) DeleteRulesetWithContext(ctx context.Context, id string) error 
 }
 
 // GetRuleset gets details about a ruleset.
+//
+// Deprecated: Use GetRulesetWithContext instead.
 func (c *Client) GetRuleset(id string) (*Ruleset, *http.Response, error) {
 	return c.getRulesetWithContext(context.Background(), id)
 }
@@ -233,8 +237,9 @@ func (c *Client) getRulesetWithContext(ctx context.Context, id string) (*Ruleset
 	return getRulesetFromResponse(c, resp, err)
 }
 
-// UpdateRuleset updates a ruleset. It's recommended to use
-// UpdateRulesetWithContext instead.
+// UpdateRuleset updates a ruleset.
+//
+// Deprecated: Use UpdateRulesetWithContext instead.
 func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
 	return c.updateRulesetWithContext(context.Background(), r)
 }
@@ -318,8 +323,9 @@ func (c *Client) ListRulesetRulesPaginated(ctx context.Context, rulesetID string
 	return rules, nil
 }
 
-// GetRulesetRule gets an event rule. It's recommended to use
-// GetRulesetRuleWithContext instead.
+// GetRulesetRule gets an event rule.
+//
+// Deprecated: Use GetRulesetRuleWithContext instead.
 func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, *http.Response, error) {
 	return c.getRulesetRuleWithContext(context.Background(), rulesetID, ruleID)
 }
@@ -335,8 +341,9 @@ func (c *Client) getRulesetRuleWithContext(ctx context.Context, rulesetID, ruleI
 	return getRuleFromResponse(c, resp, err)
 }
 
-// DeleteRulesetRule deletes a rule. It's recommended to use
-// DeleteRulesetRuleWithContext instead.
+// DeleteRulesetRule deletes a rule.
+//
+// Deprecated: Use DeleteRulesetRuleWithContext instead.
 func (c *Client) DeleteRulesetRule(rulesetID, ruleID string) error {
 	return c.DeleteRulesetRuleWithContext(context.Background(), rulesetID, ruleID)
 }
@@ -347,8 +354,9 @@ func (c *Client) DeleteRulesetRuleWithContext(ctx context.Context, rulesetID, ru
 	return err
 }
 
-// CreateRulesetRule creates a new rule for a ruleset. It's recommended to use
-// CreateRulesetRuleWithContext instead.
+// CreateRulesetRule creates a new rule for a ruleset.
+//
+// Deprecated: Use CreateRulesetRuleWithContext instead.
 func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, *http.Response, error) {
 	return c.CreateRulesetRuleWithContext(context.Background(), rulesetID, rule)
 }
@@ -364,6 +372,8 @@ func (c *Client) CreateRulesetRuleWithContext(ctx context.Context, rulesetID str
 }
 
 // UpdateRulesetRule updates a rule.
+//
+// Deprecated: Use UpdateRulesetRuleWithContext instead.
 func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *http.Response, error) {
 	return c.UpdateRulesetRuleWithContext(context.Background(), rulesetID, ruleID, r)
 }

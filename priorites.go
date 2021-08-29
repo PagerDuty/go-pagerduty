@@ -18,8 +18,9 @@ type Priorities struct {
 	Priorities []PriorityProperty `json:"priorities"`
 }
 
-// ListPriorities lists existing priorities. It's recommended to use
-// ListPrioritiesWithContext instead.
+// ListPriorities lists existing priorities.
+//
+// Deprecated: Use ListPrioritiesWithContext instead.
 func (c *Client) ListPriorities() (*Priorities, error) {
 	return c.ListPrioritiesWithContext(context.Background())
 }

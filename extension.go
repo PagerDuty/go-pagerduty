@@ -34,8 +34,9 @@ type ListExtensionOptions struct {
 	Query             string `url:"query,omitempty"`
 }
 
-// ListExtensions lists the extensions from the API. It's recommended to use
-// ListExtensionsWithContext instead.
+// ListExtensions lists the extensions from the API.
+//
+// Deprecated: Use ListExtensionsWithContext instead.
 func (c *Client) ListExtensions(o ListExtensionOptions) (*ListExtensionResponse, error) {
 	return c.ListExtensionsWithContext(context.Background(), o)
 }
@@ -61,6 +62,8 @@ func (c *Client) ListExtensionsWithContext(ctx context.Context, o ListExtensionO
 }
 
 // CreateExtension creates a single extension.
+//
+// Deprecated: Use CreateExtensionWithContext instead.
 func (c *Client) CreateExtension(e *Extension) (*Extension, error) {
 	return c.CreateExtensionWithContext(context.Background(), e)
 }
@@ -72,6 +75,8 @@ func (c *Client) CreateExtensionWithContext(ctx context.Context, e *Extension) (
 }
 
 // DeleteExtension deletes an extension by its ID.
+//
+// Deprecated: Use DeleteExtensionWithContext instead.
 func (c *Client) DeleteExtension(id string) error {
 	return c.DeleteExtensionWithContext(context.Background(), id)
 }
@@ -83,6 +88,8 @@ func (c *Client) DeleteExtensionWithContext(ctx context.Context, id string) erro
 }
 
 // GetExtension gets an extension by its ID.
+//
+// Deprecated: Use GetExtensionWithContext instead.
 func (c *Client) GetExtension(id string) (*Extension, error) {
 	return c.GetExtensionWithContext(context.Background(), id)
 }
@@ -94,6 +101,8 @@ func (c *Client) GetExtensionWithContext(ctx context.Context, id string) (*Exten
 }
 
 // UpdateExtension updates an extension by its ID.
+//
+// Deprecated: Use UpdateExtensionWithContext instead.
 func (c *Client) UpdateExtension(id string, e *Extension) (*Extension, error) {
 	return c.UpdateExtensionWithContext(context.Background(), id, e)
 }
