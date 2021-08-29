@@ -16,7 +16,7 @@ func TestIncident_List(t *testing.T) {
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	var opts ListIncidentsOptions
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	res, err := client.ListIncidents(opts)
 
@@ -49,7 +49,7 @@ func TestIncident_Create(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"incident": {"title": "foo", "id": "1", "urgency": "low"}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 	res, err := client.CreateIncident(from, input)
 
@@ -74,7 +74,7 @@ func TestIncident_Manage_status(t *testing.T) {
 		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "status": "acknowledged"}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
 	input := []ManageIncidentsOptions{
@@ -111,7 +111,7 @@ func TestIncident_Manage_priority(t *testing.T) {
 		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "priority": {"id": "PRIORITY_ID_HERE", "type": "priority_reference"}}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
 	input := []ManageIncidentsOptions{
@@ -156,7 +156,7 @@ func TestIncident_Manage_assignments(t *testing.T) {
 		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "assignments": [{"assignee":{"id": "ASSIGNEE_ONE", "type": "user_reference"}},{"assignee":{"id": "ASSIGNEE_TWO", "type": "user_reference"}}]}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
 	input := []ManageIncidentsOptions{
@@ -218,7 +218,7 @@ func TestIncident_Merge(t *testing.T) {
 		testMethod(t, r, "PUT")
 		_, _ = w.Write([]byte(`{"incident": {"title": "foo", "id": "1"}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
 	input := []MergeIncidentsOptions{{ID: "2", Type: "incident"}}
@@ -240,7 +240,7 @@ func TestIncident_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"incident": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	id := "1"
 	res, err := client.GetIncident(id)
@@ -262,7 +262,7 @@ func TestIncident_ListIncidentNotes(t *testing.T) {
 		_, _ = w.Write([]byte(`{"notes": [{"id": "1","content":"foo"}]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 
 	res, err := client.ListIncidentNotes(id)
@@ -289,7 +289,7 @@ func TestIncident_ListIncidentAlerts(t *testing.T) {
 		_, _ = w.Write([]byte(`{"alerts": [{"id": "1","summary":"foo"}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 
 	res, err := client.ListIncidentAlerts(id)
@@ -321,7 +321,7 @@ func TestIncident_ListIncidentAlertsWithOpts(t *testing.T) {
 		_, _ = w.Write([]byte(`{"alerts": [{"id": "1","summary":"foo"}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 
 	alertOpts := ListIncidentAlertsOptions{
@@ -362,7 +362,7 @@ func TestIncident_CreateIncidentNote(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"note": {"id": "1","content": "foo"}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	err := client.CreateIncidentNote(id, input)
 	if err != nil {
@@ -383,7 +383,7 @@ func TestIncident_CreateIncidentNoteWithResponse(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"note": {"id": "1","content": "foo"}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	res, err := client.CreateIncidentNoteWithResponse(id, input)
 
@@ -407,7 +407,7 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"incident": {"id": "1", "pending_actions": [{"type": "unacknowledge", "at":"2019-12-31T16:58:35Z"}]}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	var duration uint = 3600
 	id := "1"
 
@@ -426,7 +426,7 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 		testMethod(t, r, "POST")
 		_, _ = w.Write([]byte(`{"incident": {"id": "1", "pending_actions": [{"type": "unacknowledge", "at":"2019-12-31T16:58:35Z"}]}}`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	var duration uint = 3600
 	id := "1"
 
@@ -458,7 +458,7 @@ func TestIncident_ListLogEntries(t *testing.T) {
 		_, _ = w.Write([]byte(`{"log_entries": [{"id": "1","summary":"foo"}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	entriesOpts := ListIncidentLogEntriesOptions{
 		APIListObject: listObj,
@@ -498,7 +498,7 @@ func TestIncident_ListLogEntriesSinceUntil(t *testing.T) {
 		_, _ = w.Write([]byte(`{"log_entries": [{"id": "1","summary":"foo"}]}`))
 	})
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	entriesOpts := ListIncidentLogEntriesOptions{
 		APIListObject: listObj,
@@ -559,7 +559,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	}
 }`))
 	})
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
 	r := ResponderRequestTarget{}
@@ -607,7 +607,7 @@ func TestIncident_GetAlert(t *testing.T) {
 		_, _ = w.Write([]byte(`{"alert": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	incidentID := "1"
 	alertID := "1"
@@ -636,7 +636,7 @@ func TestIncident_ManageAlerts(t *testing.T) {
 		_, _ = w.Write([]byte(`{"alerts": [{"id": "1"}]}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 
 	incidentID := "1"
 

@@ -26,12 +26,7 @@ func TestChangeEvent_Create(t *testing.T) {
 		},
 	)
 
-	client := &Client{
-		v2EventsAPIEndpoint: server.URL,
-		apiEndpoint:         server.URL,
-		authToken:           "foo",
-		HTTPClient:          defaultHTTPClient,
-	}
+	client := defaultTestClient(server.URL, "foo")
 
 	want := ChangeEventResponse{
 		Status:  "success",
@@ -81,12 +76,7 @@ func TestChangeEvent_CreateWithPayloadVerification(t *testing.T) {
 		},
 	)
 
-	client := &Client{
-		v2EventsAPIEndpoint: server.URL,
-		apiEndpoint:         server.URL,
-		authToken:           "foo",
-		HTTPClient:          defaultHTTPClient,
-	}
+	client := defaultTestClient(server.URL, "foo")
 
 	eventDetails := map[string]interface{}{"DetailKey1": "DetailValue1", "DetailKey2": "DetailValue2"}
 	ce := ChangeEvent{

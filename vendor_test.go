@@ -16,7 +16,7 @@ func TestVendor_List(t *testing.T) {
 	})
 
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	opts := ListVendorOptions{
 		APIListObject: listObj,
 		Query:         "foo",
@@ -50,7 +50,7 @@ func TestVendor_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"vendor": {"id": "1"}}`))
 	})
 
-	client := &Client{apiEndpoint: server.URL, authToken: "foo", HTTPClient: defaultHTTPClient}
+	client := defaultTestClient(server.URL, "foo")
 	venID := "1"
 
 	res, err := client.GetVendor(venID)
