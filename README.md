@@ -137,7 +137,7 @@ is similar to that of the `http.Client.Do` method, except it also includes a
 API). When the API is authenticated, the client will annotate the request with
 the appropriate headers to be authenticated by the API.
 
-If PagerDuty the client doesn't natively expose functionality that you wish to
+If the PagerDuty client doesn't natively expose functionality that you wish to
 use, such as undocumented JSON fields, you can use the `Do()` method to issue
 your own request that you can parse the response of.
 
