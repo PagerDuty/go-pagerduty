@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.4.2](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.2) (2021-08-30)
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/5)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.1...v1.4.2)
+
+**Highlights**
+- Fix bug that prevented CreateService() from working when SupportHours and ScheduledActions were unset.
+
+**Merged pull requests**
+- Add omitempty on Service.SupportHours and Service.ScheduledActions [\#352](https://github.com/PagerDuty/go-pagerduty/pull/352) ([theckman](https://github.com/theckman))
+
+**Closed issues**
+- Backward incompatability - CreateService - existing setup works in 1.3.0 but not in 1.4.x [\#346](https://github.com/PagerDuty/go-pagerduty/pull/346) ([onikroo](https://github.com/onikroo))
+
 ## [v1.4.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.1) (2021-05-13)
 
 [Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/4)  
