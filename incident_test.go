@@ -544,7 +544,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 			"type": "user_reference"
 		},
 		"message": "Help",
-		"responder_request_targets": {
+		"responder_request_targets": [{
 			"responder_request_target": {
 				"id": "PJ25ZYX",
 				"type": "user_reference",
@@ -555,7 +555,7 @@ func TestIncident_ResponderRequest(t *testing.T) {
 					}
 				}
 			}
-		}
+		}]
 	}
 }`))
 	})
@@ -566,11 +566,15 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	r.ID = "PJ25ZYX"
 	r.Type = "user_reference"
 
+	targets := []ResponderRequestTargets{
+		ResponderRequestTargets{Target: r},
+	}
+
 	input := ResponderRequestOptions{
 		From:        from,
 		Message:     "help",
 		RequesterID: "PL1JMK5",
-		Targets:     []ResponderRequestTarget{r},
+		Targets:     targets,
 	}
 
 	user := User{}
@@ -583,12 +587,16 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	target.Responders.State = "pending"
 	target.Responders.User.ID = "PJ25ZYX"
 
+	targets = []ResponderRequestTargets{
+		ResponderRequestTargets{Target: target},
+	}
+
 	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   ResponderRequestTargets{target},
+			Targets:   targets,
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
