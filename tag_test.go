@@ -54,7 +54,7 @@ func TestTag_Create(t *testing.T) {
 	input := &Tag{
 		Label: "foo",
 	}
-	res, _, err := client.CreateTag(input)
+	res, err := client.CreateTag(input)
 
 	want := &Tag{
 		APIObject: APIObject{
@@ -98,7 +98,7 @@ func TestTag_Get(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 	id := "1"
-	res, _, err := client.GetTag(id)
+	res, err := client.GetTag(id)
 
 	want := &Tag{
 		APIObject: APIObject{
@@ -136,7 +136,7 @@ func TestTag_AssignAdd(t *testing.T) {
 		},
 	}
 	// this endpoint only returns  an "ok" in the body. no point in testing for it.
-	_, err := client.AssignTags("teams", "1", ta)
+	err := client.AssignTags("teams", "1", ta)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func TestTag_AssignRemove(t *testing.T) {
 		},
 	}
 	// this endpoint only returns  an "ok" in the body. no point in testing for it.
-	_, err := client.AssignTags("teams", "1", ta)
+	err := client.AssignTags("teams", "1", ta)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -85,12 +85,12 @@ func (c *Client) ListTagsPaginated(ctx context.Context, o ListTagOptions) ([]*Ta
 // CreateTag creates a new tag.
 //
 // Deprecated: Use CreateTagWithContext instead.
-func (c *Client) CreateTag(t *Tag) (*Tag, *http.Response, error) {
+func (c *Client) CreateTag(t *Tag) (*Tag, error) {
 	return c.CreateTagWithContext(context.Background(), t)
 }
 
 // CreateTagWithContext creates a new tag.
-func (c *Client) CreateTagWithContext(ctx context.Context, t *Tag) (*Tag, *http.Response, error) {
+func (c *Client) CreateTagWithContext(ctx context.Context, t *Tag) (*Tag, error) {
 	d := map[string]*Tag{
 		"tag": t,
 	}
@@ -115,12 +115,12 @@ func (c *Client) DeleteTagWithContext(ctx context.Context, id string) error {
 // GetTag gets details about an existing tag.
 //
 // Deprecated: Use GetTagWithContext instead.
-func (c *Client) GetTag(id string) (*Tag, *http.Response, error) {
+func (c *Client) GetTag(id string) (*Tag, error) {
 	return c.GetTagWithContext(context.Background(), id)
 }
 
 // GetTagWithContext gets details about an existing tag.
-func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, *http.Response, error) {
+func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, error) {
 	resp, err := c.get(ctx, "/tags/"+id)
 	return getTagFromResponse(c, resp, err)
 }
@@ -128,18 +128,18 @@ func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, *http.
 // AssignTags adds and removes tag assignments with entities.
 //
 // Deprecated: Use AssignTagsWithContext instead.
-func (c *Client) AssignTags(e, eid string, a *TagAssignments) (*http.Response, error) {
+func (c *Client) AssignTags(e, eid string, a *TagAssignments) error {
 	return c.AssignTagsWithContext(context.Background(), e, eid, a)
 }
 
 // AssignTagsWithContext adds and removes tag assignments with entities.
-func (c *Client) AssignTagsWithContext(ctx context.Context, e, eid string, a *TagAssignments) (*http.Response, error) {
-	resp, err := c.post(ctx, "/"+e+"/"+eid+"/change_tags", a, nil)
+func (c *Client) AssignTagsWithContext(ctx context.Context, e, eid string, a *TagAssignments) error {
+	_, err := c.post(ctx, "/"+e+"/"+eid+"/change_tags", a, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	return nil
 }
 
 // GetUsersByTag gets related user references based on the Tag. This method
@@ -308,24 +308,24 @@ func (c *Client) GetTagsForEntityPaginated(ctx context.Context, entityType, enti
 	return getTagList(ctx, c, entityType, entityID, o)
 }
 
-func getTagFromResponse(c *Client, resp *http.Response, err error) (*Tag, *http.Response, error) {
+func getTagFromResponse(c *Client, resp *http.Response, err error) (*Tag, error) {
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var target map[string]Tag
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "tag"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
 
-	return &t, resp, nil
+	return &t, nil
 }
 
 // getTagList  is a utility function that processes all pages of a ListTagResponse
