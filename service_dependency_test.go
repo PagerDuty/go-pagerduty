@@ -17,7 +17,7 @@ func TestBusinessServiceDependency_List(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 	bServeID := "1"
-	res, _, err := client.ListBusinessServiceDependencies(bServeID)
+	res, err := client.ListBusinessServiceDependencies(bServeID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestTechnicalServiceDependency_List(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 	bServeID := "1"
-	res, _, err := client.ListTechnicalServiceDependencies(bServeID)
+	res, err := client.ListTechnicalServiceDependencies(bServeID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestServiceDependency_Associate(t *testing.T) {
 			},
 		},
 	}
-	res, _, err := client.AssociateServiceDependencies(input)
+	res, err := client.AssociateServiceDependencies(input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func TestServiceDependency_Disassociate(t *testing.T) {
 			},
 		},
 	}
-	res, _, err := client.DisassociateServiceDependencies(input)
+	res, err := client.DisassociateServiceDependencies(input)
 	if err != nil {
 		t.Fatal(err)
 	}
