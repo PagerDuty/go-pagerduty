@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
 	"os"
 	"strings"
+
+	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 )
 
 type MaintenanceWindowCreate struct {
@@ -59,7 +61,7 @@ func (c *MaintenanceWindowCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", m)
-	if _, err := client.CreateMaintenanceWindows(m); err != nil {
+	if _, err := client.CreateMaintenanceWindowWithContext(context.Background(), "", m); err != nil {
 		log.Error(err)
 		return -1
 	}
