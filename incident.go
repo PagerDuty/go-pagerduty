@@ -89,6 +89,7 @@ type Incident struct {
 	Body                 IncidentBody         `json:"body,omitempty"`
 	IsMergeable          bool                 `json:"is_mergeable,omitempty"`
 	ConferenceBridge     *ConferenceBridge    `json:"conference_bridge,omitempty"`
+	IncidentResponders   []IncidentResponders `json:"incidents_responders,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
