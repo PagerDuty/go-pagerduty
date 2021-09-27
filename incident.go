@@ -172,6 +172,7 @@ type ManageIncidentsOptions struct {
 	Status           string        `json:"status,omitempty"`
 	Priority         *APIReference `json:"priority,omitempty"`
 	Assignments      []Assignee    `json:"assignments,omitempty"`
+	EscalationLevel  uint          `json:"escalation_level,omitempty"`
 	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
 	Resolution       string        `json:"resolution,omitempty"`
 }

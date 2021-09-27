@@ -210,6 +210,42 @@ func TestIncident_Manage_assignments(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+func TestIncident_Manage_esclation_level(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1"}]}`))
+	})
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := defaultTestClient(server.URL, "foo")
+	from := "foo@bar.com"
+
+	input := []ManageIncidentsOptions{
+		{
+			ID:   "1",
+			Type: "incident",
+			EscalationLevel: 2,
+		},
+	}
+
+	want := &ListIncidentsResponse{
+		APIListObject: listObj,
+		Incidents: []Incident{
+			{
+				Id:    "1",
+				Title: "foo",
+			},
+		},
+	}
+	res, err := client.ManageIncidents(from, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 func TestIncident_Merge(t *testing.T) {
 	setup()
 	defer teardown()
