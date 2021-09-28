@@ -41,7 +41,7 @@ func (c *MaintenanceWindowList) Run(args []string) int {
 	var includes, serviceIDs, teamIDs []string
 	var query, filter string
 	flags := c.Meta.FlagSet("maintenance-window list")
-	flags.Usage = func() { fmt.Println(c.Help())}
+	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.Var((*ArrayFlags)(&includes), "includes", "Additional details to include (can be specified multiple times)")
 	flags.Var((*ArrayFlags)(&serviceIDs), "service-id", "Show maintenance windows for the specified services only (can be specified multiple times)")
 	flags.Var((*ArrayFlags)(&teamIDs), "team-id", "Show maintenance windows for the specified teams only (can be specified multiple times)")
@@ -52,10 +52,12 @@ func (c *MaintenanceWindowList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
+
 	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	client := c.Meta.Client()
 	opts := pagerduty.ListMaintenanceWindowsOptions{
 		Query:      query,
@@ -64,11 +66,13 @@ func (c *MaintenanceWindowList) Run(args []string) int {
 		ServiceIDs: serviceIDs,
 		Filter:     filter,
 	}
+
 	mws, err := client.ListMaintenanceWindowsWithContext(context.Background(), opts)
 	if err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	for i, mw := range mws.MaintenanceWindows {
 		fmt.Println("Entry: ", i)
 		data, err := yaml.Marshal(mw)

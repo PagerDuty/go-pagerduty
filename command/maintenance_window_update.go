@@ -34,15 +34,18 @@ func (c *MaintenanceWindowUpdate) Synopsis() string {
 
 func (c *MaintenanceWindowUpdate) Run(args []string) int {
 	flags := c.Meta.FlagSet("maintenance-window update")
-	flags.Usage = func() { fmt.Println(c.Help())}
+	flags.Usage = func() { fmt.Println(c.Help()) }
+
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	client := c.Meta.Client()
 	var mw pagerduty.MaintenanceWindow
 	if len(flags.Args()) != 1 {
@@ -55,16 +58,19 @@ func (c *MaintenanceWindowUpdate) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
+
 	defer f.Close()
 	decoder := json.NewDecoder(f)
 	if err := decoder.Decode(&mw); err != nil {
 		log.Errorln("Failed to decode json. Error:", err)
 		return -1
 	}
+
 	log.Debugf("%#v", mw)
 	if _, err := client.UpdateMaintenanceWindowWithContext(context.Background(), mw); err != nil {
 		log.Error(err)
 		return -1
 	}
+
 	return 0
 }
