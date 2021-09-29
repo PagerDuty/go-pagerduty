@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
@@ -52,16 +52,15 @@ func (c *MaintenanceWindowUpdate) Run(args []string) int {
 		log.Error("Please specify input json file")
 		return -1
 	}
+
 	log.Info("Input file is:", flags.Arg(0))
-	f, err := os.Open(flags.Arg(0))
+	f, err := ioutil.ReadFile(flags.Arg(0))
 	if err != nil {
 		log.Error(err)
 		return -1
 	}
 
-	defer f.Close()
-	decoder := json.NewDecoder(f)
-	if err := decoder.Decode(&mw); err != nil {
+	if err := json.Unmarshal(f, &mw); err != nil {
 		log.Errorln("Failed to decode json. Error:", err)
 		return -1
 	}
