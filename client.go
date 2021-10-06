@@ -90,7 +90,7 @@ type APIErrorObject struct {
 // While the PagerDuty REST API is documented to always return the error object,
 // we assume it's possible in exceptional failure modes for this to be omitted.
 // As such, this wrapper type provides us a way to check if the object was
-// provided while avoiding cosnumers accidentally missing a nil pointer check,
+// provided while avoiding consumers accidentally missing a nil pointer check,
 // thus crashing their whole program.
 type NullAPIErrorObject struct {
 	Valid       bool
@@ -291,7 +291,7 @@ const (
 	DebugCaptureLastRequest DebugFlag = 1 << 0
 
 	// DebugCaptureLastResponse captures the last HTTP response from the API (if
-	// there was one) and makes it available via the LastAPIReponse() method.
+	// there was one) and makes it available via the LastAPIResponse() method.
 	//
 	// This may increase memory usage / GC, as we'll be making a copy of the
 	// full HTTP response body on each request and capturing it for inspection.
@@ -518,7 +518,7 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 
 func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, error) {
 	if err != nil {
-		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
+		return resp, fmt.Errorf("error calling the API endpoint: %v", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
