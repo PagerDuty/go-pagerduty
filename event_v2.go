@@ -75,12 +75,17 @@ func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, e
 	defer func() { _ = resp.Body.Close() }() // explicitly discard error
 
 	if resp.StatusCode != http.StatusAccepted {
-		bytes, err := ioutil.ReadAll(resp.Body)
+		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
+			return nil, APIError{
+				StatusCode: resp.StatusCode,
+				message:    fmt.Sprintf("HTTP response with status code: %d", resp.StatusCode),
+			}
 		}
-
-		return nil, fmt.Errorf("HTTP Status Code: %d, Message: %s", resp.StatusCode, string(bytes))
+		return nil, APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code: %d message: %s", resp.StatusCode, string(b)),
+		}
 	}
 
 	var eventResponse V2EventResponse
