@@ -112,6 +112,7 @@ type ListIncidentsOptions struct {
 	TimeZone    string   `url:"time_zone,omitempty"`
 	SortBy      string   `url:"sort_by,omitempty"`
 	Includes    []string `url:"include,omitempty,brackets"`
+	Total       bool     `url:"total,omitempty"`
 }
 
 // ConferenceBridge is a struct for the conference_bridge object on an incident
