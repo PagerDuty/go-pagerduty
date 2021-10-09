@@ -28,7 +28,10 @@ type IncidentDetails struct {
 	ResolveReason        *string           `json:"resolve_reason"`
 	AlertCounts          AlertCounts       `json:"alert_counts"`
 	Metadata             interface{}       `json:"metadata"`
-	Alerts               []IncidentAlert   `json:"alerts,omitempty"`
+
+	// Alerts is the list of alerts within this incident. Each item in the slice
+	// is not fully hydrated, so only the AlertKey field will be set.
+	Alerts []IncidentAlert `json:"alerts,omitempty"`
 
 	// Description is deprecated, use Title instead.
 	Description string `json:"description"`
