@@ -111,21 +111,44 @@ func TestGetBasePrefix(t *testing.T) {
 }
 
 func TestAPIError_Error(t *testing.T) {
-	const jsonBody = `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["Enhance Your Calm", "Slow Your Roll"]}}`
+	t.Run("json_tests", func(t *testing.T) {
+		tests := []struct {
+			name  string
+			input string
+			want  string
+		}{
+			{
+				name:  "one_error",
+				input: `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["No Seriously, Enhance Your Calm"]}}`,
+				want:  "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420): No Seriously, Enhance Your Calm",
+			},
+			{
+				name:  "two_error",
+				input: `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["No Seriously, Enhance Your Calm", "Slow Your Roll"]}}`,
+				want:  "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420): No Seriously, Enhance Your Calm (and 1 more error...)",
+			},
+			{
+				name:  "three_error",
+				input: `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["No Seriously, Enhance Your Calm", "Slow Your Roll", "No, really..."]}}`,
+				want:  "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420): No Seriously, Enhance Your Calm (and 2 more errors...)",
+			},
+		}
 
-	var a APIError
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				var a APIError
+				if err := json.Unmarshal([]byte(tt.input), &a); err != nil {
+					t.Fatalf("failed to unmarshal JSON: %s", err)
+				}
 
-	if err := json.Unmarshal([]byte(jsonBody), &a); err != nil {
-		t.Fatalf("failed to unmarshal JSON: %s", err)
-	}
+				a.StatusCode = 429
 
-	a.StatusCode = 429
-
-	const want = "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420)"
-
-	if got := a.Error(); got != want {
-		t.Errorf("a.Error() = %q, want %q", got, want)
-	}
+				if got := a.Error(); got != tt.want {
+					t.Errorf("a.Error() = %q, want %q", got, tt.want)
+				}
+			})
+		}
+	})
 
 	tests := []struct {
 		name string
