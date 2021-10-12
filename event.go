@@ -26,7 +26,7 @@ type EventResponse struct {
 	Status      string `json:"status"`
 	Message     string `json:"message"`
 	IncidentKey string `json:"incident_key"`
-	HttpStatus  int
+	HTTPStatus  int
 }
 
 // CreateEvent sends PagerDuty an event to trigger, acknowledge, or resolve a
@@ -55,7 +55,7 @@ func CreateEventWithHTTPClient(e Event, client HTTPClient) (*EventResponse, erro
 	defer func() { _ = resp.Body.Close() }() // explicitly discard error
 
 	if resp.StatusCode != http.StatusOK {
-		return &EventResponse{HttpStatus: resp.StatusCode}, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
+		return &EventResponse{HTTPStatus: resp.StatusCode}, fmt.Errorf("HTTP Status Code: %d", resp.StatusCode)
 	}
 	var eventResponse EventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&eventResponse); err != nil {
