@@ -43,9 +43,9 @@ func TestEventAPIV2Error_BadRequest(t *testing.T) {
 			name: "bad_request",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusBadRequest,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "invalid",
 						Message: "Event object is invalid",
 						Errors:  []string{"Length of 'routing_key' is incorrect (should be 32 characters)", "'event_action' is missing or blank"},
@@ -58,9 +58,9 @@ func TestEventAPIV2Error_BadRequest(t *testing.T) {
 			name: "rate_limited",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusTooManyRequests,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "throttle exceeded",
 						Message: "Requests for this service are arriving too quickly.  Please retry later.",
 						Errors:  []string{"Enhance Your Calm."},
@@ -106,9 +106,9 @@ func TestEventAPIV2Error_RateLimited(t *testing.T) {
 			name: "rate_limited",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusTooManyRequests,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "throttle exceeded",
 						Message: "Requests for this service are arriving too quickly.  Please retry later.",
 						Errors:  []string{"Enhance Your Calm"},
@@ -121,9 +121,9 @@ func TestEventAPIV2Error_RateLimited(t *testing.T) {
 			name: "not_found",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusNotFound,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "Not Found",
 						Message: "Not Found",
 						Errors:  []string{"Not Found"},
@@ -155,9 +155,9 @@ func TestEventAPIV2Error_Temporary(t *testing.T) {
 			name: "rate_limited",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusTooManyRequests,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "throttle exceeded",
 						Message: "Requests for this service are arriving too quickly.  Please retry later.",
 						Errors:  []string{"Enhance Your Calm"},
@@ -184,9 +184,9 @@ func TestEventAPIV2Error_Temporary(t *testing.T) {
 			name: "not_found",
 			e: EventsAPIV2Error{
 				StatusCode: http.StatusNotFound,
-				EventsAPIV2Error: NullEventAPIV2ErrorObject{
+				EventsAPIV2Error: NullEventsAPIV2ErrorObject{
 					Valid: true,
-					ErrorObject: EventAPIV2ErrorObject{
+					ErrorObject: EventsAPIV2ErrorObject{
 						Status:  "Not Found",
 						Message: "Not Found",
 						Errors:  []string{"Not Found"},

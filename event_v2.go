@@ -68,7 +68,7 @@ type EventsAPIV2Error struct {
 	// If the API response did not contain an error object, the .Valid field of
 	// EventsAPIV2Error will be false. If .Valid is true, the .ErrorObject field is
 	// valid and should be consulted.
-	EventsAPIV2Error NullEventAPIV2ErrorObject
+	EventsAPIV2Error NullEventsAPIV2ErrorObject
 
 	message string
 }
@@ -88,7 +88,7 @@ func (e EventsAPIV2Error) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"HTTP response failed with status code: %d, message: %s, status: %s, errors: %s",
+		"HTTP response failed with status code: %d, message: %s, status: %s: %s",
 		e.StatusCode,
 		e.EventsAPIV2Error.ErrorObject.Message,
 		e.EventsAPIV2Error.ErrorObject.Status,
@@ -98,7 +98,7 @@ func (e EventsAPIV2Error) Error() string {
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler.
 func (e *EventsAPIV2Error) UnmarshalJSON(data []byte) error {
-	var aeo EventAPIV2ErrorObject
+	var aeo EventsAPIV2ErrorObject
 	if err := json.Unmarshal(data, &aeo); err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (e EventsAPIV2Error) Temporary() bool {
 	return e.RateLimited() || (e.StatusCode >= 500 && e.StatusCode < 600)
 }
 
-// NullEventAPIV2ErrorObject is a wrapper around the EventAPIV2ErrorObject type. If the Valid
+// NullEventsAPIV2ErrorObject is a wrapper around the EventsAPIV2ErrorObject type. If the Valid
 // field is true, the API response included a structured error JSON object. This
 // structured object is then set on the ErrorObject field.
 //
@@ -136,12 +136,15 @@ func (e EventsAPIV2Error) Temporary() bool {
 // As such, this wrapper type provides us a way to check if the object was
 // provided while avoiding consumers accidentally missing a nil pointer check,
 // thus crashing their whole program.
-type NullEventAPIV2ErrorObject struct {
+type NullEventsAPIV2ErrorObject struct {
 	Valid       bool
-	ErrorObject EventAPIV2ErrorObject
+	ErrorObject EventsAPIV2ErrorObject
 }
 
-type EventAPIV2ErrorObject struct {
+// EventsAPIV2ErrorObject represents the object returned by the Events V2 API when an error
+// occurs. This includes messages that should hopefully provide useful context
+// to the end user.
+type EventsAPIV2ErrorObject struct {
 	Status  string   `json:"status,omitempty"`
 	Message string   `json:"message,omitempty"`
 	Errors  []string `json:"errors,omitempty"`
