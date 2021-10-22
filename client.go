@@ -90,7 +90,7 @@ type APIErrorObject struct {
 // While the PagerDuty REST API is documented to always return the error object,
 // we assume it's possible in exceptional failure modes for this to be omitted.
 // As such, this wrapper type provides us a way to check if the object was
-// provided while avoiding consnumers accidentally missing a nil pointer check,
+// provided while avoiding consumers accidentally missing a nil pointer check,
 // thus crashing their whole program.
 type NullAPIErrorObject struct {
 	Valid       bool

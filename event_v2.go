@@ -53,7 +53,7 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 
 // EventsAPIV2Error represents the error response received when an Events API V2 call fails. The
 // HTTP response code is set inside of the StatusCode field, with the EventsAPIV2Error
-// field being the structured JSON error object returned from the Events API V2.
+// field being the wrapper around the JSON error object returned from the Events API V2.
 //
 // This type also provides some helper methods like .BadRequest(), .RateLimited(),
 // and .Temporary() to help callers reason about how to handle the error.
@@ -98,18 +98,19 @@ func (e EventsAPIV2Error) Error() string {
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler.
 func (e *EventsAPIV2Error) UnmarshalJSON(data []byte) error {
-	var aeo EventsAPIV2ErrorObject
-	if err := json.Unmarshal(data, &aeo); err != nil {
+	var eaeo EventsAPIV2ErrorObject
+	if err := json.Unmarshal(data, &eaeo); err != nil {
 		return err
 	}
 
-	e.EventsAPIV2Error.ErrorObject = aeo
+	e.EventsAPIV2Error.ErrorObject = eaeo
 	e.EventsAPIV2Error.Valid = true
 
 	return nil
 }
 
-// BadRequest returns whether the request was rejected by PagerDuty as a bad request.
+// BadRequest returns whether the event request was rejected by PagerDuty as an
+// incorrect or invalid event structure.
 func (e EventsAPIV2Error) BadRequest() bool {
 	return e.StatusCode == http.StatusBadRequest
 }
@@ -181,18 +182,18 @@ func ManageEventWithContext(ctx context.Context, e V2Event) (*V2EventResponse, e
 			}
 		}
 		// now try to decode the response body into the error object.
-		var eerr EventsAPIV2Error
-		err = json.Unmarshal(b, &eerr)
+		var eae EventsAPIV2Error
+		err = json.Unmarshal(b, &eae)
 		if err != nil {
-			eerr = EventsAPIV2Error{
+			eae = EventsAPIV2Error{
 				StatusCode: resp.StatusCode,
 				message:    fmt.Sprintf("HTTP response with status code: %d, JSON unmarshal object body failed: %s, body: %s", resp.StatusCode, err, string(b)),
 			}
-			return nil, eerr
+			return nil, eae
 		}
 
-		eerr.StatusCode = resp.StatusCode
-		return nil, eerr
+		eae.StatusCode = resp.StatusCode
+		return nil, eae
 	}
 
 	var eventResponse V2EventResponse
