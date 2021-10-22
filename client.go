@@ -44,7 +44,7 @@ const (
 )
 
 // APIObject represents generic api json response that is shared by most
-// domain object (like escalation
+// domain objects (like escalation)
 type APIObject struct {
 	ID      string `json:"id,omitempty"`
 	Type    string `json:"type,omitempty"`
@@ -90,12 +90,14 @@ type APIErrorObject struct {
 // While the PagerDuty REST API is documented to always return the error object,
 // we assume it's possible in exceptional failure modes for this to be omitted.
 // As such, this wrapper type provides us a way to check if the object was
-// provided while avoiding consumers accidentally missing a nil pointer check,
+// provided while avoiding consnumers accidentally missing a nil pointer check,
 // thus crashing their whole program.
 type NullAPIErrorObject struct {
 	Valid       bool
 	ErrorObject APIErrorObject
 }
+
+var _ json.Unmarshaler = &NullAPIErrorObject{} // assert that it satisfies the json.Unmarshaler interface.
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler
 func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
@@ -135,6 +137,8 @@ type APIError struct {
 	message string
 }
 
+var _ error = &APIError{} // assert that it implements the error interface.
+
 // Error satisfies the error interface, and should contain the StatusCode,
 // APIErrorObject.Message, and APIErrorObject.Code.
 func (a APIError) Error() string {
@@ -147,9 +151,8 @@ func (a APIError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"HTTP response failed with status code %d, message: %s (code: %d)",
-		a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code,
-	)
+		"HTTP response failed with status code %d, message: %s (code: %d), errors: %s",
+		a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, strings.Join(a.APIError.ErrorObject.Errors, ", "))
 }
 
 // RateLimited returns whether the response had a status of 429, and as such the
