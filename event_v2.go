@@ -56,7 +56,7 @@ func ManageEvent(e V2Event) (*V2EventResponse, error) {
 // HTTP response code is set inside of the StatusCode field, with the EventsAPIV2Error
 // field being the structured JSON error object returned from the Events API V2.
 //
-// This type also provides some helper methods like .RateLimited()
+// This type also provides some helper methods like .BadRequest(), .RateLimited(),
 // and .Temporary() to help callers reason about how to handle the error.
 type EventsAPIV2Error struct {
 	// StatusCode is the HTTP response status code.
