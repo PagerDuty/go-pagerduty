@@ -169,7 +169,7 @@ func (a APIError) Error() string {
 func apiErrorsDetailString(errs []string) string {
 	switch n := len(errs); n {
 	case 0:
-		panic("errs slice is empty")
+		return ""
 
 	case 1:
 		return errs[0]
