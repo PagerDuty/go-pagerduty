@@ -33,7 +33,7 @@ func TestEventV2_ManageEvent(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-func TestEventAPIV2Error_BadRequest(t *testing.T) {
+func TestEventsAPIV2Error_BadRequest(t *testing.T) {
 	tests := []struct {
 		name string
 		e    EventsAPIV2Error
@@ -96,7 +96,7 @@ func TestEventAPIV2Error_BadRequest(t *testing.T) {
 	}
 }
 
-func TestEventAPIV2Error_RateLimited(t *testing.T) {
+func TestEventsAPIV2Error_RateLimited(t *testing.T) {
 	tests := []struct {
 		name string
 		e    EventsAPIV2Error
@@ -145,7 +145,7 @@ func TestEventAPIV2Error_RateLimited(t *testing.T) {
 	}
 }
 
-func TestEventAPIV2Error_Temporary(t *testing.T) {
+func TestEventsAPIV2Error_Temporary(t *testing.T) {
 	tests := []struct {
 		name string
 		e    EventsAPIV2Error
