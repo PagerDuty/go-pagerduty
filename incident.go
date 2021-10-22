@@ -146,6 +146,37 @@ func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOp
 	return &result, nil
 }
 
+// ListServicesPaginated lists existing services processing paginated responses
+func (c *Client) ListIncidentsPaginated(ctx context.Context, o ListIncidentsOptions) ([]Incident, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	var incidents []Incident
+
+	responseHandler := func(response *http.Response) (APIListObject, error) {
+		var result ListIncidentsResponse
+		if err := c.decodeJSON(response, &result); err != nil {
+			return APIListObject{}, err
+		}
+
+		incidents = append(incidents, result.Incidents...)
+
+		return APIListObject{
+			More:   result.More,
+			Offset: result.Offset,
+			Limit:  result.Limit,
+		}, nil
+	}
+
+	if err := c.pagedGet(ctx, "/incidents?"+v.Encode(), responseHandler); err != nil {
+		return nil, err
+	}
+
+	return incidents, nil
+}
+
 // createIncidentResponse is returned from the API when creating a response.
 type createIncidentResponse struct {
 	Incident Incident `json:"incident"`
