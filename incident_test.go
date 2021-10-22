@@ -24,7 +24,9 @@ func TestIncident_List(t *testing.T) {
 		APIListObject: listObj,
 		Incidents: []Incident{
 			{
-				Id: "1",
+				APIObject: APIObject{
+					ID: "1",
+				},
 			},
 		},
 	}
@@ -54,8 +56,10 @@ func TestIncident_Create(t *testing.T) {
 	res, err := client.CreateIncident(from, input)
 
 	want := &Incident{
+		APIObject: APIObject{
+			ID: "1",
+		},
 		Title:   "foo",
-		Id:      "1",
 		Urgency: "low",
 	}
 
@@ -89,7 +93,9 @@ func TestIncident_Manage_status(t *testing.T) {
 		APIListObject: listObj,
 		Incidents: []Incident{
 			{
-				Id:     "1",
+				APIObject: APIObject{
+					ID: "1",
+				},
 				Title:  "foo",
 				Status: "acknowledged",
 			},
@@ -129,7 +135,9 @@ func TestIncident_Manage_priority(t *testing.T) {
 		APIListObject: listObj,
 		Incidents: []Incident{
 			{
-				Id:    "1",
+				APIObject: APIObject{
+					ID: "1",
+				},
 				Title: "foo",
 				Priority: &Priority{
 					APIObject: APIObject{
@@ -184,7 +192,9 @@ func TestIncident_Manage_assignments(t *testing.T) {
 		APIListObject: listObj,
 		Incidents: []Incident{
 			{
-				Id:    "1",
+				APIObject: APIObject{
+					ID: "1",
+				},
 				Title: "foo",
 				Assignments: []Assignment{
 					{
@@ -222,7 +232,12 @@ func TestIncident_Merge(t *testing.T) {
 	from := "foo@bar.com"
 
 	input := []MergeIncidentsOptions{{ID: "2", Type: "incident"}}
-	want := &Incident{Id: "1", Title: "foo"}
+	want := &Incident{
+		APIObject: APIObject{
+			ID: "1",
+		},
+		Title: "foo",
+	}
 
 	res, err := client.MergeIncidents(from, "1", input)
 	if err != nil {
@@ -245,7 +260,7 @@ func TestIncident_Get(t *testing.T) {
 	id := "1"
 	res, err := client.GetIncident(id)
 
-	want := &Incident{Id: "1"}
+	want := &Incident{APIObject: APIObject{ID: "1"}}
 
 	if err != nil {
 		t.Fatal(err)
@@ -433,7 +448,9 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 	res, err := client.SnoozeIncidentWithResponse(id, duration)
 
 	want := &Incident{
-		Id: "1",
+		APIObject: APIObject{
+			ID: "1",
+		},
 		PendingActions: []PendingAction{
 			{
 				Type: "unacknowledge",

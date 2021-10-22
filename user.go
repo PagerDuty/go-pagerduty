@@ -21,7 +21,6 @@ type NotificationRule struct {
 // User is a member of a PagerDuty account that has the ability to interact with incidents and other data on the account.
 type User struct {
 	APIObject
-	Type              string             `json:"type"`
 	Name              string             `json:"name"`
 	Summary           string             `json:"summary"`
 	Email             string             `json:"email"`

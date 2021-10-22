@@ -150,9 +150,38 @@ func (a APIError) Error() string {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
 	}
 
+	if len(a.APIError.ErrorObject.Errors) == 0 {
+		return fmt.Sprintf(
+			"HTTP response failed with status code %d, message: %s (code: %d)",
+			a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code,
+		)
+	}
+
 	return fmt.Sprintf(
-		"HTTP response failed with status code %d, message: %s (code: %d), errors: %s",
-		a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, strings.Join(a.APIError.ErrorObject.Errors, ", "))
+		"HTTP response failed with status code %d, message: %s (code: %d): %s",
+		a.StatusCode,
+		a.APIError.ErrorObject.Message,
+		a.APIError.ErrorObject.Code,
+		apiErrorsDetailString(a.APIError.ErrorObject.Errors),
+	)
+}
+
+func apiErrorsDetailString(errs []string) string {
+	switch n := len(errs); n {
+	case 0:
+		panic("errs slice is empty")
+
+	case 1:
+		return errs[0]
+
+	default:
+		e := "error"
+		if n > 2 {
+			e += "s"
+		}
+
+		return fmt.Sprintf("%s (and %d more %s...)", errs[0], n-1, e)
+	}
 }
 
 // RateLimited returns whether the response had a status of 429, and as such the

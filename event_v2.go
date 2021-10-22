@@ -90,7 +90,7 @@ func (e EventsAPIV2Error) Error() string {
 
 	return fmt.Sprintf(
 		"HTTP response failed with status code: %d, message: %s, status: %s, errors: %s",
-		e.StatusCode, e.EventsAPIV2Error.ErrorObject.Message, e.EventsAPIV2Error.ErrorObject.Status, strings.Join(e.EventsAPIV2Error.ErrorObject.Errors, ", "),
+		e.StatusCode, e.EventsAPIV2Error.ErrorObject.Message, e.EventsAPIV2Error.ErrorObject.Status, apiErrorsDetailString(e.EventsAPIV2Error.ErrorObject.Errors),
 	)
 }
 
