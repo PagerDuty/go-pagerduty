@@ -1,11 +1,12 @@
-package main
+package cmd
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
+
+	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type AddonShow struct {

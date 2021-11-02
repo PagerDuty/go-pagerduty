@@ -10,7 +10,7 @@
 
 .PHONY: build
 build: build-deps
-	go build -mod=vendor -o pd ./command
+	go build -mod=vendor -o out/pd ./pd/main.go
 
 .PHONY: build-deps
 build-deps:
@@ -20,7 +20,7 @@ build-deps:
 
 .PHONY: install
 install: build
-	cp pd $(GOROOT)/bin
+	go install -mod=vendor ./pd
 
 .PHONY: test
 test:
