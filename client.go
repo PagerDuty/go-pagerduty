@@ -83,6 +83,14 @@ type APIErrorObject struct {
 	Errors  []string `json:"errors,omitempty"`
 }
 
+// apiErrorStringObject represents the object returned by the API when an error
+// occurs and it returns error as a string. This gets converted to an APIErrorObject
+type apiErrorStringObject struct {
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+	Error   string `json:"errors,omitempty"`
+}
+
 // NullAPIErrorObject is a wrapper around the APIErrorObject type. If the Valid
 // field is true, the API response included a structured error JSON object. This
 // structured object is then set on the ErrorObject field.
@@ -90,7 +98,7 @@ type APIErrorObject struct {
 // While the PagerDuty REST API is documented to always return the error object,
 // we assume it's possible in exceptional failure modes for this to be omitted.
 // As such, this wrapper type provides us a way to check if the object was
-// provided while avoiding cosnumers accidentally missing a nil pointer check,
+// provided while avoiding consumers accidentally missing a nil pointer check,
 // thus crashing their whole program.
 type NullAPIErrorObject struct {
 	Valid       bool
@@ -567,21 +575,35 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 		return aerr
 	}
 
-	var document APIError
+	var e APIError
 
-	// because of above check this probably won't fail, but it's possible...
-	if err := c.decodeJSON(resp, &document); err != nil {
-		aerr := APIError{
-			StatusCode: resp.StatusCode,
-			message:    fmt.Sprintf("HTTP response with status code %d, JSON error object decode failed: %s", resp.StatusCode, err),
-		}
-
-		return aerr
+	if err := c.decodeJSON(resp, &e); err == nil {
+		e.StatusCode = resp.StatusCode
+		return e
 	}
 
-	document.StatusCode = resp.StatusCode
+	// If we're here, the response wasn't what was expected. Let's see if it's a case where the API returns a string instead of a slice of strings.
+	var se apiErrorStringObject
 
-	return document
+	if err := c.decodeJSON(resp, &se); err != nil {
+		return APIError{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("Unexpected response: %+v, decode failed: %v", resp, err),
+		}
+	}
+
+	// Create an APIError from a apiErrorSstringObject
+	return APIError{
+		StatusCode: se.Code,
+		APIError: NullAPIErrorObject{
+			Valid: true,
+			ErrorObject: APIErrorObject{
+				Code:    se.Code,
+				Message: se.Message,
+				Errors:  []string{se.Error},
+			},
+		},
+	}
 }
 
 // Helper function to determine wither additional parameters should use ? or & to append args
