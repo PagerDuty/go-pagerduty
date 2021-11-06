@@ -46,7 +46,7 @@ func TestRuleset_Create(t *testing.T) {
 	input := &Ruleset{
 		Name: "foo",
 	}
-	res, _, err := client.CreateRuleset(input)
+	res, err := client.CreateRuleset(input)
 
 	want := &Ruleset{
 		ID:   "1",
@@ -72,7 +72,7 @@ func TestRuleset_Get(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	ruleSetID := "1"
 
-	res, _, err := client.GetRuleset(ruleSetID)
+	res, err := client.GetRuleset(ruleSetID)
 
 	want := &Ruleset{
 		ID:   "1",
@@ -100,7 +100,7 @@ func TestRuleset_Update(t *testing.T) {
 		ID:   "1",
 		Name: "foo",
 	}
-	res, _, err := client.UpdateRuleset(input)
+	res, err := client.UpdateRuleset(input)
 
 	want := &Ruleset{
 		ID:   "1",
@@ -172,7 +172,7 @@ func TestRuleset_GetRule(t *testing.T) {
 
 	rulesetID := "1"
 	ruleID := "1"
-	res, _, err := client.GetRulesetRule(rulesetID, ruleID)
+	res, err := client.GetRulesetRule(rulesetID, ruleID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -198,7 +198,7 @@ func TestRuleset_CreateRule(t *testing.T) {
 	rulesetID := "1"
 	rule := &RulesetRule{}
 
-	res, _, err := client.CreateRulesetRule(rulesetID, rule)
+	res, err := client.CreateRulesetRule(rulesetID, rule)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,7 +225,7 @@ func TestRuleset_UpdateRule(t *testing.T) {
 	ruleID := "1"
 	rule := &RulesetRule{}
 
-	res, _, err := client.UpdateRulesetRule(rulesetID, ruleID, rule)
+	res, err := client.UpdateRulesetRule(rulesetID, ruleID, rule)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -187,17 +187,12 @@ func (c *Client) ListRulesetsPaginated(ctx context.Context) ([]*Ruleset, error) 
 // CreateRuleset creates a new ruleset.
 //
 // Deprecated: Use CreateRulesetWithContext instead.
-func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
-	return c.createRulesetWithContext(context.Background(), r)
+func (c *Client) CreateRuleset(r *Ruleset) (*Ruleset, error) {
+	return c.CreateRulesetWithContext(context.Background(), r)
 }
 
 // CreateRulesetWithContext creates a new ruleset.
 func (c *Client) CreateRulesetWithContext(ctx context.Context, r *Ruleset) (*Ruleset, error) {
-	rs, _, err := c.createRulesetWithContext(ctx, r)
-	return rs, err
-}
-
-func (c *Client) createRulesetWithContext(ctx context.Context, r *Ruleset) (*Ruleset, *http.Response, error) {
 	d := map[string]*Ruleset{
 		"ruleset": r,
 	}
@@ -222,17 +217,12 @@ func (c *Client) DeleteRulesetWithContext(ctx context.Context, id string) error 
 // GetRuleset gets details about a ruleset.
 //
 // Deprecated: Use GetRulesetWithContext instead.
-func (c *Client) GetRuleset(id string) (*Ruleset, *http.Response, error) {
-	return c.getRulesetWithContext(context.Background(), id)
+func (c *Client) GetRuleset(id string) (*Ruleset, error) {
+	return c.GetRulesetWithContext(context.Background(), id)
 }
 
 // GetRulesetWithContext gets details about a ruleset.
 func (c *Client) GetRulesetWithContext(ctx context.Context, id string) (*Ruleset, error) {
-	rs, _, err := c.getRulesetWithContext(ctx, id)
-	return rs, err
-}
-
-func (c *Client) getRulesetWithContext(ctx context.Context, id string) (*Ruleset, *http.Response, error) {
 	resp, err := c.get(ctx, "/rulesets/"+id)
 	return getRulesetFromResponse(c, resp, err)
 }
@@ -240,17 +230,12 @@ func (c *Client) getRulesetWithContext(ctx context.Context, id string) (*Ruleset
 // UpdateRuleset updates a ruleset.
 //
 // Deprecated: Use UpdateRulesetWithContext instead.
-func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, *http.Response, error) {
-	return c.updateRulesetWithContext(context.Background(), r)
+func (c *Client) UpdateRuleset(r *Ruleset) (*Ruleset, error) {
+	return c.UpdateRulesetWithContext(context.Background(), r)
 }
 
 // UpdateRulesetWithContext updates a ruleset.
 func (c *Client) UpdateRulesetWithContext(ctx context.Context, r *Ruleset) (*Ruleset, error) {
-	rs, _, err := c.updateRulesetWithContext(ctx, r)
-	return rs, err
-}
-
-func (c *Client) updateRulesetWithContext(ctx context.Context, r *Ruleset) (*Ruleset, *http.Response, error) {
 	d := map[string]*Ruleset{
 		"ruleset": r,
 	}
@@ -259,22 +244,22 @@ func (c *Client) updateRulesetWithContext(ctx context.Context, r *Ruleset) (*Rul
 	return getRulesetFromResponse(c, resp, err)
 }
 
-func getRulesetFromResponse(c *Client, resp *http.Response, err error) (*Ruleset, *http.Response, error) {
+func getRulesetFromResponse(c *Client, resp *http.Response, err error) (*Ruleset, error) {
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var target map[string]Ruleset
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 
 	t, nodeOK := target["ruleset"]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have ruleset field")
+		return nil, fmt.Errorf("JSON response does not have ruleset field")
 	}
 
-	return &t, resp, nil
+	return &t, nil
 }
 
 // ListRulesetRules gets all rules for a ruleset. This method currently handles pagination of
@@ -326,17 +311,12 @@ func (c *Client) ListRulesetRulesPaginated(ctx context.Context, rulesetID string
 // GetRulesetRule gets an event rule.
 //
 // Deprecated: Use GetRulesetRuleWithContext instead.
-func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, *http.Response, error) {
-	return c.getRulesetRuleWithContext(context.Background(), rulesetID, ruleID)
+func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, error) {
+	return c.GetRulesetRuleWithContext(context.Background(), rulesetID, ruleID)
 }
 
 // GetRulesetRuleWithContext gets an event rule
 func (c *Client) GetRulesetRuleWithContext(ctx context.Context, rulesetID, ruleID string) (*RulesetRule, error) {
-	rsr, _, err := c.getRulesetRuleWithContext(ctx, rulesetID, ruleID)
-	return rsr, err
-}
-
-func (c *Client) getRulesetRuleWithContext(ctx context.Context, rulesetID, ruleID string) (*RulesetRule, *http.Response, error) {
 	resp, err := c.get(ctx, "/rulesets/"+rulesetID+"/rules/"+ruleID)
 	return getRuleFromResponse(c, resp, err)
 }
@@ -357,12 +337,12 @@ func (c *Client) DeleteRulesetRuleWithContext(ctx context.Context, rulesetID, ru
 // CreateRulesetRule creates a new rule for a ruleset.
 //
 // Deprecated: Use CreateRulesetRuleWithContext instead.
-func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, *http.Response, error) {
+func (c *Client) CreateRulesetRule(rulesetID string, rule *RulesetRule) (*RulesetRule, error) {
 	return c.CreateRulesetRuleWithContext(context.Background(), rulesetID, rule)
 }
 
 // CreateRulesetRuleWithContext creates a new rule for a ruleset.
-func (c *Client) CreateRulesetRuleWithContext(ctx context.Context, rulesetID string, rule *RulesetRule) (*RulesetRule, *http.Response, error) {
+func (c *Client) CreateRulesetRuleWithContext(ctx context.Context, rulesetID string, rule *RulesetRule) (*RulesetRule, error) {
 	d := map[string]*RulesetRule{
 		"rule": rule,
 	}
@@ -374,12 +354,12 @@ func (c *Client) CreateRulesetRuleWithContext(ctx context.Context, rulesetID str
 // UpdateRulesetRule updates a rule.
 //
 // Deprecated: Use UpdateRulesetRuleWithContext instead.
-func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *http.Response, error) {
+func (c *Client) UpdateRulesetRule(rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, error) {
 	return c.UpdateRulesetRuleWithContext(context.Background(), rulesetID, ruleID, r)
 }
 
 // UpdateRulesetRuleWithContext updates a rule.
-func (c *Client) UpdateRulesetRuleWithContext(ctx context.Context, rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, *http.Response, error) {
+func (c *Client) UpdateRulesetRuleWithContext(ctx context.Context, rulesetID, ruleID string, r *RulesetRule) (*RulesetRule, error) {
 	d := map[string]*RulesetRule{
 		"rule": r,
 	}
@@ -388,22 +368,22 @@ func (c *Client) UpdateRulesetRuleWithContext(ctx context.Context, rulesetID, ru
 	return getRuleFromResponse(c, resp, err)
 }
 
-func getRuleFromResponse(c *Client, resp *http.Response, err error) (*RulesetRule, *http.Response, error) {
+func getRuleFromResponse(c *Client, resp *http.Response, err error) (*RulesetRule, error) {
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var target map[string]RulesetRule
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "rule"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
 
-	return &t, resp, nil
+	return &t, nil
 }
