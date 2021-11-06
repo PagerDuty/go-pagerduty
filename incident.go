@@ -3,7 +3,6 @@ package pagerduty
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -612,55 +611,45 @@ func (c *Client) ResponderRequestWithContext(ctx context.Context, id string, o R
 // GetIncidentAlert gets the alert that triggered the incident.
 //
 // Deprecated: Use GetIncidentAlertWithContext instead.
-func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
-	return c.getIncidentAlertWithContext(context.Background(), incidentID, alertID)
+func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertResponse, error) {
+	return c.GetIncidentAlertWithContext(context.Background(), incidentID, alertID)
 }
 
 // GetIncidentAlertWithContext gets the alert that triggered the incident.
 func (c *Client) GetIncidentAlertWithContext(ctx context.Context, incidentID, alertID string) (*IncidentAlertResponse, error) {
-	iar, _, err := c.getIncidentAlertWithContext(context.Background(), incidentID, alertID)
-	return iar, err
-}
-
-func (c *Client) getIncidentAlertWithContext(ctx context.Context, incidentID, alertID string) (*IncidentAlertResponse, *http.Response, error) {
 	resp, err := c.get(ctx, "/incidents/"+incidentID+"/alerts/"+alertID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var result IncidentAlertResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &result, resp, nil
+	return &result, nil
 }
 
 // ManageIncidentAlerts allows you to manage the alerts of an incident.
 //
 // Deprecated: Use ManageIncidentAlertsWithContext instead.
-func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
-	return c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
+func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
+	return c.ManageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
 }
 
 // ManageIncidentAlertsWithContext allows you to manage the alerts of an incident.
 func (c *Client) ManageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
-	lar, _, err := c.manageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
-	return lar, err
-}
-
-func (c *Client) manageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, *http.Response, error) {
 	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var result ListAlertsResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &result, resp, nil
+	return &result, nil
 }
 
 /* TODO: Create Status Updates */

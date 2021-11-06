@@ -636,7 +636,7 @@ func TestIncident_GetAlert(t *testing.T) {
 
 	incidentID := "1"
 	alertID := "1"
-	res, _, err := client.GetIncidentAlert(incidentID, alertID)
+	res, err := client.GetIncidentAlert(incidentID, alertID)
 
 	want := &IncidentAlertResponse{
 		IncidentAlert: &IncidentAlert{
@@ -674,7 +674,7 @@ func TestIncident_ManageAlerts(t *testing.T) {
 			},
 		},
 	}
-	res, _, err := client.ManageIncidentAlerts(incidentID, input)
+	res, err := client.ManageIncidentAlerts(incidentID, input)
 
 	want := &ListAlertsResponse{
 		Alerts: []IncidentAlert{
