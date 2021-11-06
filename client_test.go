@@ -8,10 +8,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"strings"
 	"sync/atomic"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 var (
@@ -56,9 +57,11 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 	}
 }
 
-func testEqual(t *testing.T, expected interface{}, actual interface{}) {
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("returned %#v; want %#v", expected, actual)
+func testEqual(t *testing.T, want interface{}, got interface{}) {
+	t.Helper()
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("values not equal (-want / +got):\n%s", diff)
 	}
 }
 
