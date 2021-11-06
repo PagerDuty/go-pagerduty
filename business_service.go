@@ -102,41 +102,31 @@ func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusine
 // CreateBusinessService creates a new business service.
 //
 // Deprecated: Use CreateBusinessServiceWithContext instead
-func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	return c.createBusinessServiceWithContext(context.Background(), b)
+func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, error) {
+	return c.CreateBusinessServiceWithContext(context.Background(), b)
 }
 
 // CreateBusinessServiceWithContext creates a new business service.
 func (c *Client) CreateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
-	bs, _, err := c.createBusinessServiceWithContext(ctx, b)
-	return bs, err
-}
-
-func (c *Client) createBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, *http.Response, error) {
 	d := map[string]*BusinessService{
 		"business_service": b,
 	}
 
 	resp, err := c.post(ctx, "/business_services", d, nil)
-	return getBusinessServiceFromResponse(c, resp, err)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
 // GetBusinessService gets details about a business service.
 //
 // Deprecated: Use GetBusinessServiceWithContext instead.
-func (c *Client) GetBusinessService(id string) (*BusinessService, *http.Response, error) {
-	return c.getBusinessServiceWithContext(context.Background(), id)
+func (c *Client) GetBusinessService(id string) (*BusinessService, error) {
+	return c.GetBusinessServiceWithContext(context.Background(), id)
 }
 
 // GetBusinessServiceWithContext gets details about a business service.
 func (c *Client) GetBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, error) {
-	bs, _, err := c.getBusinessServiceWithContext(ctx, id)
-	return bs, err
-}
-
-func (c *Client) getBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, *http.Response, error) {
 	resp, err := c.get(ctx, "/business_services/"+id)
-	return getBusinessServiceFromResponse(c, resp, err)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
 // DeleteBusinessService deletes a business_service.
@@ -155,17 +145,12 @@ func (c *Client) DeleteBusinessServiceWithContext(ctx context.Context, id string
 // UpdateBusinessService updates a business_service.
 //
 // Deprecated: Use UpdateBusinessServiceWithContext instead.
-func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	return c.updateBusinessServiceWithContext(context.Background(), b)
+func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, error) {
+	return c.UpdateBusinessServiceWithContext(context.Background(), b)
 }
 
 // UpdateBusinessServiceWithContext updates a business_service.
 func (c *Client) UpdateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
-	bs, _, err := c.updateBusinessServiceWithContext(ctx, b)
-	return bs, err
-}
-
-func (c *Client) updateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, *http.Response, error) {
 	id := b.ID
 	b.ID = ""
 
@@ -174,25 +159,25 @@ func (c *Client) updateBusinessServiceWithContext(ctx context.Context, b *Busine
 	}
 
 	resp, err := c.put(ctx, "/business_services/"+id, d, nil)
-	return getBusinessServiceFromResponse(c, resp, err)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
-func getBusinessServiceFromResponse(c *Client, resp *http.Response, err error) (*BusinessService, *http.Response, error) {
+func getBusinessServiceFromResponse(resp *http.Response, err error, decodeFn func(*http.Response, interface{}) error) (*BusinessService, error) {
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var target map[string]BusinessService
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	if dErr := decodeFn(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "business_service"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
 
-	return &t, resp, nil
+	return &t, nil
 }

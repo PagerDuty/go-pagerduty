@@ -51,7 +51,7 @@ func TestBusinessService_Create(t *testing.T) {
 	input := &BusinessService{
 		Name: "foo",
 	}
-	res, _, err := client.CreateBusinessService(input)
+	res, err := client.CreateBusinessService(input)
 
 	want := &BusinessService{
 		ID:   "1",
@@ -77,7 +77,7 @@ func TestBusinessService_Get(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	ruleSetID := "1"
 
-	res, _, err := client.GetBusinessService(ruleSetID)
+	res, err := client.GetBusinessService(ruleSetID)
 
 	want := &BusinessService{
 		ID:   "1",
@@ -117,7 +117,7 @@ func TestBusinessService_Update(t *testing.T) {
 		ID:   "1",
 		Name: "foo",
 	}
-	res, _, err := client.UpdateBusinessService(input)
+	res, err := client.UpdateBusinessService(input)
 
 	want := &BusinessService{
 		ID:   "1",
