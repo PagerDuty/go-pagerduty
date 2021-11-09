@@ -4,3 +4,6 @@ pd
 vendor/
 .vscode/
 .idea/
+
+# development API key(s)
+*.key
