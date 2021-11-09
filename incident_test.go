@@ -1,6 +1,8 @@
 package pagerduty
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -145,6 +147,60 @@ func TestIncident_Manage_priority(t *testing.T) {
 						Type: "priority_reference",
 					},
 				},
+			},
+		},
+	}
+	res, err := client.ManageIncidents(from, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_Manage_title(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+
+		// test if title is present and correct
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var data map[string][]ManageIncidentsOptions
+		if err := json.Unmarshal(body, &data); err != nil {
+			t.Fatal(err)
+		}
+		if len(data["incidents"]) == 0 {
+			t.Fatalf("no incidents, expect 1")
+		}
+		if data["incidents"][0].Title != "bar" {
+			t.Fatalf("expected incidents[0].title to be \"bar\" got \"%s\"", data["incidents"][0].Title)
+		}
+		_, _ = w.Write([]byte(`{"incidents": [{"title": "bar", "id": "1"}]}`))
+	})
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+	client := defaultTestClient(server.URL, "foo")
+	from := "foo@bar.com"
+
+	input := []ManageIncidentsOptions{
+		{
+			ID:    "1",
+			Type:  "incident",
+			Title: "bar",
+		},
+	}
+
+	want := &ListIncidentsResponse{
+		APIListObject: listObj,
+		Incidents: []Incident{
+			{
+				APIObject: APIObject{
+					ID: "1",
+				},
+				Title: "bar",
 			},
 		},
 	}
