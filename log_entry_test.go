@@ -83,6 +83,20 @@ func TestChannel_MarhalUnmarshal(t *testing.T) {
 			"type": "web_trigger",
 			"summary": "My new incident",
 			"details_omitted": false
+		},
+		"service": {
+			"type": "service_reference",
+			"id": "abc123",
+			"summary": "xyz890",
+			"self": "http://test.local/api/service/abc123",
+			"html_url": "http://test.local/service/abc123"
+		},
+		"user": {
+			"type": "user_reference",
+			"id": "abc890",
+			"summary": "xyz123",
+			"self": "http://test.local/api/user/abc890",
+			"html_url": "http://test.local/user/abc890"
 		}
 	}`)
 	want := &LogEntry{
@@ -100,6 +114,20 @@ func TestChannel_MarhalUnmarshal(t *testing.T) {
 					"details_omitted": false,
 				},
 			},
+		},
+		Service: APIObject{
+			ID:      "abc123",
+			Type:    "service_reference",
+			Summary: "xyz890",
+			Self:    "http://test.local/api/service/abc123",
+			HTMLURL: "http://test.local/service/abc123",
+		},
+		User: APIObject{
+			ID:      "abc890",
+			Type:    "user_reference",
+			Summary: "xyz123",
+			Self:    "http://test.local/api/user/abc890",
+			HTMLURL: "http://test.local/user/abc890",
 		},
 	}
 

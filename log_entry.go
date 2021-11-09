@@ -41,7 +41,9 @@ type CommonLogEntryField struct {
 // LogEntry is a list of all of the events that happened to an incident.
 type LogEntry struct {
 	CommonLogEntryField
-	Incident Incident `json:"incident"`
+	Incident Incident  `json:"incident"`
+	Service  APIObject `json:"service"`
+	User     APIObject `json:"user"`
 }
 
 // ListLogEntryResponse is the response data when calling the ListLogEntry API endpoint.
