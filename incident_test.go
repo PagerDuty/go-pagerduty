@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -708,12 +709,17 @@ func TestIncident_GetAlert(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-func TestIncident_ManageAlerts(t *testing.T) {
+func TestIncident_ManageIncidentAlerts(t *testing.T) {
 	setup()
 	defer teardown()
 
+	from := "pagerduty@example.com"
+
 	mux.HandleFunc("/incidents/1/alerts/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
+		if hdr := r.Header.Get("From"); hdr != "pagerduty@example.com" {
+			t.Errorf("From header = %q, want %q", hdr, from)
+		}
 		_, _ = w.Write([]byte(`{"alerts": [{"id": "1"}]}`))
 	})
 
@@ -730,7 +736,7 @@ func TestIncident_ManageAlerts(t *testing.T) {
 			},
 		},
 	}
-	res, err := client.ManageIncidentAlerts(incidentID, input)
+	res, err := client.ManageIncidentAlerts(context.Background(), incidentID, from, input)
 
 	want := &ListAlertsResponse{
 		Alerts: []IncidentAlert{
