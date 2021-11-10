@@ -633,15 +633,12 @@ func (c *Client) GetIncidentAlertWithContext(ctx context.Context, incidentID, al
 }
 
 // ManageIncidentAlerts allows you to manage the alerts of an incident.
-//
-// Deprecated: Use ManageIncidentAlertsWithContext instead.
-func (c *Client) ManageIncidentAlerts(incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
-	return c.ManageIncidentAlertsWithContext(context.Background(), incidentID, alerts)
-}
+func (c *Client) ManageIncidentAlerts(ctx context.Context, incidentID, from string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
+	h := map[string]string{
+		"From": from,
+	}
 
-// ManageIncidentAlertsWithContext allows you to manage the alerts of an incident.
-func (c *Client) ManageIncidentAlertsWithContext(ctx context.Context, incidentID string, alerts *IncidentAlertList) (*ListAlertsResponse, error) {
-	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, nil)
+	resp, err := c.put(ctx, "/incidents/"+incidentID+"/alerts/", alerts, h)
 	if err != nil {
 		return nil, err
 	}
