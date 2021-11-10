@@ -680,3 +680,65 @@ func TestClient_Do(t *testing.T) {
 		})
 	}
 }
+
+func TestNullAPIErrorObject_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name string
+		json string
+		err  string
+		want *NullAPIErrorObject
+	}{
+		{
+			name: "error_per_api_spec",
+			json: `{"code":42,"message":"test message","errors":["first error","second error"]}`,
+			want: &NullAPIErrorObject{
+				Valid: true,
+				ErrorObject: APIErrorObject{
+					Code:    42,
+					Message: "test message",
+					Errors: []string{
+						"first error",
+						"second error",
+					},
+				},
+			},
+		},
+		{
+			name: "issue_339",
+			json: `{"code":84,"message":"other message","errors":"only error"}`,
+			want: &NullAPIErrorObject{
+				Valid: true,
+				ErrorObject: APIErrorObject{
+					Code:    84,
+					Message: "other message",
+					Errors: []string{
+						"only error",
+					},
+				},
+			},
+		},
+		{
+			name: "returns_type_errors",
+			json: `{"code":"42","message":"test message","errors":"first error"}`,
+			err:  "json: cannot unmarshal string into Go struct field APIErrorObject.code of type int",
+		},
+		{
+			name: "returns_syntax_errors",
+			json: `}`,
+			err:  "invalid character '}' looking for beginning of value",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := &NullAPIErrorObject{}
+
+			err := json.Unmarshal([]byte(tt.json), &got)
+			if !testErrCheck(t, "*NullAPIErrorObject.UnmarshalJSON()", tt.err, err) {
+				return
+			}
+
+			testEqual(t, tt.want, got)
+		})
+	}
+}
