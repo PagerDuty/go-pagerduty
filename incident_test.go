@@ -291,8 +291,8 @@ func TestIncident_Manage_esclation_level(t *testing.T) {
 
 	input := []ManageIncidentsOptions{
 		{
-			ID:   "1",
-			Type: "incident",
+			ID:              "1",
+			Type:            "incident",
 			EscalationLevel: 2,
 		},
 	}
@@ -301,7 +301,9 @@ func TestIncident_Manage_esclation_level(t *testing.T) {
 		APIListObject: listObj,
 		Incidents: []Incident{
 			{
-				Id:    "1",
+				APIObject: APIObject{
+					ID: "1",
+				},
 				Title: "foo",
 			},
 		},
