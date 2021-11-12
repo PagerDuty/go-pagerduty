@@ -30,10 +30,10 @@ type User struct {
 	AvatarURL         string             `json:"avatar_url,omitempty"`
 	Description       string             `json:"description,omitempty"`
 	InvitationSent    bool               `json:"invitation_sent,omitempty"`
-	ContactMethods    []ContactMethod    `json:"contact_methods"`
-	NotificationRules []NotificationRule `json:"notification_rules"`
+	ContactMethods    []ContactMethod    `json:"contact_methods,omitempty"`
+	NotificationRules []NotificationRule `json:"notification_rules,omitempty"`
 	JobTitle          string             `json:"job_title,omitempty"`
-	Teams             []Team
+	Teams             []Team             `json:"teams,omitempty"`
 }
 
 // ContactMethod is a way of contacting the user.
