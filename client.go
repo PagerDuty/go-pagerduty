@@ -70,6 +70,16 @@ type APIErrorObject struct {
 	Errors  []string `json:"errors,omitempty"`
 }
 
+// fallbackAPIErrorObject is a shim to solve this issue:
+// https://github.com/PagerDuty/go-pagerduty/issues/339
+//
+// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
+type fallbackAPIErrorObject struct {
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+	Errors  string `json:"errors,omitempty"`
+}
+
 // NullAPIErrorObject is a wrapper around the APIErrorObject type. If the Valid
 // field is true, the API response included a structured error JSON object. This
 // structured object is then set on the ErrorObject field.
@@ -77,7 +87,7 @@ type APIErrorObject struct {
 // While the PagerDuty REST API is documented to always return the error object,
 // we assume it's possible in exceptional failure modes for this to be omitted.
 // As such, this wrapper type provides us a way to check if the object was
-// provided while avoiding cosnumers accidentally missing a nil pointer check,
+// provided while avoiding consumer accidentally missing a nil pointer check,
 // thus crashing their whole program.
 type NullAPIErrorObject struct {
 	Valid       bool
@@ -87,8 +97,27 @@ type NullAPIErrorObject struct {
 // UnmarshalJSON satisfies encoding/json.Unmarshaler
 func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
 	var aeo APIErrorObject
-	if err := json.Unmarshal(data, &aeo); err != nil {
-		return err
+
+	err := json.Unmarshal(data, &aeo)
+	if err != nil {
+		terr, ok := err.(*json.UnmarshalTypeError)
+		if !ok {
+			return err
+		}
+
+		//
+		// see https://github.com/PagerDuty/go-pagerduty/issues/339
+		//
+		var faeo fallbackAPIErrorObject
+
+		if err := json.Unmarshal(data, &faeo); err != nil {
+			// still failed, so return the original error
+			return terr
+		}
+
+		aeo.Code = faeo.Code
+		aeo.Message = faeo.Message
+		aeo.Errors = []string{faeo.Errors}
 	}
 
 	n.ErrorObject = aeo
