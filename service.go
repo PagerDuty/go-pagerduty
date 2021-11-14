@@ -91,8 +91,8 @@ type Service struct {
 	APIObject
 	Name                    string                   `json:"name,omitempty"`
 	Description             string                   `json:"description,omitempty"`
-	AutoResolveTimeout      *uint                    `json:"auto_resolve_timeout"`
-	AcknowledgementTimeout  *uint                    `json:"acknowledgement_timeout"`
+	AutoResolveTimeout      *uint                    `json:"auto_resolve_timeout,omitempty"`
+	AcknowledgementTimeout  *uint                    `json:"acknowledgement_timeout,omitempty"`
 	CreateAt                string                   `json:"created_at,omitempty"`
 	Status                  string                   `json:"status,omitempty"`
 	LastIncidentTimestamp   string                   `json:"last_incident_timestamp,omitempty"`
@@ -100,8 +100,8 @@ type Service struct {
 	EscalationPolicy        EscalationPolicy         `json:"escalation_policy,omitempty"`
 	Teams                   []Team                   `json:"teams,omitempty"`
 	IncidentUrgencyRule     *IncidentUrgencyRule     `json:"incident_urgency_rule,omitempty"`
-	SupportHours            *SupportHours            `json:"support_hours"`
-	ScheduledActions        []ScheduledAction        `json:"scheduled_actions"`
+	SupportHours            *SupportHours            `json:"support_hours,omitempty"`
+	ScheduledActions        []ScheduledAction        `json:"scheduled_actions,omitempty"`
 	AlertCreation           string                   `json:"alert_creation,omitempty"`
 	AlertGrouping           string                   `json:"alert_grouping,omitempty"`
 	AlertGroupingTimeout    *uint                    `json:"alert_grouping_timeout,omitempty"`
