@@ -3,6 +3,7 @@ package pagerduty
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -45,13 +46,38 @@ func TestIncident_Create(t *testing.T) {
 	defer teardown()
 
 	input := &CreateIncidentOptions{
-		Type:    "incident",
 		Title:   "foo",
 		Urgency: "low",
 	}
 
 	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
+
+		body, err := ioutil.ReadAll(r.Body)
+		testErrCheck(t, "ioutil.ReadAll", "", err)
+
+		fmt.Println(string(body))
+
+		got := make(map[string]CreateIncidentOptions)
+		testErrCheck(t, "json.Unmarshal()", "", json.Unmarshal(body, &got))
+
+		o, ok := got["incident"]
+		if !ok {
+			t.Fatal("map does not have an incident key")
+		}
+
+		if o.Type != "incident" {
+			t.Errorf("o.Type = %q, want %q", o.Type, "incident")
+		}
+
+		if o.Title != "foo" {
+			t.Errorf("o.Foo = %q, want %q", o.Title, "foo")
+		}
+
+		if o.Urgency != "low" {
+			t.Errorf("o.Urgency = %q, want %q", o.Urgency, "low")
+		}
+
 		_, _ = w.Write([]byte(`{"incident": {"title": "foo", "id": "1", "urgency": "low"}}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
@@ -76,18 +102,56 @@ func TestIncident_Manage_status(t *testing.T) {
 	setup()
 	defer teardown()
 
+	wantFrom := "foo@bar.com"
+
 	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
+
+		if gotFrom := r.Header.Get("From"); gotFrom != wantFrom {
+			t.Errorf("From HTTP header = %q, want %q", gotFrom, wantFrom)
+		}
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var data map[string][]ManageIncidentsOptions
+		testErrCheck(t, "json.Unmarshal()", "", json.Unmarshal(body, &data))
+
+		if len(data["incidents"]) == 0 {
+			t.Fatalf("no incidents, expect 1")
+		}
+
+		const (
+			wantType   = "incident"
+			wantID     = "1"
+			wantStatus = "acknowledged"
+		)
+
+		inc := data["incidents"][0]
+
+		if inc.Type != wantType {
+			t.Errorf("inc.Type = %q, want %q", inc.Type, wantType)
+		}
+
+		if inc.ID != wantID {
+			t.Errorf("inc.ID = %q, want %q", inc.ID, wantID)
+		}
+
+		if inc.Status != wantStatus {
+			t.Errorf("inc.Status = %q, want %q", inc.Status, wantStatus)
+		}
+
 		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1", "status": "acknowledged"}]}`))
 	})
+
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
-	from := "foo@bar.com"
 
 	input := []ManageIncidentsOptions{
 		{
 			ID:     "1",
-			Type:   "incident",
 			Status: "acknowledged",
 		},
 	}
@@ -104,7 +168,7 @@ func TestIncident_Manage_status(t *testing.T) {
 			},
 		},
 	}
-	res, err := client.ManageIncidents(from, input)
+	res, err := client.ManageIncidents(wantFrom, input)
 	if err != nil {
 		t.Fatal(err)
 	}

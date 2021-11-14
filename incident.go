@@ -159,6 +159,12 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
+	// Type is the type of API object this is.
+	//
+	// Deprecated: Because the Type field can only have the value of "incident"
+	// when creating an incident, the CreateIncident* methods always set this
+	// value to "incident". Any other value will be overwritten. This will be
+	// removed in v2.0.0.
 	Type             string            `json:"type"`
 	Title            string            `json:"title"`
 	Service          *APIReference     `json:"service"`
@@ -173,7 +179,15 @@ type CreateIncidentOptions struct {
 
 // ManageIncidentsOptions is the structure used when PUTing updates to incidents to the ManageIncidents func
 type ManageIncidentsOptions struct {
-	ID               string            `json:"id"`
+	ID string `json:"id"`
+
+	// Type is the type of API object this is.
+	//
+	// Deprecated: Because the Type field can only have the value of "incident"
+	// or "incident_reference" when managing an incident, the CreateIncident*
+	// methods always set this value to "incident" because this struct is not an
+	// incident_reference. Any other value will be overwritten. This will be
+	// removed in v2.0.0.
 	Type             string            `json:"type"`
 	Status           string            `json:"status,omitempty"`
 	Title            string            `json:"title,omitempty"`
@@ -206,6 +220,9 @@ func (c *Client) CreateIncidentWithContext(ctx context.Context, from string, o *
 		"From": from,
 	}
 
+	// see: https://github.com/PagerDuty/go-pagerduty/issues/390
+	o.Type = "incident"
+
 	d := map[string]*CreateIncidentOptions{
 		"incident": o,
 	}
@@ -234,6 +251,11 @@ func (c *Client) ManageIncidents(from string, incidents []ManageIncidentsOptions
 // ManageIncidentsWithContext acknowledges, resolves, escalates, or reassigns
 // one or more incidents.
 func (c *Client) ManageIncidentsWithContext(ctx context.Context, from string, incidents []ManageIncidentsOptions) (*ListIncidentsResponse, error) {
+	// see: https://github.com/PagerDuty/go-pagerduty/issues/390
+	for i := range incidents {
+		incidents[i].Type = "incident"
+	}
+
 	d := map[string][]ManageIncidentsOptions{
 		"incidents": incidents,
 	}
