@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.4.3](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.3) (2021-11-13)
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/6)
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.1...v1.4.3)
+
+**Highlights**
+- Mitigate PagerDuty REST API bug that would result in a JSON parsing failure when reading an error response from the API. Prior to `v1.4.0` our error parsing logic was not impacted by the bug.
+
+**Merged pull requests**
+- Handle unexpected type changes in PagerDuty REST API error responses [\#382](https://github.com/PagerDuty/go-pagerduty/pull/382) [backported via [\#386](https://github.com/PagerDuty/go-pagerduty/pull/386)] ([theckman](https://github.com/theckman))
+
+**Closed issues**
+- APIError unmarshaling broken in 1.4 [\#339](https://github.com/PagerDuty/go-pagerduty/pull/339) ([dsymonds](https://github.com/dsymonds))
+
 ## [v1.4.2](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.2) (2021-08-30)
 
 [Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/5)  
