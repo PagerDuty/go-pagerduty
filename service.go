@@ -8,17 +8,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// Integration is an endpoint (like Nagios, email, or an API call) that generates events, which are normalized and de-duplicated by PagerDuty to create incidents.
-type Integration struct {
-	APIObject
-	Name             string     `json:"name,omitempty"`
-	Service          *APIObject `json:"service,omitempty"`
-	CreatedAt        string     `json:"created_at,omitempty"`
-	Vendor           *APIObject `json:"vendor,omitempty"`
-	IntegrationKey   string     `json:"integration_key,omitempty"`
-	IntegrationEmail string     `json:"integration_email,omitempty"`
-}
-
 // InlineModel represents when a scheduled action will occur.
 type InlineModel struct {
 	Type string `json:"type,omitempty"`
@@ -262,72 +251,6 @@ func (c *Client) DeleteService(id string) error {
 // DeleteServiceWithContext deletes an existing service.
 func (c *Client) DeleteServiceWithContext(ctx context.Context, id string) error {
 	_, err := c.delete(ctx, "/services/"+id)
-	return err
-}
-
-// CreateIntegration creates a new integration belonging to a service.
-//
-// Deprecated: Use CreateIntegrationWithContext instead.
-func (c *Client) CreateIntegration(id string, i Integration) (*Integration, error) {
-	return c.CreateIntegrationWithContext(context.Background(), id, i)
-}
-
-// CreateIntegrationWithContext creates a new integration belonging to a service.
-func (c *Client) CreateIntegrationWithContext(ctx context.Context, id string, i Integration) (*Integration, error) {
-	d := map[string]Integration{
-		"integration": i,
-	}
-
-	resp, err := c.post(ctx, "/services/"+id+"/integrations", d, nil)
-	return getIntegrationFromResponse(c, resp, err)
-}
-
-// GetIntegrationOptions is the data structure used when calling the GetIntegration API endpoint.
-type GetIntegrationOptions struct {
-	Includes []string `url:"include,omitempty,brackets"`
-}
-
-// GetIntegration gets details about an integration belonging to a service.
-//
-// Deprecated: Use GetIntegrationWithContext instead.
-func (c *Client) GetIntegration(serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
-	return c.GetIntegrationWithContext(context.Background(), serviceID, integrationID, o)
-}
-
-// GetIntegrationWithContext gets details about an integration belonging to a service.
-func (c *Client) GetIntegrationWithContext(ctx context.Context, serviceID, integrationID string, o GetIntegrationOptions) (*Integration, error) {
-	v, err := query.Values(o)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
-	return getIntegrationFromResponse(c, resp, err)
-}
-
-// UpdateIntegration updates an integration belonging to a service.
-//
-// Deprecated: Use UpdateIntegrationWithContext instead.
-func (c *Client) UpdateIntegration(serviceID string, i Integration) (*Integration, error) {
-	return c.UpdateIntegrationWithContext(context.Background(), serviceID, i)
-}
-
-// UpdateIntegrationWithContext updates an integration belonging to a service.
-func (c *Client) UpdateIntegrationWithContext(ctx context.Context, serviceID string, i Integration) (*Integration, error) {
-	resp, err := c.put(ctx, "/services/"+serviceID+"/integrations/"+i.ID, i, nil)
-	return getIntegrationFromResponse(c, resp, err)
-}
-
-// DeleteIntegration deletes an existing integration.
-//
-// Deprecated: Use DeleteIntegrationWithContext instead.
-func (c *Client) DeleteIntegration(serviceID string, integrationID string) error {
-	return c.DeleteIntegrationWithContext(context.Background(), serviceID, integrationID)
-}
-
-// DeleteIntegrationWithContext deletes an existing integration.
-func (c *Client) DeleteIntegrationWithContext(ctx context.Context, serviceID string, integrationID string) error {
-	_, err := c.delete(ctx, "/services/"+serviceID+"/integrations/"+integrationID)
 	return err
 }
 
