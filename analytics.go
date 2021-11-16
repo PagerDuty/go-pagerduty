@@ -2,7 +2,10 @@ package pagerduty
 
 import (
 	"context"
+	"fmt"
 )
+
+const baseURL = "/analytics/metrics/incidents"
 
 // AnalyticsRequest represents the request to be sent to PagerDuty when you want
 // aggregated analytics.
@@ -60,48 +63,26 @@ type AnalyticsData struct {
 
 // GetAggregatedIncidentData gets the aggregated incident analytics for the requested data.
 func (c *Client) GetAggregatedIncidentData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
-	h := map[string]string{
-		"X-EARLY-ACCESS": "analytics-v2",
-	}
-	resp, err := c.post(ctx, "/analytics/metrics/incidents/all", analytics, h)
-	if err != nil {
-		return AnalyticsResponse{}, err
-	}
-
-	var analyticsResponse AnalyticsResponse
-	if err = c.decodeJSON(resp, &analyticsResponse); err != nil {
-		return AnalyticsResponse{}, err
-	}
-
-	return analyticsResponse, nil
+	return c.getAggregatedData(ctx, analytics, "all")
 }
 
 // GetAggregatedServiceData gets the aggregated service analytics for the requested data.
 func (c *Client) GetAggregatedServiceData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
-	h := map[string]string{
-		"X-EARLY-ACCESS": "analytics-v2",
-	}
-
-	resp, err := c.post(ctx, "/analytics/metrics/incidents/services", analytics, h)
-	if err != nil {
-		return AnalyticsResponse{}, err
-	}
-
-	var analyticsResponse AnalyticsResponse
-	if err = c.decodeJSON(resp, &analyticsResponse); err != nil {
-		return AnalyticsResponse{}, err
-	}
-
-	return analyticsResponse, nil
+	return c.getAggregatedData(ctx, analytics, "services")
 }
 
 // GetAggregatedTeamData gets the aggregated team analytics for the requested data.
 func (c *Client) GetAggregatedTeamData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
+	return c.getAggregatedData(ctx, analytics, "teams")
+}
+
+func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsRequest, endpoint string) (AnalyticsResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "analytics-v2",
 	}
 
-	resp, err := c.post(ctx, "/analytics/metrics/incidents/teams", analytics, h)
+	URL := fmt.Sprintf("%s/%s", baseURL, endpoint)
+	resp, err := c.post(ctx, URL, analytics, h)
 	if err != nil {
 		return AnalyticsResponse{}, err
 	}
