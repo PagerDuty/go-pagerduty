@@ -15,23 +15,23 @@ const changeEventPath = "/v2/change/enqueue"
 type ChangeEvent struct {
 	RoutingKey string             `json:"routing_key"`
 	Payload    ChangeEventPayload `json:"payload"`
-	Links      []ChangeEventLink  `json:"links"`
+	Links      []ChangeEventLink  `json:"links,omitempty"`
 }
 
 // ChangeEventPayload ChangeEvent ChangeEventPayload
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#example-request-payload
 type ChangeEventPayload struct {
-	Source        string                 `json:"source"`
 	Summary       string                 `json:"summary"`
-	Timestamp     string                 `json:"timestamp"`
-	CustomDetails map[string]interface{} `json:"custom_details"`
+	Source        string                 `json:"source,omitempty"`
+	Timestamp     string                 `json:"timestamp,omitempty"`
+	CustomDetails map[string]interface{} `json:"custom_details,omitempty"`
 }
 
 // ChangeEventLink represents a single link in a ChangeEvent
 // https://developer.pagerduty.com/docs/events-api-v2/send-change-events/#the-links-property
 type ChangeEventLink struct {
 	Href string `json:"href"`
-	Text string `json:"text"`
+	Text string `json:"text,omitempty"`
 }
 
 // ChangeEventResponse is the json response body for an event

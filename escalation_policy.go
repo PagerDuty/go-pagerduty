@@ -28,7 +28,6 @@ type EscalationPolicy struct {
 	NumLoops        uint             `json:"num_loops,omitempty"`
 	Teams           []APIReference   `json:"teams"`
 	Description     string           `json:"description,omitempty"`
-	RepeatEnabled   bool             `json:"repeat_enabled,omitempty"`
 }
 
 // ListEscalationPoliciesResponse is the data structure returned from calling the ListEscalationPolicies API endpoint.

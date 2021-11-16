@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	expectedChangeCreatePayload = `{"routing_key":"a0000000aa0000a0a000aa0a0a0aa000","payload":{"source":"Test runner",` +
-		`"summary":"Summary can't be blank","timestamp":"2020-10-19T03:06:16.318Z",` +
+	expectedChangeCreatePayload = `{"routing_key":"a0000000aa0000a0a000aa0a0a0aa000","payload":{"summary":"Summary can't be blank",` +
+		`"source":"Test runner","timestamp":"2020-10-19T03:06:16.318Z",` +
 		`"custom_details":{"DetailKey1":"DetailValue1","DetailKey2":"DetailValue2"}},` +
 		`"links":[{"href":"https://acme.pagerduty.dev/build/2","text":"View more details in Acme!"},` +
 		`{"href":"https://acme2.pagerduty.dev/build/2","text":"View more details in Acme2!"}]}`
