@@ -277,6 +277,90 @@ func TestIncident_Manage_assignments(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+func TestIncident_Manage_conference_bridge(t *testing.T) {
+	setup()
+	defer teardown()
+
+	wantFrom := "foo@bar.com"
+
+	mux.HandleFunc("/incidents", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+
+		if gotFrom := r.Header.Get("From"); gotFrom != wantFrom {
+			t.Errorf("From HTTP header = %q, want %q", gotFrom, wantFrom)
+		}
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var data map[string][]ManageIncidentsOptions
+		testErrCheck(t, "json.Unmarshal()", "", json.Unmarshal(body, &data))
+
+		if len(data["incidents"]) == 0 {
+			t.Fatalf("no incidents, expect 1")
+		}
+
+		const (
+			wantNum = "42"
+			wantURL = "http://example.org/bridge"
+		)
+
+		inc := data["incidents"][0]
+
+		if inc.ConferenceBridge == nil {
+			t.Fatalf("inc.ConferenceBridge = <nil>")
+		}
+
+		if got := inc.ConferenceBridge.ConferenceNumber; got != wantNum {
+			t.Fatalf("inc.ConferenceBridge.ConferenceNumber = %q, want %q", got, wantNum)
+		}
+
+		if got := inc.ConferenceBridge.ConferenceURL; got != wantURL {
+			t.Fatalf("inc.ConferenceBridge.ConferenceNumber = %q, want %q", got, wantURL)
+		}
+
+		_, _ = w.Write([]byte(`{"incidents": [{"title": "foo", "id": "1","conference_bridge":{"conference_number":"42","conference_url":"http://example.org/bridge"}}]}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	input := []ManageIncidentsOptions{
+		{
+			ID:   "1",
+			Type: "incident",
+			ConferenceBridge: &ConferenceBridge{
+				ConferenceNumber: "42",
+				ConferenceURL:    "http://example.org/bridge",
+			},
+		},
+	}
+
+	want := &ListIncidentsResponse{
+		APIListObject: APIListObject{Limit: 0, Offset: 0, More: false, Total: 0},
+		Incidents: []Incident{
+			{
+				APIObject: APIObject{
+					ID: "1",
+				},
+				Title: "foo",
+				ConferenceBridge: &ConferenceBridge{
+					ConferenceNumber: "42",
+					ConferenceURL:    "http://example.org/bridge",
+				},
+			},
+		},
+	}
+
+	got, err := client.ManageIncidents(wantFrom, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testEqual(t, want, got)
+}
+
 func TestIncident_Manage_esclation_level(t *testing.T) {
 	setup()
 	defer teardown()

@@ -114,8 +114,15 @@ type ListIncidentsOptions struct {
 
 // ConferenceBridge is a struct for the conference_bridge object on an incident
 type ConferenceBridge struct {
+	// ConferenceNumber is the phone number of the conference call for the
+	// conference bridge. Phone numbers should be formatted like
+	// +1 415-555-1212,,,,1234#, where a comma (,) represents a one-second
+	// wait and pound (#) completes access code input.
 	ConferenceNumber string `json:"conference_number,omitempty"`
-	ConferenceURL    string `json:"conference_url,omitempty"`
+
+	// ConferenceURL is the URL for the conference bridge. This could be a link
+	// to a video conference or Slack channel.
+	ConferenceURL string `json:"conference_url,omitempty"`
 }
 
 // ListIncidents lists existing incidents.
@@ -152,28 +159,30 @@ type createIncidentResponse struct {
 
 // CreateIncidentOptions is the structure used when POSTing to the CreateIncident API endpoint.
 type CreateIncidentOptions struct {
-	Type             string        `json:"type"`
-	Title            string        `json:"title"`
-	Service          *APIReference `json:"service"`
-	Priority         *APIReference `json:"priority"`
-	Urgency          string        `json:"urgency,omitempty"`
-	IncidentKey      string        `json:"incident_key,omitempty"`
-	Body             *APIDetails   `json:"body,omitempty"`
-	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
-	Assignments      []Assignee    `json:"assignments,omitempty"`
+	Type             string            `json:"type"`
+	Title            string            `json:"title"`
+	Service          *APIReference     `json:"service"`
+	Priority         *APIReference     `json:"priority"`
+	Urgency          string            `json:"urgency,omitempty"`
+	IncidentKey      string            `json:"incident_key,omitempty"`
+	Body             *APIDetails       `json:"body,omitempty"`
+	EscalationPolicy *APIReference     `json:"escalation_policy,omitempty"`
+	Assignments      []Assignee        `json:"assignments,omitempty"`
+	ConferenceBridge *ConferenceBridge `json:"conference_bridge,omitempty"`
 }
 
 // ManageIncidentsOptions is the structure used when PUTing updates to incidents to the ManageIncidents func
 type ManageIncidentsOptions struct {
-	ID               string        `json:"id"`
-	Type             string        `json:"type"`
-	Status           string        `json:"status,omitempty"`
-	Title            string        `json:"title,omitempty"`
-	Priority         *APIReference `json:"priority,omitempty"`
-	Assignments      []Assignee    `json:"assignments,omitempty"`
-	EscalationLevel  uint          `json:"escalation_level,omitempty"`
-	EscalationPolicy *APIReference `json:"escalation_policy,omitempty"`
-	Resolution       string        `json:"resolution,omitempty"`
+	ID               string            `json:"id"`
+	Type             string            `json:"type"`
+	Status           string            `json:"status,omitempty"`
+	Title            string            `json:"title,omitempty"`
+	Priority         *APIReference     `json:"priority,omitempty"`
+	Assignments      []Assignee        `json:"assignments,omitempty"`
+	EscalationLevel  uint              `json:"escalation_level,omitempty"`
+	EscalationPolicy *APIReference     `json:"escalation_policy,omitempty"`
+	Resolution       string            `json:"resolution,omitempty"`
+	ConferenceBridge *ConferenceBridge `json:"conference_bridge,omitempty"`
 }
 
 // MergeIncidentsOptions is the structure used when merging incidents with MergeIncidents func
