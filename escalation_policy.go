@@ -22,12 +22,13 @@ type EscalationRule struct {
 // EscalationPolicy is a collection of escalation rules.
 type EscalationPolicy struct {
 	APIObject
-	Name            string           `json:"name,omitempty"`
-	EscalationRules []EscalationRule `json:"escalation_rules,omitempty"`
-	Services        []APIObject      `json:"services,omitempty"`
-	NumLoops        uint             `json:"num_loops,omitempty"`
-	Teams           []APIReference   `json:"teams"`
-	Description     string           `json:"description,omitempty"`
+	Name                       string           `json:"name,omitempty"`
+	EscalationRules            []EscalationRule `json:"escalation_rules,omitempty"`
+	Services                   []APIObject      `json:"services,omitempty"`
+	NumLoops                   uint             `json:"num_loops,omitempty"`
+	Teams                      []APIReference   `json:"teams"`
+	Description                string           `json:"description,omitempty"`
+	OnCallHandoffNotifications string           `json:"on_call_handoff_notifications,omitempty"`
 }
 
 // ListEscalationPoliciesResponse is the data structure returned from calling the ListEscalationPolicies API endpoint.
