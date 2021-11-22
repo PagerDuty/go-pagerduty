@@ -113,6 +113,12 @@ func (c *Client) UpdateExtensionWithContext(ctx context.Context, id string, e *E
 	return getExtensionFromResponse(c, resp, err)
 }
 
+// EnableExtension enables a temporarily disabled extension by its ID.
+func (c *Client) EnableExtension(ctx context.Context, id string) (*Extension, error) {
+	resp, err := c.post(ctx, "/extensions/"+id+"/enable", nil, nil)
+	return getExtensionFromResponse(c, resp, err)
+}
+
 func getExtensionFromResponse(c *Client, resp *http.Response, err error) (*Extension, error) {
 	if err != nil {
 		return nil, err

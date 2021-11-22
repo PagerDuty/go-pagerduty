@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -220,4 +221,30 @@ func testGotExpectedURL(t *testing.T, expected string, got map[string]interface{
 	if got["endpoint_url"] != expected {
 		t.Errorf(`Expected url: "%v", got: "%v"`, "expected_url", got["endpoint_url"])
 	}
+}
+
+func TestExtension_Enable(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/extensions/1/enable", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"extension": {"name": "foo", "id": "1"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.EnableExtension(context.Background(), "1")
+
+	want := &Extension{
+		Name: "foo",
+		APIObject: APIObject{
+			ID: "1",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
