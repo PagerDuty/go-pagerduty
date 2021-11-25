@@ -21,12 +21,13 @@ func TestService_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListServiceOptions{
-		APIListObject: listObj,
-		TeamIDs:       []string{},
-		TimeZone:      "foo",
-		SortBy:        "bar",
-		Query:         "baz",
-		Includes:      []string{},
+		Limit:    listObj.Limit,
+		Offset:   listObj.Offset,
+		TeamIDs:  []string{},
+		TimeZone: "foo",
+		SortBy:   "bar",
+		Query:    "baz",
+		Includes: []string{},
 	}
 	res, err := client.ListServices(opts)
 
@@ -73,12 +74,13 @@ func TestService_ListPaginated(t *testing.T) {
 	listObj := APIListObject{Limit: 1, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListServiceOptions{
-		APIListObject: listObj,
-		TeamIDs:       []string{},
-		TimeZone:      "foo",
-		SortBy:        "bar",
-		Query:         "baz",
-		Includes:      []string{},
+		Limit:    listObj.Limit,
+		Offset:   listObj.Offset,
+		TeamIDs:  []string{},
+		TimeZone: "foo",
+		SortBy:   "bar",
+		Query:    "baz",
+		Includes: []string{},
 	}
 	res, err := client.ListServicesPaginated(context.Background(), opts)
 

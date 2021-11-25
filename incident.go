@@ -97,7 +97,25 @@ type ListIncidentsResponse struct {
 
 // ListIncidentsOptions is the structure used when passing parameters to the ListIncident API endpoint.
 type ListIncidentsOptions struct {
-	APIListObject
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
+
 	Since       string   `url:"since,omitempty"`
 	Until       string   `url:"until,omitempty"`
 	DateRange   string   `url:"date_range,omitempty"`
@@ -406,7 +424,25 @@ type ListAlertsResponse struct {
 
 // ListIncidentAlertsOptions is the structure used when passing parameters to the ListIncidentAlerts API endpoint.
 type ListIncidentAlertsOptions struct {
-	APIListObject
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
+
 	Statuses []string `url:"statuses,omitempty,brackets"`
 	SortBy   string   `url:"sort_by,omitempty"`
 	Includes []string `url:"include,omitempty,brackets"`
@@ -534,7 +570,25 @@ type ListIncidentLogEntriesResponse struct {
 
 // ListIncidentLogEntriesOptions is the structure used when passing parameters to the ListIncidentLogEntries API endpoint.
 type ListIncidentLogEntriesOptions struct {
-	APIListObject
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
+
 	Includes   []string `url:"include,omitempty,brackets"`
 	IsOverview bool     `url:"is_overview,omitempty"`
 	TimeZone   string   `url:"time_zone,omitempty"`

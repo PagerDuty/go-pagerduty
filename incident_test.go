@@ -583,8 +583,9 @@ func TestIncident_ListIncidentAlertsWithOpts(t *testing.T) {
 	id := "1"
 
 	alertOpts := ListIncidentAlertsOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
+		Limit:    listObj.Limit,
+		Offset:   listObj.Offset,
+		Includes: []string{},
 	}
 
 	res, err := client.ListIncidentAlertsWithOpts(id, alertOpts)
@@ -721,10 +722,11 @@ func TestIncident_ListLogEntries(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	entriesOpts := ListIncidentLogEntriesOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
-		IsOverview:    true,
-		TimeZone:      "UTC",
+		Limit:      listObj.Limit,
+		Offset:     listObj.Offset,
+		Includes:   []string{},
+		IsOverview: true,
+		TimeZone:   "UTC",
 	}
 	res, err := client.ListIncidentLogEntries(id, entriesOpts)
 
@@ -761,12 +763,13 @@ func TestIncident_ListLogEntriesSinceUntil(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	id := "1"
 	entriesOpts := ListIncidentLogEntriesOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
-		IsOverview:    true,
-		TimeZone:      "UTC",
-		Since:         "2020-03-27T22:40:00-0700",
-		Until:         "2020-03-28T22:50:00-0700",
+		Limit:      listObj.Limit,
+		Offset:     listObj.Offset,
+		Includes:   []string{},
+		IsOverview: true,
+		TimeZone:   "UTC",
+		Since:      "2020-03-27T22:40:00-0700",
+		Until:      "2020-03-28T22:50:00-0700",
 	}
 	res, err := client.ListIncidentLogEntries(id, entriesOpts)
 

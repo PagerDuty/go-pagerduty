@@ -18,10 +18,11 @@ func TestLogEntry_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	entriesOpts := ListLogEntriesOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
-		IsOverview:    true,
-		TimeZone:      "UTC",
+		Limit:      listObj.Limit,
+		Offset:     listObj.Offset,
+		Includes:   []string{},
+		IsOverview: true,
+		TimeZone:   "UTC",
 	}
 	res, err := client.ListLogEntries(entriesOpts)
 

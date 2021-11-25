@@ -18,8 +18,9 @@ func TestSchedule_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListSchedulesOptions{
-		APIListObject: listObj,
-		Query:         "foo",
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
+		Query:  "foo",
 	}
 	res, err := client.ListSchedules(opts)
 
@@ -103,14 +104,12 @@ func TestSchedule_Get(t *testing.T) {
 	})
 
 	client := defaultTestClient(server.URL, "foo")
-	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 
 	input := "1"
 	opts := GetScheduleOptions{
-		APIListObject: listObj,
-		TimeZone:      "UTC",
-		Since:         "foo",
-		Until:         "bar",
+		TimeZone: "UTC",
+		Since:    "foo",
+		Until:    "bar",
 	}
 	res, err := client.GetSchedule(input, opts)
 
@@ -171,21 +170,18 @@ func TestSchedule_ListOverrides(t *testing.T) {
 		_, _ = w.Write([]byte(`{"overrides": [{"id": "1"}]}`))
 	})
 
-	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListOverridesOptions{
-		APIListObject: listObj,
-		Since:         "foo",
-		Until:         "bar",
-		Editable:      false,
-		Overflow:      false,
+		Since:    "foo",
+		Until:    "bar",
+		Editable: false,
+		Overflow: false,
 	}
 	schedID := "1"
 
 	res, err := client.ListOverrides(schedID, opts)
 
 	want := &ListOverridesResponse{
-		APIListObject: listObj,
 		Overrides: []Override{
 			{
 				ID: "1",
@@ -258,12 +254,10 @@ func TestSchedule_ListOnCallUsers(t *testing.T) {
 		_, _ = w.Write([]byte(`{"users": [{"id": "1"}]}`))
 	})
 
-	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListOnCallUsersOptions{
-		APIListObject: listObj,
-		Since:         "foo",
-		Until:         "bar",
+		Since: "foo",
+		Until: "bar",
 	}
 	schedID := "1"
 

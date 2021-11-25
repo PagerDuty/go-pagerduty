@@ -18,8 +18,8 @@ func TestVendor_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListVendorOptions{
-		APIListObject: listObj,
-		Query:         "foo",
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
 	}
 	res, err := client.ListVendors(opts)
 

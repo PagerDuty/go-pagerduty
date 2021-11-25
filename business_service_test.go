@@ -20,13 +20,18 @@ func TestBusinessService_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListBusinessServiceOptions{
-		APIListObject: listObj,
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
 	}
 	res, err := client.ListBusinessServices(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := &ListBusinessServicesResponse{
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
+		More:   listObj.More,
+		Total:  listObj.Total,
 		BusinessServices: []*BusinessService{
 			{
 				ID: "1",

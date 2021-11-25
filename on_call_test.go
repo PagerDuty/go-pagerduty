@@ -18,7 +18,8 @@ func TestOnCall_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListOnCallOptions{
-		APIListObject:       listObj,
+		Limit:               listObj.Limit,
+		Offset:              listObj.Offset,
 		TimeZone:            "UTC",
 		Includes:            []string{},
 		UserIDs:             []string{},

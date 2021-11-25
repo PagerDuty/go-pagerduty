@@ -53,7 +53,25 @@ type Schedule struct {
 
 // ListSchedulesOptions is the data structure used when calling the ListSchedules API endpoint.
 type ListSchedulesOptions struct {
-	APIListObject
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
+
 	Query string `url:"query,omitempty"`
 }
 
@@ -114,7 +132,6 @@ func (c *Client) CreateScheduleWithContext(ctx context.Context, s Schedule) (*Sc
 
 // PreviewScheduleOptions is the data structure used when calling the PreviewSchedule API endpoint.
 type PreviewScheduleOptions struct {
-	APIListObject
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
 	Overflow bool   `url:"overflow,omitempty"`
@@ -159,7 +176,6 @@ func (c *Client) DeleteScheduleWithContext(ctx context.Context, id string) error
 
 // GetScheduleOptions is the data structure used when calling the GetSchedule API endpoint.
 type GetScheduleOptions struct {
-	APIListObject
 	TimeZone string `url:"time_zone,omitempty"`
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
@@ -209,7 +225,6 @@ func (c *Client) UpdateScheduleWithContext(ctx context.Context, id string, s Sch
 
 // ListOverridesOptions is the data structure used when calling the ListOverrides API endpoint.
 type ListOverridesOptions struct {
-	APIListObject
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
 	Editable bool   `url:"editable,omitempty"`
@@ -218,7 +233,6 @@ type ListOverridesOptions struct {
 
 // ListOverridesResponse is the data structure returned from calling the ListOverrides API endpoint.
 type ListOverridesResponse struct {
-	APIListObject
 	Overrides []Override `json:"overrides,omitempty"`
 }
 
@@ -295,7 +309,6 @@ func (c *Client) DeleteOverrideWithContext(ctx context.Context, scheduleID, over
 
 // ListOnCallUsersOptions is the data structure used when calling the ListOnCallUsers API endpoint.
 type ListOnCallUsersOptions struct {
-	APIListObject
 	Since string `url:"since,omitempty"`
 	Until string `url:"until,omitempty"`
 }

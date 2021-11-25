@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -18,9 +19,9 @@ func TestPriorities_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 
-	res, err := client.ListPriorities()
+	res, err := client.ListPrioritiesWithContext(context.Background(), ListPrioritiesOptions{})
 
-	want := &Priorities{
+	want := &ListPrioritiesResponse{
 		APIListObject: listObj,
 		Priorities: []PriorityProperty{
 			{
