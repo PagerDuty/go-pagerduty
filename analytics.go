@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const baseURL = "/analytics/metrics/incidents"
+const analyticsBaseURL = "/analytics/metrics/incidents"
 
 // AnalyticsRequest represents the request to be sent to PagerDuty when you want
 // aggregated analytics.
@@ -81,8 +81,8 @@ func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsReque
 		"X-EARLY-ACCESS": "analytics-v2",
 	}
 
-	URL := fmt.Sprintf("%s/%s", baseURL, endpoint)
-	resp, err := c.post(ctx, URL, analytics, h)
+	u := fmt.Sprintf("%s/%s", analyticsBaseURL, endpoint)
+	resp, err := c.post(ctx, u, analytics, h)
 	if err != nil {
 		return AnalyticsResponse{}, err
 	}
