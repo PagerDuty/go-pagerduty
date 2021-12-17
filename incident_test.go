@@ -939,3 +939,55 @@ func TestIncident_ManageIncidentAlerts(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+// CreateIncidentStatusUpdate
+func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	wantId := "1"
+	wantFrom := "foo@bar.com"
+	wantMessage := "foo"
+
+	mux.HandleFunc("/incidents/1/status_updates", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+
+		if gotFrom := r.Header.Get("From"); gotFrom != wantFrom {
+			t.Errorf("From HTTP header = %q, want %q", gotFrom, wantFrom)
+		}
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var data map[string]string
+		if err := json.Unmarshal(body, &data); err != nil {
+			t.Fatal(err)
+		}
+		o, ok := data["message"]
+		if !ok {
+			t.Fatal("map does not have message key")
+		}
+		if o != wantMessage {
+			t.Errorf("message = %q, want %q", o, wantMessage)
+		}
+
+		_, _ = w.Write([]byte(`{"status_update": {"id": "1", "message": "foo", "sender": {"summary": "foo@bar.com", "type": "user_reference"}}}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	res, err := client.CreateIncidentStatusUpdate(context.Background(), wantId, wantFrom, wantMessage)
+	want := IncidentStatusUpdate{
+		ID:      wantId,
+		Message: wantMessage,
+		Sender: APIObject{
+			Summary: wantFrom,
+			Type: "user_reference",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}

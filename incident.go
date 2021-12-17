@@ -682,4 +682,35 @@ func (c *Client) ManageIncidentAlerts(ctx context.Context, incidentID, from stri
 	return &result, nil
 }
 
-/* TODO: Create Status Updates */
+// IncidentStatusUpdate is a status update for the specified incident.
+type IncidentStatusUpdate struct {
+	ID        string	`json:"id"`
+	Message   string	`json:"message"`
+	CreatedAt string	`json:"created_at"`
+	Sender    APIObject	`json:"sender"`
+}
+
+// CreateIncidentStatusUpdate creates a new status update for the specified incident.
+func (c *Client) CreateIncidentStatusUpdate(ctx context.Context, id string, from string, message string) (IncidentStatusUpdate, error) {
+	d := map[string]string{
+		"message": message,
+	}
+
+	h := map[string]string{
+		"From": from,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/status_updates", d, h)
+	if err != nil {
+		return IncidentStatusUpdate{}, err
+	}
+
+	var result struct {
+		IncidentStatusUpdate IncidentStatusUpdate `json:"status_update"`
+	}
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return IncidentStatusUpdate{}, err
+	}
+
+	return result.IncidentStatusUpdate, nil
+}
