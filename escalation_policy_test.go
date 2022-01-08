@@ -158,3 +158,28 @@ func TestEscalationPolicy_UpdateTeams(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestEscalationPolicy_GetOnCallHandoffNotifications(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/escalation_policies/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"escalation_policy": {"id": "1", "on_call_handoff_notifications": "if_has_services"}}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	var opts *GetEscalationPolicyOptions
+	res, err := client.GetEscalationPolicy("1", opts)
+
+	want := &EscalationPolicy{
+		APIObject: APIObject{
+			ID: "1",
+		},
+		OnCallHandoffNotifications: "if_has_services",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
