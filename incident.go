@@ -56,6 +56,15 @@ type Assignee struct {
 	Assignee APIObject `json:"assignee"`
 }
 
+// Occurrence
+type Occurrence struct {
+	Count     uint   `json:"count,omitempty"`
+	Frequency uint   `json:"frequency,omitempty"`
+	Category  string `json:"category,omitempty"`
+	Since     string `json:"since,omitempty"`
+	Until     string `json:"until,omitempty"`
+}
+
 // FirstTriggerLogEntry is the first LogEntry
 type FirstTriggerLogEntry struct {
 	CommonLogEntryField
@@ -87,6 +96,8 @@ type Incident struct {
 	Body                 IncidentBody         `json:"body,omitempty"`
 	IsMergeable          bool                 `json:"is_mergeable,omitempty"`
 	ConferenceBridge     *ConferenceBridge    `json:"conference_bridge,omitempty"`
+	AssignedVia          string               `json:"assigned_via,omitempty"`
+	Occurrence           *Occurrence          `json:"occurrence,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
