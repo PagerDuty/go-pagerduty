@@ -21,8 +21,9 @@ func TestTeam_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListTeamOptions{
-		APIListObject: listObj,
-		Query:         "foo",
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
+		Query:  "foo",
 	}
 	res, err := client.ListTeams(opts)
 

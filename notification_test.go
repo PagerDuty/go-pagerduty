@@ -18,11 +18,12 @@ func TestNotification_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListNotificationOptions{
-		APIListObject: listObj,
-		Includes:      []string{},
-		Filter:        "foo",
-		Since:         "bar",
-		Until:         "baz",
+		Limit:    listObj.Limit,
+		Offset:   listObj.Offset,
+		Includes: []string{},
+		Filter:   "foo",
+		Since:    "bar",
+		Until:    "baz",
 	}
 	res, err := client.ListNotifications(opts)
 

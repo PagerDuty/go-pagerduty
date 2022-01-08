@@ -18,10 +18,11 @@ func TestUser_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListUsersOptions{
-		APIListObject: listObj,
-		Query:         "foo",
-		TeamIDs:       []string{},
-		Includes:      []string{},
+		Limit:    listObj.Limit,
+		Offset:   listObj.Offset,
+		Query:    "foo",
+		TeamIDs:  []string{},
+		Includes: []string{},
 	}
 	res, err := client.ListUsers(opts)
 

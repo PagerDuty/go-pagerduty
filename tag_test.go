@@ -19,8 +19,9 @@ func TestTag_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListTagOptions{
-		APIListObject: listObj,
-		Query:         "MyTag",
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
+		Query:  "MyTag",
 	}
 	res, err := client.ListTags(opts)
 	if err != nil {
@@ -267,7 +268,8 @@ func TestTag_GetTagsForEntity(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 
 	opts := ListTagOptions{
-		APIListObject: listObj,
+		Limit:  listObj.Limit,
+		Offset: listObj.Offset,
 	}
 	res, err := client.GetTagsForEntity(e, eid, opts)
 	if err != nil {

@@ -32,8 +32,24 @@ type ListExtensionSchemaResponse struct {
 // ListExtensionSchemaOptions are the options to send with the
 // ListExtensionSchema reques(s).
 type ListExtensionSchemaOptions struct {
-	APIListObject
-	Query string `url:"query,omitempty"`
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
 }
 
 // ListExtensionSchemas lists all of the extension schemas. Each schema

@@ -55,10 +55,10 @@ type APIObject struct {
 
 // APIListObject are the fields used to control pagination when listing objects.
 type APIListObject struct {
-	Limit  uint `url:"limit,omitempty"`
-	Offset uint `url:"offset,omitempty"`
-	More   bool `url:"more,omitempty"`
-	Total  uint `url:"total,omitempty"`
+	Limit  uint `json:"limit,omitempty"`
+	Offset uint `json:"offset,omitempty"`
+	More   bool `json:"more,omitempty"`
+	Total  uint `json:"total,omitempty"`
 }
 
 // APIReference are the fields required to reference another API object.

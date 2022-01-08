@@ -18,12 +18,13 @@ func TestMaintenanceWindow_List(t *testing.T) {
 	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
 	client := defaultTestClient(server.URL, "foo")
 	opts := ListMaintenanceWindowsOptions{
-		APIListObject: listObj,
-		Query:         "foo",
-		Includes:      []string{},
-		TeamIDs:       []string{},
-		ServiceIDs:    []string{},
-		Filter:        "foo",
+		Limit:      listObj.Limit,
+		Offset:     listObj.Offset,
+		Query:      "foo",
+		Includes:   []string{},
+		TeamIDs:    []string{},
+		ServiceIDs: []string{},
+		Filter:     "foo",
 	}
 	res, err := client.ListMaintenanceWindows(opts)
 
