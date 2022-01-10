@@ -143,9 +143,7 @@ func TestResponsePlay_Run(t *testing.T) {
 	})
 
 	client := defaultTestClient(server.URL, "foo")
-	err := client.RunResponsePlay(context.TODO(), "1", Incident{
-		APIObject: APIObject{ID: "5"},
-	}, "foo@example.com")
+	err := client.RunResponsePlay(context.TODO(), "foo@example.com", "1", "5")
 
 	if err != nil {
 		t.Fatal(err)

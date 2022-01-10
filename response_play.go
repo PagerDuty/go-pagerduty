@@ -90,10 +90,10 @@ func (c *Client) DeleteResponsePlay(ctx context.Context, id string) error {
 }
 
 // RunResponsePlay runs a response play on a given incident.
-func (c *Client) RunResponsePlay(ctx context.Context, rp string, incident Incident, from string) error {
+func (c *Client) RunResponsePlay(ctx context.Context, from string, responsePlayID string, incidentID string) error {
 	d := map[string]APIReference{
 		"incident": {
-			ID:   incident.ID,
+			ID:   incidentID,
 			Type: "incident_reference",
 		},
 	}
@@ -102,13 +102,13 @@ func (c *Client) RunResponsePlay(ctx context.Context, rp string, incident Incide
 		"From": from,
 	}
 
-	resp, err := c.post(ctx, "/response_plays/"+rp+"/run", d, h)
+	resp, err := c.post(ctx, "/response_plays/"+responsePlayID+"/run", d, h)
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to run response play %s on incident %s (status code: %d)", rp, incident.ID, resp.StatusCode)
+		return fmt.Errorf("failed to run response play %s on incident %s (status code: %d)", responsePlayID, incidentID, resp.StatusCode)
 	}
 
 	return nil
