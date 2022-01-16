@@ -8,6 +8,9 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// ResponsePlay represents the API object for a response object:
+//
+// https://developer.pagerduty.com/api-reference/b3A6Mjc0ODE2Ng-create-a-response-play
 type ResponsePlay struct {
 	ID                 string          `json:"id,omitempty"`
 	Type               string          `json:"type,omitempty"`
@@ -23,38 +26,42 @@ type ResponsePlay struct {
 	RespondersMessage  string          `json:"responders_message"`
 	Runnability        *string         `json:"runnability"`
 	ConferenceNumber   *string         `json:"conference_number"`
-	ConferenceUrl      *string         `json:"conference_url"`
+	ConferenceURL      *string         `json:"conference_url"`
 	ConferenceType     *string         `json:"conference_type"`
 }
 
+// ListResponsePlaysResponse represents the list of response plays.
 type ListResponsePlaysResponse struct {
 	ResponsePlays []ResponsePlay `json:"response_plays"`
 }
 
+// ListResponsePlaysOptions are the options for listing response plays.
 type ListResponsePlaysOptions struct {
-	FilterForManualRun bool   `url:"filter_for_manual_run,omitempty"`
-	Query              string `url:"query,omitempty"`
+	// FilterForManualRun limits results to show only response plays that can be
+	// invoked manually.
+	FilterForManualRun bool `url:"filter_for_manual_run,omitempty"`
+
+	Query string `url:"query,omitempty"`
 }
 
 // ListResponsePlays lists existing response plays.
-func (c *Client) ListResponsePlays(ctx context.Context, o ListResponsePlaysOptions) (ListResponsePlaysResponse, error) {
-	var result ListResponsePlaysResponse
-
+func (c *Client) ListResponsePlays(ctx context.Context, o ListResponsePlaysOptions) ([]ResponsePlay, error) {
 	v, err := query.Values(o)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 
 	resp, err := c.get(ctx, "/response_plays?"+v.Encode())
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 
+	var result ListResponsePlaysResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
-		return result, err
+		return nil, err
 	}
 
-	return result, nil
+	return result.ResponsePlays, nil
 }
 
 // CreateResponsePlay creates a new response play.

@@ -56,7 +56,7 @@ type Assignee struct {
 	Assignee APIObject `json:"assignee"`
 }
 
-// Occurrence
+// Occurrence is the data around whether this is a reocurring issue.
 type Occurrence struct {
 	Count     uint   `json:"count,omitempty"`
 	Frequency uint   `json:"frequency,omitempty"`
@@ -749,10 +749,10 @@ func (c *Client) ManageIncidentAlerts(ctx context.Context, incidentID, from stri
 
 // IncidentStatusUpdate is a status update for the specified incident.
 type IncidentStatusUpdate struct {
-	ID        string	`json:"id"`
-	Message   string	`json:"message"`
-	CreatedAt string	`json:"created_at"`
-	Sender    APIObject	`json:"sender"`
+	ID        string    `json:"id"`
+	Message   string    `json:"message"`
+	CreatedAt string    `json:"created_at"`
+	Sender    APIObject `json:"sender"`
 }
 
 // CreateIncidentStatusUpdate creates a new status update for the specified incident.

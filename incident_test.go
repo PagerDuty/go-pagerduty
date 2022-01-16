@@ -948,7 +948,7 @@ func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	wantId := "1"
+	wantID := "1"
 	wantFrom := "foo@bar.com"
 	wantMessage := "foo"
 
@@ -979,13 +979,13 @@ func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
 		_, _ = w.Write([]byte(`{"status_update": {"id": "1", "message": "foo", "sender": {"summary": "foo@bar.com", "type": "user_reference"}}}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
-	res, err := client.CreateIncidentStatusUpdate(context.Background(), wantId, wantFrom, wantMessage)
+	res, err := client.CreateIncidentStatusUpdate(context.Background(), wantID, wantFrom, wantMessage)
 	want := IncidentStatusUpdate{
-		ID:      wantId,
+		ID:      wantID,
 		Message: wantMessage,
 		Sender: APIObject{
 			Summary: wantFrom,
-			Type: "user_reference",
+			Type:    "user_reference",
 		},
 	}
 
