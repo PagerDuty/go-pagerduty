@@ -458,7 +458,7 @@ func TestClient_LastAPIRequest(t *testing.T) {
 	})
 
 	t.Run("integration", func(t *testing.T) {
-		const requestBody = `{"user":{"id":"1","name":"","summary":"","email":"foo@bar.com"}}`
+		const requestBody = `{"user":{"id":"1","name":"","email":"foo@bar.com"}}`
 
 		setup()
 		defer teardown()

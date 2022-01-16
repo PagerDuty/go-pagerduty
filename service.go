@@ -96,6 +96,7 @@ type Service struct {
 	AlertGroupingTimeout    *uint                    `json:"alert_grouping_timeout,omitempty"`
 	AlertGroupingParameters *AlertGroupingParameters `json:"alert_grouping_parameters,omitempty"`
 	ResponsePlay            *APIObject               `json:"response_play,omitempty"`
+	Addons                  []Addon                  `json:"addons,omitempty"`
 }
 
 // AlertGroupingParameters defines how alerts on the servicewill be automatically grouped into incidents

@@ -151,8 +151,9 @@ func (c *Client) AssignTags(e, eid string, a *TagAssignments) error {
 }
 
 // AssignTagsWithContext adds and removes tag assignments with entities.
-func (c *Client) AssignTagsWithContext(ctx context.Context, e, eid string, a *TagAssignments) error {
-	_, err := c.post(ctx, "/"+e+"/"+eid+"/change_tags", a, nil)
+// Permitted entity types are users, teams, and escalation_policies.
+func (c *Client) AssignTagsWithContext(ctx context.Context, entityType, entityID string, a *TagAssignments) error {
+	_, err := c.post(ctx, "/"+entityType+"/"+entityID+"/change_tags", a, nil)
 	if err != nil {
 		return err
 	}
@@ -178,7 +179,7 @@ func (c *Client) GetUsersByTag(tid string) (*ListUserResponse, error) {
 // GetUsersByTagPaginated gets related user references based on the tag. To get the
 // full info of the user, you will need to iterate over the returned slice
 // and get that user's details.
-func (c *Client) GetUsersByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+func (c *Client) GetUsersByTagPaginated(ctx context.Context, tagID string) ([]*APIObject, error) {
 	var users []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
@@ -201,7 +202,7 @@ func (c *Client) GetUsersByTagPaginated(ctx context.Context, tid string) ([]*API
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, "/tags/"+tid+"/users/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tagID+"/users/", responseHandler); err != nil {
 		return nil, err
 	}
 
@@ -226,7 +227,7 @@ func (c *Client) GetTeamsByTag(tid string) (*ListTeamsForTagResponse, error) {
 // GetTeamsByTagPaginated gets related teams based on the tag. To get the full
 // info of the team, you will need to iterate over the returend slice and get
 // that team's details.
-func (c *Client) GetTeamsByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+func (c *Client) GetTeamsByTagPaginated(ctx context.Context, tagID string) ([]*APIObject, error) {
 	var teams []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
@@ -249,7 +250,7 @@ func (c *Client) GetTeamsByTagPaginated(ctx context.Context, tid string) ([]*API
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, "/tags/"+tid+"/teams/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tagID+"/teams/", responseHandler); err != nil {
 		return nil, err
 	}
 
@@ -275,7 +276,7 @@ func (c *Client) GetEscalationPoliciesByTag(tid string) (*ListEPResponse, error)
 // GetEscalationPoliciesByTagPaginated gets related escalation policies based on
 // the tag. To get the full info of the EP, you will need to iterate over the
 // returend slice and get that policy's details.
-func (c *Client) GetEscalationPoliciesByTagPaginated(ctx context.Context, tid string) ([]*APIObject, error) {
+func (c *Client) GetEscalationPoliciesByTagPaginated(ctx context.Context, tagID string) ([]*APIObject, error) {
 	var eps []*APIObject
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
@@ -298,7 +299,7 @@ func (c *Client) GetEscalationPoliciesByTagPaginated(ctx context.Context, tid st
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, "/tags/"+tid+"/escalation_policies/", responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/tags/"+tagID+"/escalation_policies/", responseHandler); err != nil {
 		return nil, err
 	}
 
