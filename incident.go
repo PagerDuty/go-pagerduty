@@ -98,6 +98,7 @@ type Incident struct {
 	ConferenceBridge     *ConferenceBridge    `json:"conference_bridge,omitempty"`
 	AssignedVia          string               `json:"assigned_via,omitempty"`
 	Occurrence           *Occurrence          `json:"occurrence,omitempty"`
+	IncidentResponders   []IncidentResponders `json:"incidents_responders,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
@@ -749,10 +750,10 @@ func (c *Client) ManageIncidentAlerts(ctx context.Context, incidentID, from stri
 
 // IncidentStatusUpdate is a status update for the specified incident.
 type IncidentStatusUpdate struct {
-	ID        string	`json:"id"`
-	Message   string	`json:"message"`
-	CreatedAt string	`json:"created_at"`
-	Sender    APIObject	`json:"sender"`
+	ID        string    `json:"id"`
+	Message   string    `json:"message"`
+	CreatedAt string    `json:"created_at"`
+	Sender    APIObject `json:"sender"`
 }
 
 // CreateIncidentStatusUpdate creates a new status update for the specified incident.

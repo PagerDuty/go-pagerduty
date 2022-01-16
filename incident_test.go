@@ -495,7 +495,7 @@ func TestIncident_Get(t *testing.T) {
 
 	mux.HandleFunc("/incidents/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		_, _ = w.Write([]byte(`{"incident": {"id": "1"}}`))
+		_, _ = w.Write([]byte(`{"incident": {"id": "1", "incidents_responders": [{"incident": {"id": "1"}}]}}`))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
@@ -503,7 +503,7 @@ func TestIncident_Get(t *testing.T) {
 	id := "1"
 	res, err := client.GetIncident(id)
 
-	want := &Incident{APIObject: APIObject{ID: "1"}}
+	want := &Incident{APIObject: APIObject{ID: "1"}, IncidentResponders: []IncidentResponders{{Incident: APIObject{ID: "1"}}}}
 
 	if err != nil {
 		t.Fatal(err)
@@ -985,7 +985,7 @@ func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
 		Message: wantMessage,
 		Sender: APIObject{
 			Summary: wantFrom,
-			Type: "user_reference",
+			Type:    "user_reference",
 		},
 	}
 
