@@ -7,6 +7,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -104,4 +105,25 @@ func calculateSignature(payload []byte, secret string) []byte {
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write(payload)
 	return mac.Sum(nil)
+}
+
+func ReadWebhookPayload(r *http.Request) (*WebhookPayload, error) {
+	orb := r.Body
+
+	b, err := ioutil.ReadAll(io.LimitReader(r.Body, webhookBodyReaderLimit))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	defer func() { _ = orb.Close() }()
+	r.Body = ioutil.NopCloser(bytes.NewReader(b))
+
+	if len(b) == 0 {
+		return nil, ErrMalformedBody
+	}
+
+	var wp WebhookPayload
+	err = json.Unmarshal(b, &wp)
+
+	return &wp, err
 }

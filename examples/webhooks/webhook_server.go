@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/PagerDuty/go-pagerduty/webhookv3"
 )
@@ -35,5 +36,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "received signed webhook")
+	log.Infof("Received signed webhook")
+
+	payload, err := webhookv3.ReadWebhookPayload(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Errorf("%v", err)
+		return
+	}
+
+	event := payload.Event
+	dataType, _ := event.GetEventDataValue("type")
+	log.Infof("Event: %v, Event Type: %v, EventData Type: %v", event.ID, event.EventType, dataType)
+
+	fmt.Fprint(w, "OK\n")
 }
