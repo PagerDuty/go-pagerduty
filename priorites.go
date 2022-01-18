@@ -6,19 +6,24 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// PriorityProperty is a single priorty object returned from the Priorities endpoint
-type PriorityProperty struct {
-	APIObject
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
+// PriorityProperty is the original type name and is retained as an alias for API
+// compatibility.
+//
+// Deprecated: Use type Priority instead; will be removed in V2
+type PriorityProperty = Priority
 
 // ListPrioritiesResponse repreents the API response from PagerDuty when listing
 // the configured priorities.
 type ListPrioritiesResponse struct {
 	APIListObject
-	Priorities []PriorityProperty `json:"priorities"`
+	Priorities []Priority `json:"priorities"`
 }
+
+// Priorities is the original type name and is retained as an alias for API
+// compatibility.
+//
+// Deprecated: Use type ListPrioritiesResponse instead; will be removed in V2
+type Priorities = ListPrioritiesResponse
 
 // ListPrioritiesOptions is the data structure used when calling the
 // ListPriorities API endpoint.

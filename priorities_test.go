@@ -23,7 +23,7 @@ func TestPriorities_List(t *testing.T) {
 
 	want := &ListPrioritiesResponse{
 		APIListObject: listObj,
-		Priorities: []PriorityProperty{
+		Priorities: []Priority{
 			{
 				APIObject: APIObject{
 					ID:      "1",
