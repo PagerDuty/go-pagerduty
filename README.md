@@ -44,17 +44,19 @@ pd service list
 
 ### Client Library
 
-#### NOTICE: Breaking API Changes in master branch
+#### NOTICE: Breaking API Changes in v1.5.0
 
-As part of the upcoming `v1.5.0` release, we will be fixing features that have
-never worked correctly and require a breaking API change to fix. One example is
-the issue reported in [\#232](https://github.com/PagerDuty/go-pagerduty/issues/232),
-as well as a handful of other examples within the
-[v1.5.0 milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2).
+As part of the `v1.5.0` release, we have fixed features that have never worked
+correctly and require a breaking API change to fix. One example is the issue
+reported in [\#232](https://github.com/PagerDuty/go-pagerduty/issues/232), as
+well as a handful of other examples within the [v1.5.0
+milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2).
 
-As a result, the `master` branch now contains breaking changes since the last
-`v1.4.x` release. We will clearly highlight the breaking changes in the `v1.5.0`
-release notes when it's ready.
+If you are impacted by a breaking change in this release, you should audit the
+functionality you depended on as it may not have been working. If you cannot
+upgrade for some reason, the `v1.4.x` line of releases should still work. At the
+time of writing `v1.4.3` was the latest, and we intend to backport any critical
+fixes for the time being.
 
 #### Example Usage
 

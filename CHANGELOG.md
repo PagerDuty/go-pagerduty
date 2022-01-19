@@ -1,9 +1,111 @@
 # Changelog
 
+## [v1.5.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.0) (2022-01-22) - BREAKING CHANGES
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.3...v1.5.0)
+
+**NOTICE**
+
+This release is special, and intentionally includes breaking API changes without
+bumping the module's major version. We apologize for any inconveience this
+causes, but we felt this approach was better than incurring the cost of
+releasing v2 today. Specifically, we believed it was best to break the API, so
+that you became aware of features you depended on that were not working as you
+expected. We welcome your feedback on this decision via a GitHub issue.
+
+These changes largely fix API issues that would have made it impossible for the
+this module to be used correctly. Most often this is due to incorrect or invalid
+struct fields, others were a lack of required inputs to specific actions.
+
+We commit henceforth to maintaining API compatibility for future v1 releases.
+
+**Highlights**
+
+- Add support for handling signature verification of V3 Webhook requests.
+- Update `APIError` type to provide more helpful error strings.
+- Add support for API debugging, by allowing capture of the request/response from the API.
+- Added various missing fields to different structs.
+- Add support for response plays, fetching audit records, and setting up email filters.
+
+**Breaking changes**
+
+- Fix the ResponderRequest input/output structures [\#328](https://github.com/PagerDuty/go-pagerduty/pull/328) ([CerealBoy](https://github.com/CerealBoy))
+- Fix overlapping struct fields in Incident, Service, and User types [\#332](https://github.com/PagerDuty/go-pagerduty/pull/332) ([theckman](https://github.com/theckman))
+- Remove *http.Response return from different API methods. [\#357](https://github.com/PagerDuty/go-pagerduty/pull/357) [\#358](https://github.com/PagerDuty/go-pagerduty/pull/358) [\#359](https://github.com/PagerDuty/go-pagerduty/pull/359) [\#360](https://github.com/PagerDuty/go-pagerduty/pull/360) [\#361](https://github.com/PagerDuty/go-pagerduty/pull/361) ([theckman](https://github.com/theckman))
+- Add missing required From parameter to ManageIncidentAlerts [\#380](https://github.com/PagerDuty/go-pagerduty/pull/380) ([theckman](https://github.com/theckman))
+- Fix mismatches between REST API and struct definitions [\#396](https://github.com/PagerDuty/go-pagerduty/pull/396) [\#414](https://github.com/PagerDuty/go-pagerduty/pull/414) ([theckman](https://github.com/theckman))
+- Update pagination query params to conform to API spec [\#405](https://github.com/PagerDuty/go-pagerduty/pull/405) ([theckman](https://github.com/theckman)
+
+**Closed issues**
+
+- incident.ID or incident.Id [\#218](https://github.com/PagerDuty/go-pagerduty/issues/218) ([mblaschke](https://github.com/mblaschke))
+- Improper unmarshalling [\#232](https://github.com/PagerDuty/go-pagerduty/issues/232) ([Erog38](https://github.com/Erog38))
+- Update initialisms / acronyms to be capitalized [\#268](https://github.com/PagerDuty/go-pagerduty/issues/268) ([theckman](https://github.com/theckman))
+- Add IncidentDetails.Title field and mark IncidentDetails.Description as deprecated [\#277](https://github.com/PagerDuty/go-pagerduty/issues/277) ([theckman](https://github.com/theckman))
+- Remove *http.Response returns from API methods [\#305](https://github.com/PagerDuty/go-pagerduty/issues/305) ([theckman](https://github.com/theckman))
+- Add ability to create or update integrations with email filter rules [\#315](https://github.com/PagerDuty/go-pagerduty/issues/315) ([gerardocorea](https://github.com/gerardocorea))
+- EscalationRule struct should accept a slice of APIReference rather then APIObject for Targets [\#316](https://github.com/PagerDuty/go-pagerduty/issues/316) ([gerardocorea](https://github.com/gerardocorea))
+- User slice fields missing omitempty [\#343](https://github.com/PagerDuty/go-pagerduty/issues/343) ([theckman](https://github.com/theckman))
+- Should all fields in Service type be omitempty [\#348](https://github.com/PagerDuty/go-pagerduty/issues/348) ([callumj](https://github.com/callumj))
+- ManageIncidentsOptions doesn't take EscalationLevel [\#364](https://github.com/PagerDuty/go-pagerduty/issues/364) ([sim1s](https://github.com/sim1s))
+- Setting conference information in new incident [\#373](https://github.com/PagerDuty/go-pagerduty/issues/373) ([bparlidoordash](https://github.com/bparlidoordash))
+- Validate that all structure formats and method signatures work with PagerDuty API [\#389](https://github.com/PagerDuty/go-pagerduty/issues/389) ([theckman](https://github.com/theckman))
+- When creating an incident, consumers shouldn't need to set the Type field [\#390](https://github.com/PagerDuty/go-pagerduty/issues/390) ([theckman](https://github.com/theckman))
+- Reduce code duplication in analytics.go [\#393](https://github.com/PagerDuty/go-pagerduty/issues/393) ([theckman](https://github.com/theckman))
+- Add support for fetching Audit Records [\#394](https://github.com/PagerDuty/go-pagerduty/issues/394) ([theckman](https://github.com/theckman))
+
+**Merged pull requests**
+
+- Add assignees to log entry [\#237](https://github.com/PagerDuty/go-pagerduty/pull/237) ([tautvydass](https://github.com/tautvydass))
+- Add support for better API debugging; start v1.5.0 development [\#325](https://github.com/PagerDuty/go-pagerduty/pull/325) ([theckman](https://github.com/theckman))
+- Fix the ResponderRequest input/output structures [\#328](https://github.com/PagerDuty/go-pagerduty/pull/328) ([CerealBoy](https://github.com/CerealBoy))
+- Fix overlapping struct fields & last golint errors [\#332](https://github.com/PagerDuty/go-pagerduty/pull/332) ([theckman](https://github.com/theckman))
+- Add comment indicating IncidentDetails.Description is deprecated [\#333](https://github.com/PagerDuty/go-pagerduty/pull/333) ([theckman](https://github.com/theckman))
+- Update APIError.Error() to provide more helpful error messages [\#334](https://github.com/PagerDuty/go-pagerduty/pull/334) ([theckman](https://github.com/theckman))
+- Add comment above IncidentDetails.Alerts field explaining behaviors [\#335](https://github.com/PagerDuty/go-pagerduty/pull/335) ([theckman](https://github.com/theckman))
+- Correct formatting of deprecation notices. [\#340](https://github.com/PagerDuty/go-pagerduty/pull/340) ([dsymonds](https://github.com/dsymonds))
+- Fix `pd schedule override create`. [\#341](https://github.com/PagerDuty/go-pagerduty/pull/341) ([dsymonds](https://github.com/dsymonds))
+- allow setting suppress to false [\#345](https://github.com/PagerDuty/go-pagerduty/pull/345) ([cluarkhpe](https://github.com/cluarkhpe))
+- Swap two transposed words in the README file [\#350](https://github.com/PagerDuty/go-pagerduty/pull/350) ([theckman](https://github.com/theckman))
+- Fixing link to PD API Reference [\#356](https://github.com/PagerDuty/go-pagerduty/pull/356) ([stmcallister](https://github.com/stmcallister))
+- Remove returned *http.Response from incident-related methods [\#357](https://github.com/PagerDuty/go-pagerduty/pull/357) ([theckman](https://github.com/theckman))
+- Remove returned *http.Response from business svc related methods [\#358](https://github.com/PagerDuty/go-pagerduty/pull/358) ([theckman](https://github.com/theckman))
+- Remove returned *http.Response from svc dependency related methods [\#359](https://github.com/PagerDuty/go-pagerduty/pull/359) ([theckman](https://github.com/theckman))
+- Remove returned *http.Response from tag-related methods [\#360](https://github.com/PagerDuty/go-pagerduty/pull/360) ([theckman](https://github.com/theckman))
+- Remove returned *http.Response from ruleset-related methods [\#361](https://github.com/PagerDuty/go-pagerduty/pull/361) ([theckman](https://github.com/theckman))
+- implement missing maintenance-window subcommands [\#363](https://github.com/PagerDuty/go-pagerduty/pull/363) ([Hsn723](https://github.com/Hsn723))
+- Add json field incidents_responders to Incident struct [\#365](https://github.com/PagerDuty/go-pagerduty/pull/365) ([sostakas](https://github.com/sostakas))
+- Adding escalation level to ManageIncidentOptions [\#366](https://github.com/PagerDuty/go-pagerduty/pull/366) ([sim1s](https://github.com/sim1s))
+- Add v3 webhook signature verification [\#370](https://github.com/PagerDuty/go-pagerduty/pull/370) ([theckman](https://github.com/theckman))
+- Fix test after merging #332 (2f47dfc62321b) [\#371](https://github.com/PagerDuty/go-pagerduty/pull/371) ([theckman](https://github.com/theckman))
+- Add title to ManageIncidentOptions [\#372](https://github.com/PagerDuty/go-pagerduty/pull/372) ([d33d33](https://github.com/d33d33))
+- Add Service and User to LogEntry [\#377](https://github.com/PagerDuty/go-pagerduty/pull/377) ([theckman](https://github.com/theckman))
+- Add missing required parameeter to ManageIncidentAlerts [\#380](https://github.com/PagerDuty/go-pagerduty/pull/380) ([theckman](https://github.com/theckman))
+- Handle unexpected type changes in PagerDuty REST API error responses [\#382](https://github.com/PagerDuty/go-pagerduty/pull/382) ([theckman](https://github.com/theckman))
+- Add omitempty JSON tag to User slice fields [\#383](https://github.com/PagerDuty/go-pagerduty/pull/383) ([theckman](https://github.com/theckman))
+- Add omitempty JSON tag to specific Service fields [\#384](https://github.com/PagerDuty/go-pagerduty/pull/384)([theckman](https://github.com/theckman))
+- Add support for adding email filters for Generic Email Integrations [\#385](https://github.com/PagerDuty/go-pagerduty/pull/385) ([theckman](https://github.com/theckman))
+- Support adding conference bridge when creating or managing incidents [\#391](https://github.com/PagerDuty/go-pagerduty/pull/391) ([theckman](https://github.com/theckman))
+- Mark Type struct field deprecated, for incident creation + management [\#392](https://github.com/PagerDuty/go-pagerduty/pull/392) ([theckman](https://github.com/theckman))
+- Fix some mismatches between REST API and struct definitions [\#396](https://github.com/PagerDuty/go-pagerduty/pull/396) ([theckman](https://github.com/theckman))
+- refactor: Reduce code duplication in analytics.go [\#397](https://github.com/PagerDuty/go-pagerduty/pull/397) ([t-junjie](https://github.com/t-junjie))
+- Add support for escalation_policy.on_call_handoff_notifications field [\#401](https://github.com/PagerDuty/go-pagerduty/pull/401) ([zonorti](https://github.com/zonorti))
+- Missing incident fields [\#402](https://github.com/PagerDuty/go-pagerduty/pull/402) ([zonorti](https://github.com/zonorti))
+- Add extension enable [\#403](https://github.com/PagerDuty/go-pagerduty/pull/403) ([zonorti](https://github.com/zonorti))
+- Add support for response_plays [\#404](https://github.com/PagerDuty/go-pagerduty/pull/404) ([petetanton](https://github.com/petetanton))
+- Update pagination query to conform to API spec [\#405](https://github.com/PagerDuty/go-pagerduty/pull/405) ([theckman](https://github.com/theckman))
+- add createStatusUpdate [\#406](https://github.com/PagerDuty/go-pagerduty/pull/406) ([kkawamura](https://github.com/kkawamura))
+- feat: Add support for fetching Audit Records [\#408](https://github.com/PagerDuty/go-pagerduty/pull/408) ([t-junjie](https://github.com/t-junjie))
+- Fix linter issues, update ResponsePlays API before v1.5.0 release [\#410](https://github.com/PagerDuty/go-pagerduty/pull/410) ([theckman](https://github.com/theckman))
+- Second batch of fixes for API incompatibilities [\#414](https://github.com/PagerDuty/go-pagerduty/pull/414) ([theckman](https://github.com/theckman))
+- Find a way to gracefully avoid one breaking change in #405 [\#416](https://github.com/PagerDuty/go-pagerduty/pull/416) ([theckman](https://github.com/theckman))
+- Fix linter issues introduced by final PR merges [\#417](https://github.com/PagerDuty/go-pagerduty/pull/417) ([theckman](https://github.com/theckman))
+
 ## [v1.4.3](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.3) (2021-11-13)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/6)
-[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.1...v1.4.3)
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/6)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.2...v1.4.3)
 
 **Highlights**
 - Mitigate PagerDuty REST API bug that would result in a JSON parsing failure when reading an error response from the API. Prior to `v1.4.0` our error parsing logic was not impacted by the bug.
