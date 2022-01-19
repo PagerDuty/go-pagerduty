@@ -79,6 +79,7 @@ type ListLogEntriesOptions struct {
 	Until      string   `url:"until,omitempty"`
 	IsOverview bool     `url:"is_overview,omitempty"`
 	Includes   []string `url:"include,omitempty,brackets"`
+	TeamIDs    []string `url:"team_ids,omitempty,brackets"`
 }
 
 // ListLogEntries lists all of the incident log entries across the entire

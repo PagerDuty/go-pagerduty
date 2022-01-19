@@ -8,11 +8,13 @@ import (
 
 // Notification is a message containing the details of the incident.
 type Notification struct {
-	ID        string `json:"id"`
-	Type      string
-	StartedAt string `json:"started_at"`
-	Address   string
-	User      APIObject
+	ID                string    `json:"id"`
+	Type              string    `json:"type"`
+	StartedAt         string    `json:"started_at"`
+	Address           string    `json:"address"`
+	User              APIObject `json:"user"`
+	ConferenceAddress string    `json:"conferenceAddress"`
+	Status            string    `json:"status"`
 }
 
 // ListNotificationOptions is the data structure used when calling the ListNotifications API endpoint.

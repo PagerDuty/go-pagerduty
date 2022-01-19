@@ -45,7 +45,7 @@ type Schedule struct {
 	Description         string          `json:"description,omitempty"`
 	EscalationPolicies  []APIObject     `json:"escalation_policies,omitempty"`
 	Users               []APIObject     `json:"users,omitempty"`
-	Teams               []APIReference  `json:"teams,omitempty"`
+	Teams               []APIObject     `json:"teams,omitempty"`
 	ScheduleLayers      []ScheduleLayer `json:"schedule_layers,omitempty"`
 	OverrideSubschedule ScheduleLayer   `json:"override_subschedule,omitempty"`
 	FinalSchedule       ScheduleLayer   `json:"final_schedule,omitempty"`
@@ -72,7 +72,8 @@ type ListSchedulesOptions struct {
 	// total count of items in the collection.
 	Total bool `url:"total,omitempty"`
 
-	Query string `url:"query,omitempty"`
+	Query    string   `url:"query,omitempty"`
+	Includes []string `url:"include,omitempty,brackets"`
 }
 
 // ListSchedulesResponse is the data structure returned from calling the ListSchedules API endpoint.
@@ -146,7 +147,9 @@ func (c *Client) PreviewSchedule(s Schedule, o PreviewScheduleOptions) error {
 }
 
 // PreviewScheduleWithContext previews what an on-call schedule would look like
-// without saving it.
+// without saving it. Nothing is returned from this method, because the API
+// should return the Schedule as we posted it. If this method call returns no
+// error, the schedule should be valid and can be updated.
 func (c *Client) PreviewScheduleWithContext(ctx context.Context, s Schedule, o PreviewScheduleOptions) error {
 	v, err := query.Values(o)
 	if err != nil {
@@ -238,10 +241,14 @@ type ListOverridesResponse struct {
 
 // Override are any schedule layers from the override layer.
 type Override struct {
-	ID    string    `json:"id,omitempty"`
-	Start string    `json:"start,omitempty"`
-	End   string    `json:"end,omitempty"`
-	User  APIObject `json:"user,omitempty"`
+	ID      string    `json:"id,omitempty"`
+	Type    string    `json:"type,omitempty"`
+	Summary string    `json:"summary,omitempty"`
+	Self    string    `json:"self,omitempty"`
+	HTMLURL string    `json:"html_url,omitempty"`
+	Start   string    `json:"start,omitempty"`
+	End     string    `json:"end,omitempty"`
+	User    APIObject `json:"user,omitempty"`
 }
 
 // ListOverrides lists overrides for a given time range.

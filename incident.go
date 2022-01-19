@@ -99,6 +99,7 @@ type Incident struct {
 	AssignedVia          string               `json:"assigned_via,omitempty"`
 	Occurrence           *Occurrence          `json:"occurrence,omitempty"`
 	IncidentResponders   []IncidentResponders `json:"incidents_responders,omitempty"`
+	ResponderRequests    []ResponderRequest   `json:"responder_requests,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
@@ -659,26 +660,21 @@ type ResponderRequestTarget struct {
 	Responders IncidentResponders `json:"incident_responders"`
 }
 
-// ResponderRequestTargets is a wrapper for a ResponderRequestTarget.
-type ResponderRequestTargets struct {
-	Target ResponderRequestTarget `json:"responder_request_target"`
-}
-
 // ResponderRequestOptions defines the input options for the Create Responder function.
 type ResponderRequestOptions struct {
-	From        string                    `json:"-"`
-	Message     string                    `json:"message"`
-	RequesterID string                    `json:"requester_id"`
-	Targets     []ResponderRequestTargets `json:"responder_request_targets"`
+	From        string                   `json:"-"`
+	Message     string                   `json:"message"`
+	RequesterID string                   `json:"requester_id"`
+	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
 type ResponderRequest struct {
-	Incident    Incident                  `json:"incident"`
-	Requester   User                      `json:"requester,omitempty"`
-	RequestedAt string                    `json:"request_at,omitempty"`
-	Message     string                    `json:"message,omitempty"`
-	Targets     []ResponderRequestTargets `json:"responder_request_targets"`
+	Incident    Incident                 `json:"incident"`
+	Requester   User                     `json:"requester,omitempty"`
+	RequestedAt string                   `json:"request_at,omitempty"`
+	Message     string                   `json:"message,omitempty"`
+	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.

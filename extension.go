@@ -12,11 +12,12 @@ import (
 // features to be used as part of the incident management process.
 type Extension struct {
 	APIObject
-	Name             string      `json:"name"`
-	EndpointURL      string      `json:"endpoint_url,omitempty"`
-	ExtensionObjects []APIObject `json:"extension_objects"`
-	ExtensionSchema  APIObject   `json:"extension_schema"`
-	Config           interface{} `json:"config"`
+	Name                string      `json:"name"`
+	EndpointURL         string      `json:"endpoint_url,omitempty"`
+	ExtensionObjects    []APIObject `json:"extension_objects"`
+	ExtensionSchema     APIObject   `json:"extension_schema"`
+	Config              interface{} `json:"config"`
+	TemporarilyDisabled bool        `json:"temporarily_disabled,omitempty"`
 }
 
 // ListExtensionResponse represents the single response from the PagerDuty API

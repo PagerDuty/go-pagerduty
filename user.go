@@ -10,19 +10,21 @@ import (
 
 // NotificationRule is a rule for notifying the user.
 type NotificationRule struct {
-	ID                  string        `json:"id"`
+	ID                  string        `json:"id,omitempty"`
+	Type                string        `json:"type,omitempty"`
+	Summary             string        `json:"summary,omitempty"`
+	Self                string        `json:"self,omitempty"`
+	HTMLURL             string        `json:"html_url,omitempty"`
 	StartDelayInMinutes uint          `json:"start_delay_in_minutes"`
 	CreatedAt           string        `json:"created_at"`
 	ContactMethod       ContactMethod `json:"contact_method"`
 	Urgency             string        `json:"urgency"`
-	Type                string        `json:"type"`
 }
 
 // User is a member of a PagerDuty account that has the ability to interact with incidents and other data on the account.
 type User struct {
 	APIObject
 	Name              string             `json:"name"`
-	Summary           string             `json:"summary"`
 	Email             string             `json:"email"`
 	Timezone          string             `json:"time_zone,omitempty"`
 	Color             string             `json:"color,omitempty"`
@@ -38,10 +40,11 @@ type User struct {
 
 // ContactMethod is a way of contacting the user.
 type ContactMethod struct {
-	ID             string `json:"id"`
-	Type           string `json:"type"`
-	Summary        string `json:"summary"`
-	Self           string `json:"self"`
+	ID             string `json:"id,omitempty"`
+	Type           string `json:"type,omitempty"`
+	Summary        string `json:"summary,omitempty"`
+	Self           string `json:"self,omitempty"`
+	HTMLURL        string `json:"html_url,omitempty"`
 	Label          string `json:"label"`
 	Address        string `json:"address"`
 	SendShortEmail bool   `json:"send_short_email,omitempty"`
@@ -49,7 +52,6 @@ type ContactMethod struct {
 	Blacklisted    bool   `json:"blacklisted,omitempty"`
 	CountryCode    int    `json:"country_code,omitempty"`
 	Enabled        bool   `json:"enabled,omitempty"`
-	HTMLUrl        string `json:"html_url"`
 }
 
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.

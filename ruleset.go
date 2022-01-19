@@ -11,16 +11,20 @@ type Ruleset struct {
 	ID          string         `json:"id,omitempty"`
 	Name        string         `json:"name,omitempty"`
 	Type        string         `json:"type,omitempty"`
+	Self        string         `json:"self,omitempty"`
 	RoutingKeys []string       `json:"routing_keys,omitempty"`
-	Team        *RulesetObject `json:"team,omitempty"`
-	Updater     *RulesetObject `json:"updater,omitempty"`
+	CreatedAt   string         `json:"created_at"`
 	Creator     *RulesetObject `json:"creator,omitempty"`
+	UpdatedAt   string         `json:"updated_at"`
+	Updater     *RulesetObject `json:"updater,omitempty"`
+	Team        *RulesetObject `json:"team,omitempty"`
 }
 
 // RulesetObject represents a generic object that is common within a ruleset object
 type RulesetObject struct {
-	Type string `json:"type,omitempty"`
 	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
+	Self string `json:"self,omitempty"`
 }
 
 // RulesetPayload represents payload with a ruleset object
@@ -40,12 +44,12 @@ type ListRulesetsResponse struct {
 // RulesetRule represents a Ruleset rule
 type RulesetRule struct {
 	ID         string          `json:"id,omitempty"`
+	Self       string          `json:"self,omitempty"`
 	Position   *int            `json:"position,omitempty"`
 	Disabled   bool            `json:"disabled,omitempty"`
 	Conditions *RuleConditions `json:"conditions,omitempty"`
 	Actions    *RuleActions    `json:"actions,omitempty"`
 	Ruleset    *APIObject      `json:"ruleset,omitempty"`
-	Self       string          `json:"self,omitempty"`
 	CatchAll   bool            `json:"catch_all,omitempty"`
 	TimeFrame  *RuleTimeFrame  `json:"time_frame,omitempty"`
 }
@@ -81,16 +85,29 @@ type RuleTimeFrame struct {
 
 // ScheduledWeekly represents a time_frame object for scheduling rules weekly
 type ScheduledWeekly struct {
-	Weekdays  []int  `json:"weekdays,omitempty"`
-	Timezone  string `json:"timezone,omitempty"`
-	StartTime int    `json:"start_time,omitempty"`
-	Duration  int    `json:"duration,omitempty"`
+	// Weekdays is a 0 indexed slice of days, where 0 is Sunday and 6 is
+	// Saturday, when the window is scheduled for.
+	Weekdays []int `json:"weekdays,omitempty"`
+
+	Timezone string `json:"timezone,omitempty"`
+
+	// StartTime is the number of milliseconds into the day at which the window
+	// starts.
+	StartTime int `json:"start_time,omitempty"`
+
+	// Duration is the window duration in milliseconds.
+	Duration int `json:"duration,omitempty"`
 }
 
 // ActiveBetween represents an active_between object for setting a timeline for rules
 type ActiveBetween struct {
+	// StartTime is in the number of milliseconds into the day at which the
+	// window starts.
 	StartTime int `json:"start_time,omitempty"`
-	EndTime   int `json:"end_time,omitempty"`
+
+	// EndTime is the number of milliseconds into the day at which the window
+	// ends.
+	EndTime int `json:"end_time,omitempty"`
 }
 
 // ListRulesetRulesResponse represents a list of rules in a ruleset
@@ -129,7 +146,8 @@ type RuleActionSuppress struct {
 
 // RuleActionSuspend represents a rule suspend action object
 type RuleActionSuspend struct {
-	Value *bool `json:"value,omitempty"`
+	// Value specifies for how long to suspend the alert in seconds.
+	Value int `json:"value,omitempty"`
 }
 
 // RuleActionExtraction represents a rule extraction action object

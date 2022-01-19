@@ -11,8 +11,9 @@ import (
 // Team is a collection of users and escalation policies that represent a group of people within an organization.
 type Team struct {
 	APIObject
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Parent      *APIObject `json:"parent,omitempty"`
 }
 
 // ListTeamResponse is the structure used when calling the ListTeams API endpoint.
@@ -231,14 +232,12 @@ func getTeamFromResponse(c *Client, resp *http.Response, err error) (*Team, erro
 
 // Member is a team member.
 type Member struct {
-	APIObject struct {
-		APIObject
-	} `json:"user"`
-	Role string `json:"role"`
+	User APIObject `json:"user"`
+	Role string    `json:"role"`
 }
 
-// ListMembersOptions are the optional parameters for a members request.
-type ListMembersOptions struct {
+// ListTeamMembersOptions are the optional parameters for a members request.
+type ListTeamMembersOptions struct {
 	// Limit is the pagination parameter that limits the number of results per
 	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
 	// bound of 100.
@@ -259,21 +258,40 @@ type ListMembersOptions struct {
 	Total bool `url:"total,omitempty"`
 }
 
-// ListMembersResponse is the response from the members endpoint.
-type ListMembersResponse struct {
+// ListMembersOptions is the original type name and is retained as an alias for
+// API compatibility.
+//
+// Deprecated: Use type ListTeamMembersOptions instead; will be removed in V2
+type ListMembersOptions = ListTeamMembersOptions
+
+// ListTeamMembersResponse is the response from the members endpoint.
+type ListTeamMembersResponse struct {
 	APIListObject
 	Members []Member `json:"members"`
 }
 
-// ListMembers gets the first page of users associated with the specified team.
+// ListMembersResponse is the original type name and is retained as an alias for
+// API compatibility.
 //
-// Deprecated: Use ListMembersWithContext instead.
-func (c *Client) ListMembers(teamID string, o ListMembersOptions) (*ListMembersResponse, error) {
-	return c.ListMembersWithContext(context.Background(), teamID, o)
+// Deprecated: Use type ListTeamMembersResponse instead; will be removed in V2
+type ListMembersResponse = ListTeamMembersResponse
+
+// ListMembers gets a page of users associated with the specified team.
+//
+// Deprecated: Use ListTeamMembers instead.
+func (c *Client) ListMembers(teamID string, o ListTeamMembersOptions) (*ListTeamMembersResponse, error) {
+	return c.ListTeamMembers(context.Background(), teamID, o)
 }
 
-// ListMembersWithContext gets the first page of users associated with the specified team.
-func (c *Client) ListMembersWithContext(ctx context.Context, teamID string, o ListMembersOptions) (*ListMembersResponse, error) {
+// ListMembersWithContext gets a page of users associated with the specified team.
+//
+// Deprecated: Use ListTeamMembers instead.
+func (c *Client) ListMembersWithContext(ctx context.Context, teamID string, o ListTeamMembersOptions) (*ListTeamMembersResponse, error) {
+	return c.ListTeamMembers(ctx, teamID, o)
+}
+
+// ListTeamMembers gets a page of users associated with the specified team.
+func (c *Client) ListTeamMembers(ctx context.Context, teamID string, o ListTeamMembersOptions) (*ListTeamMembersResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -284,7 +302,7 @@ func (c *Client) ListMembersWithContext(ctx context.Context, teamID string, o Li
 		return nil, err
 	}
 
-	var result ListMembersResponse
+	var result ListTeamMembersResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
@@ -292,20 +310,28 @@ func (c *Client) ListMembersWithContext(ctx context.Context, teamID string, o Li
 	return &result, nil
 }
 
-// ListAllMembers gets all members associated with the specified team. It's
-// recommended to use ListMembersPaginated instead.
+// ListAllMembers gets all members associated with the specified team.
+//
+// Deprecated: Use ListTeamMembersPaginated instead.
 func (c *Client) ListAllMembers(teamID string) ([]Member, error) {
-	return c.ListMembersPaginated(context.Background(), teamID)
+	return c.ListTeamMembersPaginated(context.Background(), teamID)
 }
 
 // ListMembersPaginated gets all members associated with the specified team.
+//
+// Deprecated: Use ListTeamMembersPaginated instead.
 func (c *Client) ListMembersPaginated(ctx context.Context, teamID string) ([]Member, error) {
+	return c.ListTeamMembersPaginated(ctx, teamID)
+}
+
+// ListTeamMembersPaginated gets all members associated with the specified team.
+func (c *Client) ListTeamMembersPaginated(ctx context.Context, teamID string) ([]Member, error) {
 	var members []Member
 
 	// Create a handler closure capable of parsing data from the members endpoint
 	// and appending resultant members to the return slice.
 	responseHandler := func(response *http.Response) (APIListObject, error) {
-		var result ListMembersResponse
+		var result ListTeamMembersResponse
 		if err := c.decodeJSON(response, &result); err != nil {
 			return APIListObject{}, err
 		}
