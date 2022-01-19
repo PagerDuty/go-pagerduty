@@ -19,11 +19,9 @@ func TestResponsePlay_List(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListResponsePlays(context.TODO(), ListResponsePlaysOptions{})
 
-	want := ListResponsePlaysResponse{
-		ResponsePlays: []ResponsePlay{
-			{
-				ID: "1",
-			},
+	want := []ResponsePlay{
+		{
+			ID: "1",
 		},
 	}
 
@@ -144,7 +142,6 @@ func TestResponsePlay_Run(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 	err := client.RunResponsePlay(context.TODO(), "foo@example.com", "1", "5")
-
 	if err != nil {
 		t.Fatal(err)
 	}

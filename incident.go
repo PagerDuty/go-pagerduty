@@ -56,7 +56,7 @@ type Assignee struct {
 	Assignee APIObject `json:"assignee"`
 }
 
-// Occurrence
+// Occurrence is the data around whether this is a reocurring issue.
 type Occurrence struct {
 	Count     uint   `json:"count,omitempty"`
 	Frequency uint   `json:"frequency,omitempty"`
