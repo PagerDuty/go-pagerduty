@@ -656,3 +656,53 @@ func (c *Client) pagedGet(ctx context.Context, basePath string, handler response
 
 	return nil
 }
+
+type cursor struct {
+	// The minimum of the 'limit' parameter used in the request or
+	// the maximum request size of the API.
+	Limit uint
+	// An opaque string used to fetch the next set of results or 'null'
+	// if no additional results are available.
+	NextCursor string
+}
+
+// cursorHandler is capable of parsing a response, using cursor-based pagination.
+// At a minimum it must extract the page information for the current page.
+type cursorHandler func(r *http.Response) (cursor, error)
+
+func (c *Client) cursorGet(ctx context.Context, basePath string, handler cursorHandler) error {
+	var next string
+
+	basePrefix := getBasePrefix(basePath)
+
+	for {
+		var cs string
+		if len(next) > 0 {
+			cs = fmt.Sprintf("cursor=%s", next)
+		}
+
+		// The next set of results can be obtained by providing the
+		// NextCursor value from the previous request in a cursor
+		// query parameter on the subsequent request.
+		resp, err := c.do(ctx, http.MethodGet, fmt.Sprintf("%s%s", basePrefix, cs), nil, nil)
+		if err != nil {
+			return err
+		}
+
+		// Call handler to extract page information and execute additional necessary handling.
+		c, err := handler(resp)
+		if err != nil {
+			return err
+		}
+
+		// Stop parsing if there are no more results.
+		if len(c.NextCursor) == 0 {
+			break
+		}
+
+		// Otherwise, update next to parse more results.
+		next = c.NextCursor
+	}
+
+	return nil
+}
