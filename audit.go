@@ -29,10 +29,10 @@ type ListAuditRecordsOptions struct {
 // ListAuditRecords API endpoint.
 type ListAuditRecordsResponse struct {
 	Records []AuditRecord `json:"records,omitempty"`
-	// ResponseMetaData is not a required field in the pagerduty API response,
+	// ResponseMetadata is not a required field in the pagerduty API response,
 	// using a pointer allows us to not marshall an empty ResponseMetaData struct
 	// into a JSON.
-	ResponseMetaData *ResponseMetaData `json:"response_metadata,omitempty"`
+	ResponseMetaData *ResponseMetadata `json:"response_metadata,omitempty"`
 	Limit            uint              `json:"limit,omitempty"`
 	// NextCursor is an  opaque string that will deliver the next set of results
 	// when provided as the cursor parameter in a subsequent request.
@@ -56,7 +56,7 @@ type AuditRecord struct {
 }
 
 // ResponseMetadata contains information about the response.
-type ResponseMetaData struct {
+type ResponseMetadata struct {
 	Messages []string `json:"messages,omitempty"`
 }
 
@@ -120,7 +120,6 @@ func (c *Client) ListAuditRecords(ctx context.Context, o ListAuditRecordsOptions
 	}
 
 	return result, nil
-
 }
 
 // ListAuditRecordsPaginated lists audit trial records matching provided query
