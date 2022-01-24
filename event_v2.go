@@ -61,52 +61,56 @@ type EventsAPIV2Error struct {
 	// StatusCode is the HTTP response status code.
 	StatusCode int `json:"-"`
 
-	// EventsAPIV2Error represents the object returned by the API when an error occurs,
+	// APIError represents the object returned by the API when an error occurs,
 	// which includes messages that should hopefully provide useful context
 	// to the end user.
 	//
 	// If the API response did not contain an error object, the .Valid field of
-	// EventsAPIV2Error will be false. If .Valid is true, the .ErrorObject field is
+	// APIError will be false. If .Valid is true, the .ErrorObject field is
 	// valid and should be consulted.
-	EventsAPIV2Error NullEventsAPIV2ErrorObject
+	APIError NullEventsAPIV2ErrorObject
 
 	message string
 }
 
-var (
-	_ error            = &EventsAPIV2Error{} // assert that it satisfies the error interface.
-	_ json.Unmarshaler = &EventsAPIV2Error{} // assert that it satisfies the json.Unmarshaler interface.
-)
+var _ json.Unmarshaler = (*EventsAPIV2Error)(nil) // assert that it satisfies the json.Unmarshaler interface.
 
 // Error satisfies the error interface, and should contain the StatusCode,
-// EventsAPIV2Error.Message, EventsAPIV2Error.ErrorObject.Status, and EventsAPIV2Error.Errors.
+// APIError.Message, APIError.ErrorObject.Status, and APIError.Errors.
 func (e EventsAPIV2Error) Error() string {
 	if len(e.message) > 0 {
 		return e.message
 	}
 
-	if !e.EventsAPIV2Error.Valid {
+	if !e.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", e.StatusCode)
 	}
 
+	if len(e.APIError.ErrorObject.Errors) == 0 {
+		return fmt.Sprintf(
+			"HTTP response failed with status code %d, status: %s, message: %s",
+			e.StatusCode, e.APIError.ErrorObject.Status, e.APIError.ErrorObject.Message,
+		)
+	}
+
 	return fmt.Sprintf(
-		"HTTP response failed with status code: %d, message: %s, status: %s: %s",
+		"HTTP response failed with status code %d, status: %s, message: %s: %s",
 		e.StatusCode,
-		e.EventsAPIV2Error.ErrorObject.Message,
-		e.EventsAPIV2Error.ErrorObject.Status,
-		apiErrorsDetailString(e.EventsAPIV2Error.ErrorObject.Errors),
+		e.APIError.ErrorObject.Status,
+		e.APIError.ErrorObject.Message,
+		apiErrorsDetailString(e.APIError.ErrorObject.Errors),
 	)
 }
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler.
 func (e *EventsAPIV2Error) UnmarshalJSON(data []byte) error {
-	var eaeo EventsAPIV2ErrorObject
-	if err := json.Unmarshal(data, &eaeo); err != nil {
+	var eo EventsAPIV2ErrorObject
+	if err := json.Unmarshal(data, &eo); err != nil {
 		return err
 	}
 
-	e.EventsAPIV2Error.ErrorObject = eaeo
-	e.EventsAPIV2Error.Valid = true
+	e.APIError.ErrorObject = eo
+	e.APIError.Valid = true
 
 	return nil
 }
@@ -117,7 +121,7 @@ func (e EventsAPIV2Error) BadRequest() bool {
 	return e.StatusCode == http.StatusBadRequest
 }
 
-// RateLimited returns whether the response had e status of 429, and as such the
+// RateLimited returns whether the response had a status of 429, and as such the
 // client is rate limited. The PagerDuty rate limits should reset once per
 // minute, and for the REST API they are an account-wide rate limit (not per
 // API key or IP).
@@ -125,10 +129,20 @@ func (e EventsAPIV2Error) RateLimited() bool {
 	return e.StatusCode == http.StatusTooManyRequests
 }
 
+// APITimeout returns whether whether the response had a status of 408,
+// indicating there was a request timeout on PagerDuty's side. This error is
+// considered temporary, and so the request should be retried.
+//
+// Please note, this does not returnn true if the Go context.Context deadline
+// was exceeded when making the request.
+func (e EventsAPIV2Error) APITimeout() bool {
+	return e.StatusCode == http.StatusRequestTimeout
+}
+
 // Temporary returns whether it was a temporary error, one of which is a
 // RateLimited error.
 func (e EventsAPIV2Error) Temporary() bool {
-	return e.RateLimited() || (e.StatusCode >= 500 && e.StatusCode < 600)
+	return e.RateLimited() || e.APITimeout() || (e.StatusCode >= 500 && e.StatusCode < 600)
 }
 
 // NullEventsAPIV2ErrorObject is a wrapper around the EventsAPIV2ErrorObject type. If the Valid
@@ -148,9 +162,12 @@ type NullEventsAPIV2ErrorObject struct {
 // occurs. This includes messages that should hopefully provide useful context
 // to the end user.
 type EventsAPIV2ErrorObject struct {
-	Status  string   `json:"status,omitempty"`
-	Message string   `json:"message,omitempty"`
-	Errors  []string `json:"errors,omitempty"`
+	Status  string `json:"status,omitempty"`
+	Message string `json:"message,omitempty"`
+
+	// Errors is likely to be empty, with the relevant error presented via the
+	// Status field instead.
+	Errors []string `json:"errors,omitempty"`
 }
 
 // ManageEventWithContext handles the trigger, acknowledge, and resolve methods for an event.

@@ -107,7 +107,7 @@ type NullAPIErrorObject struct {
 	ErrorObject APIErrorObject
 }
 
-var _ json.Unmarshaler = &NullAPIErrorObject{} // assert that it satisfies the json.Unmarshaler interface.
+var _ json.Unmarshaler = (*NullAPIErrorObject)(nil) // assert that it satisfies the json.Unmarshaler interface.
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler
 func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
@@ -166,8 +166,6 @@ type APIError struct {
 	message string
 }
 
-var _ error = &APIError{} // assert that it implements the error interface.
-
 // Error satisfies the error interface, and should contain the StatusCode,
 // APIErrorObject.Message, and APIErrorObject.Code.
 func (a APIError) Error() string {
@@ -198,7 +196,7 @@ func (a APIError) Error() string {
 func apiErrorsDetailString(errs []string) string {
 	switch n := len(errs); n {
 	case 0:
-		return ""
+		panic("errs slice is empty")
 
 	case 1:
 		return errs[0]
