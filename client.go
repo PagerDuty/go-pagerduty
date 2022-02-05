@@ -44,7 +44,7 @@ const (
 )
 
 // APIObject represents generic api json response that is shared by most
-// domain object (like escalation
+// domain objects (like escalation)
 type APIObject struct {
 	ID      string `json:"id,omitempty"`
 	Type    string `json:"type,omitempty"`
@@ -106,6 +106,8 @@ type NullAPIErrorObject struct {
 	Valid       bool
 	ErrorObject APIErrorObject
 }
+
+var _ json.Unmarshaler = (*NullAPIErrorObject)(nil) // assert that it satisfies the json.Unmarshaler interface.
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler
 func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
@@ -348,7 +350,7 @@ const (
 	DebugCaptureLastRequest DebugFlag = 1 << 0
 
 	// DebugCaptureLastResponse captures the last HTTP response from the API (if
-	// there was one) and makes it available via the LastAPIReponse() method.
+	// there was one) and makes it available via the LastAPIResponse() method.
 	//
 	// This may increase memory usage / GC, as we'll be making a copy of the
 	// full HTTP response body on each request and capturing it for inspection.
@@ -575,7 +577,7 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 
 func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, error) {
 	if err != nil {
-		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
+		return resp, fmt.Errorf("error calling the API endpoint: %v", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
