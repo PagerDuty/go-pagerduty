@@ -3,9 +3,11 @@ package pagerduty
 import (
 	"context"
 	"fmt"
+	"net/http"
 )
 
 const analyticsBaseURL = "/analytics/metrics/incidents"
+const analyticsRawURL = "/analytics/raw"
 
 // AnalyticsRequest represents the request to be sent to PagerDuty when you want
 // aggregated analytics.
@@ -61,6 +63,35 @@ type AnalyticsData struct {
 	RangeStart                     string  `json:"range_start,omitempty"`
 }
 
+type AnalyticsRawIncidentResponse struct {
+	ID                        string `json:"id,omitempty"`
+	TeamID                    string `json:"team_id,omitempty"`
+	TeamName                  string `json:"team_name,omitempty"`
+	ServiceID                 string `json:"service_id,omitempty"`
+	ServiceName               string `json:"service_name,omitempty"`
+	Description               string `json:"description,omitempty"`
+	IncidentNumber            uint   `json:"incident_number,omitempty"`
+	CreatedAt                 string `json:"created_at,omitempty"`
+	ResolvedAt                string `json:"resolved_at,omitempty"`
+	Urgency                   string `json:"urgency,omitempty"`
+	Major                     bool   `json:"major,omitempty"`
+	PriorityID                string `json:"priority_id,omitempty"`
+	PriorityName              string `json:"priority_name,omitempty"`
+	SecondsToResolve          uint   `json:"seconds_to_resolve,omitempty"`
+	SecondsToFirstAck         uint   `json:"seconds_to_first_ack,omitempty"`
+	SecondsToEngage           uint   `json:"seconds_to_engage,omitempty"`
+	SecondsToMobilize         uint   `json:"seconds_to_mobilize,omitempty"`
+	EngagedSeconds            uint   `json:"engaged_seconds,omitempty"`
+	EngagedUserCount          uint   `json:"engaged_user_count,omitempty"`
+	EscalationCount           uint   `json:"escalation_count,omitempty"`
+	AssignmentCount           uint   `json:"assignment_count,omitempty"`
+	BusinessHourInterruptions uint   `json:"business_hour_interruptions,omitempty"`
+	SleepHourInterruptions    uint   `json:"sleep_hour_interruptions,omitempty"`
+	OffHourInterruptions      uint   `json:"off_hour_interruptions,omitempty"`
+	SnoozedSeconds            uint   `json:"snoozed_seconds,omitempty"`
+	UserDefinedEffortsSeconds uint   `json:"user_defined_effort_seconds,omitempty"`
+}
+
 // GetAggregatedIncidentData gets the aggregated incident analytics for the requested data.
 func (c *Client) GetAggregatedIncidentData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
 	return c.getAggregatedData(ctx, analytics, "all")
@@ -93,4 +124,32 @@ func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsReque
 	}
 
 	return analyticsResponse, nil
+}
+
+// Get raw data incident data and its metrics for the requested data.
+func (c *Client) GetAnalyticsRawIncidentData(ctx context.Context, incident_id string) (AnalyticsRawIncidentResponse, error) {
+	return c.GetAnalyticsRawIncidentWithContext(ctx, incident_id, "incidents")
+}
+
+// Gets raw data incident with context gets the incident and its metrics for the requested data.
+func (c *Client) GetAnalyticsRawIncidentWithContext(ctx context.Context, incident_id string, endpoint string) (AnalyticsRawIncidentResponse, error) {
+	headers := map[string]string{
+		"X-EARLY-ACCESS": "analytics-v2",
+	}
+
+	url := fmt.Sprintf("%s/%s/%s", analyticsRawURL, endpoint, incident_id)
+
+	resp, err := c.do(ctx, http.MethodGet, url, nil, headers)
+
+	if err != nil {
+		return AnalyticsRawIncidentResponse{}, err
+	}
+
+	var analyticsResponse AnalyticsRawIncidentResponse
+
+	if err := c.decodeJSON(resp, &analyticsResponse); err != nil {
+		return AnalyticsRawIncidentResponse{}, err
+	}
+	return analyticsResponse, nil
+
 }

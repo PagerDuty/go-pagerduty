@@ -139,3 +139,25 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestAnalytics_GetAnalyticsRawIncidentData(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/analytics/raw/incidents/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"id": "1"}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	id := "1"
+
+	res, err := client.GetAnalyticsRawIncidentData(context.Background(), id)
+
+	want := AnalyticsRawIncidentResponse{ID: "1"}
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
