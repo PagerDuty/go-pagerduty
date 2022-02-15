@@ -409,6 +409,7 @@ func (c *Client) ListIncidentNotesWithContext(ctx context.Context, id string) ([
 type IncidentAlert struct {
 	APIObject
 	CreatedAt   string                 `json:"created_at,omitempty"`
+	ResolvedAt  string                 `json:"resolved_at,omitempty"`
 	Status      string                 `json:"status,omitempty"`
 	AlertKey    string                 `json:"alert_key,omitempty"`
 	Service     APIObject              `json:"service,omitempty"`
