@@ -51,6 +51,7 @@ type APIObject struct {
 	Summary string `json:"summary,omitempty"`
 	Self    string `json:"self,omitempty"`
 	HTMLURL string `json:"html_url,omitempty"`
+	DeletedAt string `json:"deleted_at,omitempty"`
 }
 
 // APIListObject are the fields used to control pagination when listing objects.
