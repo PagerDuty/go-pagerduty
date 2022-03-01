@@ -8,12 +8,15 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 )
 
+// OutboundEventData is the unmarshalled data portion of the OutboundEvent.
 type OutboundEventData struct {
 	Object map[string]interface{}
 	// The raw json data for use in structured unmarshalling.
 	RawData json.RawMessage
 }
 
+// OutboundEvent represents the event that is delivered in a V3 Webhook Payload.
+// See https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTkw-v3-overview#webhook-payload for more details.
 type OutboundEvent struct {
 	ID           string                  `json:"id"`
 	EventType    string                  `json:"event_type"`
@@ -23,10 +26,14 @@ type OutboundEvent struct {
 	Data         *OutboundEventData      `json:"data"`
 }
 
+// WebhookPayload represents the full object delivered as a result of V3 Webhook Subscriptions.
+// See https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTkw-v3-overview#webhook-payload for more details.
 type WebhookPayload struct {
 	Event OutboundEvent `json:"event"`
 }
 
+// UnmarshalJSON is a custom unmarshaller used to produce OutboundEventData
+// for further processing.
 func (e *OutboundEventData) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &e.Object); err != nil {
 		return err
@@ -39,8 +46,14 @@ func (e *OutboundEventData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (oe *OutboundEvent) GetEventDataValue(keys ...string) (string, error) {
-	return getDataValue(oe.Data.Object, keys)
+// GetEventDataValue returns a value from the e.Data object using the keys as a path
+// or returns an error if the path does not point to a field.
+//
+// For example, `e.GetEventDataValue("type")` would return the `event.data.type` from a Webhook Payload.
+// If the event type is `"incident"`, e.GetEventDataValue("priority", "id") would return the priority id.
+// See the tests for additional examples.
+func (e OutboundEvent) GetEventDataValue(keys ...string) (string, error) {
+	return getDataValue(e.Data.Object, keys)
 }
 
 func getDataValue(d map[string]interface{}, keys []string) (string, error) {
