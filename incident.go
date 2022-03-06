@@ -126,6 +126,10 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return c.ListIncidentsWithContext(context.Background(), o)
 }
 
+func (c *Client) ListIncidentsPaginated(o ListIncidentsOptions) ([]Incident, error) {
+	return c.ListIncidentsPaginatedWithContext(context.Background(), o)
+}
+
 // ListIncidentsWithContext lists existing incidents.
 func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOptions) (*ListIncidentsResponse, error) {
 	v, err := query.Values(o)
@@ -146,8 +150,8 @@ func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOp
 	return &result, nil
 }
 
-// ListServicesPaginated lists existing services processing paginated responses
-func (c *Client) ListIncidentsPaginated(ctx context.Context, o ListIncidentsOptions) ([]Incident, error) {
+// ListIncidentsPaginated lists existing services processing paginated responses
+func (c *Client) ListIncidentsPaginatedWithContext(ctx context.Context, o ListIncidentsOptions) ([]Incident, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
