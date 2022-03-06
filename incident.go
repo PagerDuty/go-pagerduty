@@ -3,6 +3,7 @@ package pagerduty
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -163,6 +164,10 @@ func (c *Client) ListIncidents(o ListIncidentsOptions) (*ListIncidentsResponse, 
 	return c.ListIncidentsWithContext(context.Background(), o)
 }
 
+func (c *Client) ListIncidentsPaginated(o ListIncidentsOptions) ([]Incident, error) {
+	return c.ListIncidentsPaginatedWithContext(context.Background(), o)
+}
+
 // ListIncidentsWithContext lists existing incidents.
 func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOptions) (*ListIncidentsResponse, error) {
 	v, err := query.Values(o)
@@ -181,6 +186,37 @@ func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOp
 	}
 
 	return &result, nil
+}
+
+// ListIncidentsPaginated lists existing services processing paginated responses
+func (c *Client) ListIncidentsPaginatedWithContext(ctx context.Context, o ListIncidentsOptions) ([]Incident, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	var incidents []Incident
+
+	responseHandler := func(response *http.Response) (APIListObject, error) {
+		var result ListIncidentsResponse
+		if err := c.decodeJSON(response, &result); err != nil {
+			return APIListObject{}, err
+		}
+
+		incidents = append(incidents, result.Incidents...)
+
+		return APIListObject{
+			More:   result.More,
+			Offset: result.Offset,
+			Limit:  result.Limit,
+		}, nil
+	}
+
+	if err := c.pagedGet(ctx, "/incidents?"+v.Encode(), responseHandler); err != nil {
+		return nil, err
+	}
+
+	return incidents, nil
 }
 
 // createIncidentResponse is returned from the API when creating a response.
