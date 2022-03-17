@@ -11,7 +11,7 @@ func TestSlackConnection_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/integration-slack/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 	})
 
@@ -27,7 +27,7 @@ func TestSlackConnection_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/workspaces/foo/connections", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/integration-slack/workspaces/foo/connections", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		_, _ = w.Write([]byte(`
 		{
@@ -129,7 +129,7 @@ func TestSlackConnection_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/integration-slack/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		_, _ = w.Write([]byte(`
 		{
@@ -250,7 +250,7 @@ func TestSlackConnection_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/integration-slack/workspaces/foo/connections/connectionid", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		_, _ = w.Write([]byte(`
 		{

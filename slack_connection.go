@@ -61,19 +61,19 @@ func (c *Client) CreateSlackConnectionWithContext(ctx context.Context, slackTeam
 		"slack_connection": s,
 	}
 
-	resp, err := c.post(ctx, "/workspaces/"+slackTeamID+"/connections", d, nil)
+	resp, err := c.post(ctx, "/integration-slack/workspaces/"+slackTeamID+"/connections", d, nil)
 	return getSlackConnectionFromResponse(c, resp, err)
 }
 
 // GetSlackConnection gets a Slack connection.
 func (c *Client) GetSlackConnectionWithContext(ctx context.Context, slackTeamID, connectionID string) (SlackConnectionObject, error) {
-	resp, err := c.get(ctx, "/workspaces/"+slackTeamID+"/connections/"+connectionID)
+	resp, err := c.get(ctx, "/integration-slack/workspaces/"+slackTeamID+"/connections/"+connectionID)
 	return getSlackConnectionFromResponse(c, resp, err)
 }
 
 // DeleteSlackConnectionWithContext deletes a Slack connection.
 func (c *Client) DeleteSlackConnectionWithContext(ctx context.Context, slackTeamID, connectionID string) error {
-	_, err := c.delete(ctx, "/workspaces/"+slackTeamID+"/connections/"+connectionID)
+	_, err := c.delete(ctx, "/integration-slack/workspaces/"+slackTeamID+"/connections/"+connectionID)
 	return err
 }
 
@@ -83,7 +83,7 @@ func (c *Client) UpdateSlackConnectionWithContext(ctx context.Context, slackTeam
 		"slack_connection": s,
 	}
 
-	resp, err := c.put(ctx, "/workspaces/"+slackTeamID+"/connections/"+connectionID, d, nil)
+	resp, err := c.put(ctx, "/integration-slack/workspaces/"+slackTeamID+"/connections/"+connectionID, d, nil)
 	return getSlackConnectionFromResponse(c, resp, err)
 }
 
@@ -94,7 +94,7 @@ func (c *Client) ListSlackConnectionsWithContext(ctx context.Context, slackTeamI
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/workspaces/"+slackTeamID+"/connections?"+v.Encode())
+	resp, err := c.get(ctx, "/integration-slack/workspaces/"+slackTeamID+"/connections?"+v.Encode())
 	if err != nil {
 		return nil, err
 	}
