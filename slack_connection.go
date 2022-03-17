@@ -38,7 +38,7 @@ type SlackConnectionObject struct {
 
 // ListSlackConnectionsResponse is an API object returned by the list function.
 type ListSlackConnectionsResponse struct {
-	Connections []SlackConnection `json:"slack_connections"`
+	Connections []SlackConnectionObject `json:"slack_connections"`
 	APIListObject
 }
 
