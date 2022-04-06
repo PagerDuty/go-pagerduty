@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"time"
@@ -58,4 +59,104 @@ func DecodeWebhook(r io.Reader) (*WebhookPayloadMessages, error) {
 		return nil, err
 	}
 	return &payload, nil
+}
+
+type DeliveryMethod struct {
+	Url                 string   `json:"url"`
+	Type                string   `json:"type"`
+	CustomHeaders       []string `json:"custom_headers"`
+	TemporarilyDisabled bool     `json:"temporarily_disabled"`
+}
+
+type Filter struct {
+	Type string `json:"type"`
+	ID   string `json:"id"`
+}
+
+type WebhookSubscription struct {
+	APIObject
+	ID             string         `json:"id"`
+	Type           string         `json:"type"`
+	Active         bool           `json:"active"`
+	DeliveryMethod DeliveryMethod `json:"delivery_method"`
+	Description    string         `json:"description"`
+	Events         []string       `json:"events"`
+	Filter         Filter         `json:"filter"`
+}
+
+type CreateWebhookOptions struct {
+	Type           string         `json:"type"`
+	Active         bool           `json:"active"`
+	DeliveryMethod DeliveryMethod `json:"delivery_method"`
+	Description    string         `json:"description"`
+	Events         []string       `json:"events"`
+	Filter         Filter         `json:"filter"`
+}
+
+type WebhookResponse struct {
+	WebhookSubscription WebhookSubscription `json:"webhook_subscription"`
+}
+
+type UpdateWebhookOptions struct {
+	Active      bool     `json:"active"`
+	Description string   `json:"description"`
+	Events      []string `json:"events"`
+	Filter      Filter   `json:"filter"`
+}
+
+// CreateWebhookWithContext creates a new webhook.
+func (c *Client) CreateWebhookWithContext(ctx context.Context, o *CreateWebhookOptions) (*WebhookSubscription, error) {
+	b := map[string]*CreateWebhookOptions{
+		"webhook_subscription": o,
+	}
+
+	resp, err := c.post(ctx, "/webhook_subscriptions", b, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ii WebhookResponse
+	if err = c.decodeJSON(resp, &ii); err != nil {
+		return nil, err
+	}
+
+	return &ii.WebhookSubscription, nil
+}
+
+// UpdateWebhookWithContext creates a new webhook.
+func (c *Client) UpdateWebhookWithContext(ctx context.Context, id string, o *UpdateWebhookOptions) (*WebhookSubscription, error) {
+	b := map[string]*UpdateWebhookOptions{
+		"webhook_subscription": o,
+	}
+
+	resp, err := c.put(ctx, "/webhook_subscriptions/"+id, b, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ii WebhookResponse
+	if err = c.decodeJSON(resp, &ii); err != nil {
+		return nil, err
+	}
+
+	return &ii.WebhookSubscription, nil
+}
+
+// GetWebhookWithContext returns information about a specific webhook by ID
+func (c *Client) GetWebhookWithContext(ctx context.Context, id string) (*WebhookSubscription, error) {
+	resp, err := c.get(ctx, "/webhook_subscriptions/"+id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ii WebhookResponse
+	if err = c.decodeJSON(resp, &ii); err != nil {
+		return nil, err
+	}
+
+	return &ii.WebhookSubscription, nil
+
 }
