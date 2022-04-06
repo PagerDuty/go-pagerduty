@@ -1,6 +1,11 @@
 package pagerduty
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
 	"testing"
 )
@@ -38,4 +43,202 @@ func TestWebhook_DecodeWebhook(t *testing.T) {
 	if len(incidentDetails.Assignments) != 1 {
 		t.Fatal("Expected 1 Assignment")
 	}
+}
+
+func TestWebhook_Create(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := &CreateWebhookOptions{
+		Type:   "webhook_subscription",
+		Active: true,
+		DeliveryMethod: DeliveryMethod{
+			Url:  "http://my-url.com",
+			Type: "http_delivery_method",
+		},
+		Description: "my new webhook",
+		Events:      []string{"incident.triggered"},
+		Filter: Filter{
+			Type: "account_reference",
+		},
+	}
+
+	mux.HandleFunc("/webhook_subscriptions", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+
+		body, err := ioutil.ReadAll(r.Body)
+		testErrCheck(t, "ioutil.ReadAll", "", err)
+
+		fmt.Println(string(body))
+
+		got := make(map[string]CreateWebhookOptions)
+		testErrCheck(t, "json.Unmarshal()", "", json.Unmarshal(body, &got))
+
+		o, ok := got["webhook_subscription"]
+		if !ok {
+			t.Fatal("map does not have an incident key")
+		}
+
+		if o.Type != "webhook_subscription" {
+			t.Errorf("o.Type = %q, want %q", o.Type, "incident")
+		}
+
+		if o.DeliveryMethod.Url != "http://my-url.com" {
+			t.Errorf("o.DeliveryMethod.Url = %q, want %q", o.DeliveryMethod.Url, "http://my-url.com")
+		}
+
+		_, _ = w.Write([]byte(
+			`{
+				"webhook_subscription": {		
+				"active": true,
+				"delivery_method": {
+					"type": "http_delivery_method",
+					"url": "http://my-url.com"
+				},
+				"description": "my new webhook",
+				"events": [
+					"incident.triggered"
+				],
+				"filter": {
+					"id": null,
+					"type": "account_reference"
+				},
+				"id": "1",
+				"type": "webhook_subscription"
+			}}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	res, err := client.CreateWebhookWithContext(context.Background(), input)
+
+	want := &WebhookSubscription{
+		ID:     "1",
+		Type:   "webhook_subscription",
+		Active: true,
+		DeliveryMethod: DeliveryMethod{
+			Url:  "http://my-url.com",
+			Type: "http_delivery_method",
+		},
+		Description: "my new webhook",
+		Events:      []string{"incident.triggered"},
+		Filter: Filter{
+			Type: "account_reference",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestWebhook_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/webhook_subscriptions/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+
+		_, _ = w.Write([]byte(
+			`{
+				"webhook_subscription": {		
+				"active": true,
+				"delivery_method": {
+					"type": "http_delivery_method",
+					"url": "http://my-url.com"
+				},
+				"description": "my new webhook",
+				"events": [
+					"incident.triggered",
+					"incident.delegated"
+				],
+				"filter": {
+					"id": null,
+					"type": "account_reference"
+				},
+				"id": "1",
+				"type": "webhook_subscription"
+			}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	input := &UpdateWebhookOptions{
+		Events: []string{
+			"incident.triggered", "incident.delegated",
+		},
+	}
+	res, err := client.UpdateWebhookWithContext(context.Background(), "1", input)
+
+	want := &WebhookSubscription{
+		ID:     "1",
+		Type:   "webhook_subscription",
+		Active: true,
+		DeliveryMethod: DeliveryMethod{
+			Url:  "http://my-url.com",
+			Type: "http_delivery_method",
+		},
+		Description: "my new webhook",
+		Events:      []string{"incident.triggered", "incident.delegated"},
+		Filter: Filter{
+			Type: "account_reference",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestWebhook_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/webhook_subscriptions/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+
+		_, _ = w.Write([]byte(
+			`{
+				"webhook_subscription": {		
+				"active": true,
+				"delivery_method": {
+					"type": "http_delivery_method",
+					"url": "http://my-url.com"
+				},
+				"description": "my new webhook",
+				"events": [
+					"incident.triggered"
+				],
+				"filter": {
+					"id": null,
+					"type": "account_reference"
+				},
+				"id": "1",
+				"type": "webhook_subscription"
+			}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.GetWebhookWithContext(context.Background(), "1")
+
+	want := &WebhookSubscription{
+		ID:     "1",
+		Type:   "webhook_subscription",
+		Active: true,
+		DeliveryMethod: DeliveryMethod{
+			Url:  "http://my-url.com",
+			Type: "http_delivery_method",
+		},
+		Description: "my new webhook",
+		Events:      []string{"incident.triggered"},
+		Filter: Filter{
+			Type: "account_reference",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
 }
