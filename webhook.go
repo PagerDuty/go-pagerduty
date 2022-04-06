@@ -106,7 +106,6 @@ type UpdateWebhookOptions struct {
 
 // CreateWebhookWithContext creates a new webhook.
 func (c *Client) CreateWebhookWithContext(ctx context.Context, o *CreateWebhookOptions) (*WebhookSubscription, error) {
-
 	b := map[string]*CreateWebhookOptions{
 		"webhook_subscription": o,
 	}
@@ -127,7 +126,6 @@ func (c *Client) CreateWebhookWithContext(ctx context.Context, o *CreateWebhookO
 
 // UpdateWebhookWithContext creates a new webhook.
 func (c *Client) UpdateWebhookWithContext(ctx context.Context, id string, o *UpdateWebhookOptions) (*WebhookSubscription, error) {
-
 	b := map[string]*UpdateWebhookOptions{
 		"webhook_subscription": o,
 	}
