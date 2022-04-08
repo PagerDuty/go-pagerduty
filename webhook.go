@@ -66,6 +66,9 @@ type DeliveryMethod struct {
 	Type                string   `json:"type"`
 	CustomHeaders       []string `json:"custom_headers"`
 	TemporarilyDisabled bool     `json:"temporarily_disabled"`
+	ID                  string   `json:"id"`
+	Secret              string   `json:"secret"`
+	ExtensionID         string   `json:"extension_id"`
 }
 
 type Filter struct {
