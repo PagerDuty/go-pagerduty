@@ -101,10 +101,11 @@ type WebhookResponse struct {
 }
 
 type UpdateWebhookOptions struct {
-	Active      bool     `json:"active"`
-	Description string   `json:"description"`
-	Events      []string `json:"events"`
-	Filter      Filter   `json:"filter"`
+	// pointer fields here are used to allow us to omit certain fields when updating
+	Active      *bool    `json:"active,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Events      []string `json:"events,omitempty"`
+	Filter      *Filter  `json:"filter,omitempty"`
 }
 
 // CreateWebhookWithContext creates a new webhook.
