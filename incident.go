@@ -654,6 +654,10 @@ type ResponderRequestResponse struct {
 	ResponderRequest ResponderRequest `json:"responder_request"`
 }
 
+type ResponderRequestTargetList struct {
+	Target ResponderRequestTarget `json:"responder_request_target"`
+}
+
 // ResponderRequestTarget specifies an individual target for the responder request.
 type ResponderRequestTarget struct {
 	APIObject
@@ -670,11 +674,11 @@ type ResponderRequestOptions struct {
 
 // ResponderRequest contains the API structure for an incident responder request.
 type ResponderRequest struct {
-	Incident    Incident                 `json:"incident"`
-	Requester   User                     `json:"requester,omitempty"`
-	RequestedAt string                   `json:"request_at,omitempty"`
-	Message     string                   `json:"message,omitempty"`
-	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
+	Incident    Incident                     `json:"incident"`
+	Requester   User                         `json:"requester,omitempty"`
+	RequestedAt string                       `json:"request_at,omitempty"`
+	Message     string                       `json:"message,omitempty"`
+	Targets     []ResponderRequestTargetList `json:"responder_request_targets"`
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.

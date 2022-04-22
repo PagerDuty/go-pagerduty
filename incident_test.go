@@ -808,12 +808,15 @@ func TestIncident_ResponderRequest(t *testing.T) {
 		},
 		"message": "Help",
 		"responder_request_targets": [{
-			"id": "PJ25ZYX",
-			"type": "user_reference",
-			"incident_responders": {
-				"state": "pending",
-				"user": {
-					"id": "PJ25ZYX"
+			"responder_request_target": {
+				"id": "PJ25ZYX",
+				"type": "user_reference",
+				"incident_responders": {
+					"state": "pending",
+					"user": {
+						"id": "PJ25ZYX",
+						"type": "user_reference"
+					}
 				}
 			}
 		}]
@@ -840,20 +843,21 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	user.ID = "PL1JMK5"
 	user.Type = "user_reference"
 
-	target := ResponderRequestTarget{}
-	target.ID = "PJ25ZYX"
-	target.Type = "user_reference"
-	target.Responders.State = "pending"
-	target.Responders.User.ID = "PJ25ZYX"
+	target := ResponderRequestTargetList{Target: ResponderRequestTarget{}}
+	target.Target.ID = "PJ25ZYX"
+	target.Target.Type = "user_reference"
+	target.Target.Responders.State = "pending"
+	target.Target.Responders.User.ID = "PJ25ZYX"
+	target.Target.Responders.User.Type = "user_reference"
 
-	targets = []ResponderRequestTarget{target}
+	targets_out := []ResponderRequestTargetList{target}
 
 	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   targets,
+			Targets:   targets_out,
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
