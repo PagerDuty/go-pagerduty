@@ -826,10 +826,10 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
-	targ := ResponderRequestTargetList{Target: ResponderRequestTarget{}}
-	targ.Target.ID = "PJ25ZYX"
-	targ.Target.Type = "user_reference"
-	targets := []ResponderRequestTargetList{targ}
+	target := ResponderRequestTargetList{Target: ResponderRequestTarget{}}
+	target.Target.ID = "PJ25ZYX"
+	target.Target.Type = "user_reference"
+	targets := []ResponderRequestTargetList{target}
 
 	input := ResponderRequestOptions{
 		From:        from,
@@ -842,17 +842,17 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	user.ID = "PL1JMK5"
 	user.Type = "user_reference"
 
-	targ.Target.Responders.State = "pending"
-	targ.Target.Responders.User.ID = "PJ25ZYX"
-	targ.Target.Responders.User.Type = "user_reference"
-	targets_out := []ResponderRequestTargetList{targ}
+	target.Target.Responders.State = "pending"
+	target.Target.Responders.User.ID = "PJ25ZYX"
+	target.Target.Responders.User.Type = "user_reference"
+	targets = []ResponderRequestTargetList{target}
 
 	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   targets_out,
+			Targets:   targets,
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
