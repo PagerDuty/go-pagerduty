@@ -654,6 +654,8 @@ type ResponderRequestResponse struct {
 	ResponderRequest ResponderRequest `json:"responder_request"`
 }
 
+// ResponderRequestTargetList will wrap each result in the returned responder request
+// API call, nesting the content under this key within the JSON.
 type ResponderRequestTargetList struct {
 	Target ResponderRequestTarget `json:"responder_request_target"`
 }
