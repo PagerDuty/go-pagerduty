@@ -830,7 +830,9 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	r.ID = "PJ25ZYX"
 	r.Type = "user_reference"
 
-	targets := []ResponderRequestTarget{r}
+	targets := []ResponderRequestTargetInput{
+		ResponderRequestTargetInput{Target: APIObject{ID: "PJ25ZYX", Type: "user_reference"}},
+	}
 
 	input := ResponderRequestOptions{
 		From:        from,

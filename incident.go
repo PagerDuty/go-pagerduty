@@ -666,12 +666,18 @@ type ResponderRequestTarget struct {
 	Responders IncidentResponders `json:"incident_responders"`
 }
 
+// ResponderRequestTargetInput sets up the payload structure to request a responder
+// for the specific incident.
+type ResponderRequestTargetInput struct {
+	Target APIObject `json:"responder_request_target"`
+}
+
 // ResponderRequestOptions defines the input options for the Create Responder function.
 type ResponderRequestOptions struct {
-	From        string                   `json:"-"`
-	Message     string                   `json:"message"`
-	RequesterID string                   `json:"requester_id"`
-	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
+	From        string                        `json:"-"`
+	Message     string                        `json:"message"`
+	RequesterID string                        `json:"requester_id"`
+	Targets     []ResponderRequestTargetInput `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
