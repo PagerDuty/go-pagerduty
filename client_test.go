@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -739,6 +740,47 @@ func TestNullAPIErrorObject_UnmarshalJSON(t *testing.T) {
 			}
 
 			testEqual(t, tt.want, got)
+		})
+	}
+}
+
+func Test_dupeRequest(t *testing.T) {
+	reqA, _ := http.NewRequest(http.MethodGet, "http://localhost/api/v1/foo", strings.NewReader("some data\n"))
+	reqB, _ := http.NewRequest(http.MethodGet, "http://localhost/api/v1/foo", nil)
+
+	tests := []struct {
+		name string
+		req  *http.Request
+	}{
+		{
+			name: "ok",
+			req:  reqA,
+		},
+		{
+			name: "ok_nil_body",
+			req:  reqB,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotr, err := dupeRequest(tt.req)
+			testErrCheck(t, "dupeRequest()", "", err)
+
+			var gotb, wantb []byte
+			if gotr.Body != nil {
+				gotb, err = ioutil.ReadAll(gotr.Body)
+				testErrCheck(t, "ioutil.ReadAll(gotr.Body)", "", err)
+			}
+
+			if tt.req.Body != nil {
+				wantb, err = ioutil.ReadAll(tt.req.Body)
+				testErrCheck(t, "ioutil.ReadAll(tt.req.Body)", "", err)
+			}
+
+			if !bytes.Equal(gotb, wantb) {
+				t.Fatalf("gotb = %q, want %q", gotb, wantb)
+			}
 		})
 	}
 }
