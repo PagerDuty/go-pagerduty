@@ -1,5 +1,24 @@
 # Changelog
 
+## [v1.5.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.1) (2022-04-24) - Bug Fixes
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/8)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.5.0...v1.5.1)
+
+**Highlights**
+
+- Fix panic that would occur when debug request capturing is enabled, and request has a nil HTTP body (GET request)
+- Fix options for ListNotifications, where URL parameters weren't being set correctly.
+
+**Closed issues**
+
+None
+
+**Merged pull requests**
+
+- Backport fix for panic when debug request captures are enabled [\#444](https://github.com/PagerDuty/go-pagerduty/pull/444) ([theckman](https://github.com/theckman))
+- Backport: Fix list notifications options [\#445](https://github.com/PagerDuty/go-pagerduty/pull/445) ([jaimegago](https://github.com/jaimegago), backported by [theckman](https://github.com/theckman))
+
 ## [v1.5.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.0) (2022-01-22) - BREAKING CHANGES
 
 [Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2)  
