@@ -42,7 +42,7 @@ type ListNotificationOptions struct {
 	Since    string   `url:"since,omitempty"`
 	Until    string   `url:"until,omitempty"`
 	Filter   string   `url:"filter,omitempty"`
-	Includes []string `url:"include,omitempty"`
+	Includes []string `url:"include,omitempty,brackets"`
 }
 
 // ListNotificationsResponse is the data structure returned from the ListNotifications API endpoint.
