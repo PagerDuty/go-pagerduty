@@ -7,7 +7,7 @@
 
 **Highlights**
 
-- Fix panic that would occur when debug request capturing is enabled, and request has a nil HTTP body (GET request**
+- Fix panic that would occur when debug request capturing is enabled, and request has a nil HTTP body (GET request)
 - Fix options for ListNotifications, where URL parameters weren't being set correctly.
 
 **Closed issues**
