@@ -99,10 +99,10 @@ type Service struct {
 	Addons                  []Addon                  `json:"addons,omitempty"`
 }
 
-// AlertGroupingParameters defines how alerts on the servicewill be automatically grouped into incidents
+// AlertGroupingParameters defines how alerts on the service will be automatically grouped into incidents
 type AlertGroupingParameters struct {
-	Type   string                 `json:"type"`
-	Config AlertGroupParamsConfig `json:"config"`
+	Type   string                  `json:"type,omitempty"`
+	Config *AlertGroupParamsConfig `json:"config,omitempty"`
 }
 
 // AlertGroupParamsConfig is the config object on alert_grouping_parameters

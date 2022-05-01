@@ -178,7 +178,7 @@ func TestService_CreateWithAlertGroupParamsTime(t *testing.T) {
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
 			Type: "time",
-			Config: AlertGroupParamsConfig{
+			Config: &AlertGroupParamsConfig{
 				Timeout: 2,
 			},
 		},
@@ -213,7 +213,7 @@ func TestService_CreateWithAlertGroupParamsContentBased(t *testing.T) {
 		Name: "foo",
 		AlertGroupingParameters: &AlertGroupingParameters{
 			Type: "content_based",
-			Config: AlertGroupParamsConfig{
+			Config: &AlertGroupParamsConfig{
 				Aggregate: "any",
 				Fields:    []string{"source", "component"},
 			},
