@@ -24,6 +24,10 @@ func EventOrchestrationUpdateCommand() (cli.Command, error) {
 func (c *EventOrchestrationUpdate) Help() string {
 	helpText := `
 	event-orchestration update <FILE> Update an event orchestration from json file
+	Options:
+
+		 -id
+
 	` + c.Meta.Help()
 	return strings.TrimSpace(helpText)
 }
@@ -33,16 +37,20 @@ func (c *EventOrchestrationUpdate) Synopsis() string {
 }
 
 func (c *EventOrchestrationUpdate) Run(args []string) int {
+	var eoID string
 	flags := c.Meta.FlagSet("event-orchestration update")
 	flags.Usage = func() { fmt.Println(c.Help()) }
-
+	flags.StringVar(&eoID, "id", "", "Event orchestration id")
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
 		return -1
 	}
-
 	if err := c.Meta.Setup(); err != nil {
 		log.Error(err)
+		return -1
+	}
+	if eoID == "" {
+		log.Error("You must provide event orchestration id")
 		return -1
 	}
 
@@ -66,7 +74,7 @@ func (c *EventOrchestrationUpdate) Run(args []string) int {
 	}
 
 	log.Debugf("%#v", eo)
-	if _, err := client.UpdateOrchestrationWithContext(context.Background(), eo); err != nil {
+	if _, err := client.UpdateOrchestrationWithContext(context.Background(), eoID, eo); err != nil {
 		log.Error(err)
 		return -1
 	}

@@ -36,7 +36,7 @@ func EventOrchestrationShowCommand() (cli.Command, error) {
 
 func (c *EventOrchestrationShow) Run(args []string) int {
 	var eoID string
-	flags := c.Meta.FlagSet("ep show")
+	flags := c.Meta.FlagSet("event-orchestration show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	flags.StringVar(&eoID, "id", "", "Event orchestration id")
 	if err := flags.Parse(args); err != nil {

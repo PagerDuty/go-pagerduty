@@ -151,17 +151,17 @@ func (c *Client) GetOrchestrationWithContext(ctx context.Context, id string, o *
 // UpdateOrchestration updates an existing event orchestration.
 //
 // Deprecated: Use UpdateOrchestrationWithContext instead.
-func (c *Client) UpdateOrchestration(e *Orchestration) (*Orchestration, error) {
-	return c.UpdateOrchestrationWithContext(context.Background(), *e)
+func (c *Client) UpdateOrchestration(id string, e *Orchestration) (*Orchestration, error) {
+	return c.UpdateOrchestrationWithContext(context.Background(), id, *e)
 }
 
 // UpdateOrchestrationWithContext updates an existing event orchestration.
-func (c *Client) UpdateOrchestrationWithContext(ctx context.Context, e Orchestration) (*Orchestration, error) {
+func (c *Client) UpdateOrchestrationWithContext(ctx context.Context, id string, e Orchestration) (*Orchestration, error) {
 	d := map[string]Orchestration{
 		"orchestration": e,
 	}
 
-	resp, err := c.put(ctx, eoPath+"/"+e.ID, d, nil)
+	resp, err := c.put(ctx, eoPath+"/"+id, d, nil)
 	return getOrchestrationFromResponse(c, resp, err)
 }
 
@@ -250,17 +250,17 @@ func (c *Client) GetOrchestrationRouterWithContext(ctx context.Context, id strin
 // UpdateOrchestrationRouter updates the routing rules of an existing event orchestration.
 //
 // Deprecated: Use UpdateOrchestrationRouterWithContext instead.
-func (c *Client) UpdateOrchestrationRouter(e *OrchestrationRouter) (*OrchestrationRouter, error) {
-	return c.UpdateOrchestrationRouterWithContext(context.Background(), *e)
+func (c *Client) UpdateOrchestrationRouter(id string, e *OrchestrationRouter) (*OrchestrationRouter, error) {
+	return c.UpdateOrchestrationRouterWithContext(context.Background(), id, *e)
 }
 
 // UpdateOrchestrationRouterWithContext updates the routing rules of an existing event orchestration.
-func (c *Client) UpdateOrchestrationRouterWithContext(ctx context.Context, e OrchestrationRouter) (*OrchestrationRouter, error) {
+func (c *Client) UpdateOrchestrationRouterWithContext(ctx context.Context, id string, e OrchestrationRouter) (*OrchestrationRouter, error) {
 	d := map[string]OrchestrationRouter{
 		"orchestration_path": e,
 	}
 
-	resp, err := c.put(ctx, eoPath+"/"+e.Parent.ID+"/router", d, nil)
+	resp, err := c.put(ctx, eoPath+"/"+id+"/router", d, nil)
 	return getOrchestrationRouterFromResponse(c, resp, err)
 }
 
