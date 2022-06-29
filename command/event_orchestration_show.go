@@ -16,7 +16,7 @@ type EventOrchestrationShow struct {
 
 func (c *EventOrchestrationShow) Help() string {
 	helpText := `
-	escalation-policy show  Show event orchestrations
+	pd event-orchestration show Show event orchestrations
 
 	Options:
 

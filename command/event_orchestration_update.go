@@ -23,7 +23,7 @@ func EventOrchestrationUpdateCommand() (cli.Command, error) {
 
 func (c *EventOrchestrationUpdate) Help() string {
 	helpText := `
-	event-orchestration update <FILE> Update an event orchestration from json file
+	pd event-orchestration update <FILE> Update an event orchestration from json file
 	Options:
 
 		 -id

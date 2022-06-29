@@ -19,7 +19,7 @@ func EventOrchestrationDeleteCommand() (cli.Command, error) {
 
 func (c *EventOrchestrationDelete) Help() string {
 	helpText := `
-	event-orchestration delete Delete an event orchestration
+	pd event-orchestration delete Delete an event orchestration
 
 	Options:
 		-id      The event orchestration ID

@@ -31,7 +31,7 @@ func (c *EventOrchestrationCreate) Synopsis() string {
 }
 
 func (c *EventOrchestrationCreate) Run(args []string) int {
-	flags := c.Meta.FlagSet("event orchestration create")
+	flags := c.Meta.FlagSet("event-orchestration create")
 	flags.Usage = func() { fmt.Println(c.Help()) }
 	if err := flags.Parse(args); err != nil {
 		log.Error(err)
