@@ -238,6 +238,7 @@ func (c *Client) ManageEventWithContext(ctx context.Context, e *V2Event) (*V2Eve
 	}
 
 	resp, err := c.doWithEndpoint(ctx, c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), nil)
+	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
