@@ -72,7 +72,6 @@ func (c *Client) CreateChangeEventWithContext(ctx context.Context, e ChangeEvent
 		bytes.NewBuffer(data),
 		nil,
 	)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
