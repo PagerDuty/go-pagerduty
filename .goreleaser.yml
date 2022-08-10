@@ -8,6 +8,7 @@ before:
     - go generate ./...
 builds:
   -
+    main: ./command/
     id: pd
     env:
       - CGO_ENABLED=0
