@@ -808,12 +808,14 @@ func TestIncident_ResponderRequest(t *testing.T) {
 		},
 		"message": "Help",
 		"responder_request_targets": [{
-			"id": "PJ25ZYX",
-			"type": "user_reference",
-			"incident_responders": {
-				"state": "pending",
-				"user": {
-					"id": "PJ25ZYX"
+			"responder_request_target": {
+				"id": "PJ25ZYX",
+				"type": "user_reference",
+				"incident_responders": {
+					"state": "pending",
+					"user": {
+						"id": "PJ25ZYX"
+					}
 				}
 			}
 		}]
@@ -823,37 +825,39 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
-	r := ResponderRequestTarget{}
-	r.ID = "PJ25ZYX"
-	r.Type = "user_reference"
+	request_target := ResponderRequestTarget{}
+	request_target.ID = "PJ25ZYX"
+	request_target.Type = "user_reference"
 
-	targets := []ResponderRequestTarget{r}
+	request_target_wrapper := ResponderRequestTargetWrapper{Target: request_target}
+	request_targets := []ResponderRequestTargetWrapper{request_target_wrapper}
 
 	input := ResponderRequestOptions{
 		From:        from,
-		Message:     "help",
+		Message:     "Help",
 		RequesterID: "PL1JMK5",
-		Targets:     targets,
+		Targets:     request_targets,
 	}
 
 	user := User{}
 	user.ID = "PL1JMK5"
 	user.Type = "user_reference"
 
-	target := ResponderRequestTarget{}
-	target.ID = "PJ25ZYX"
-	target.Type = "user_reference"
-	target.Responders.State = "pending"
-	target.Responders.User.ID = "PJ25ZYX"
+	want_target := ResponderRequestTarget{}
+	want_target.ID = "PJ25ZYX"
+	want_target.Type = "user_reference"
+	want_target.Responders.State = "pending"
+	want_target.Responders.User.ID = "PJ25ZYX"
 
-	targets = []ResponderRequestTarget{target}
+	want_target_wrapper := ResponderRequestTargetWrapper{Target: want_target}
+	want_targets := []ResponderRequestTargetWrapper{want_target_wrapper}
 
 	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   targets,
+			Targets:   want_targets,
 		},
 	}
 	res, err := client.ResponderRequest(id, input)

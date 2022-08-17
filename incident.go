@@ -657,7 +657,12 @@ type ResponderRequestResponse struct {
 // ResponderRequestTarget specifies an individual target for the responder request.
 type ResponderRequestTarget struct {
 	APIObject
-	Responders IncidentResponders `json:"incident_responders"`
+	Responders IncidentResponders `json:"incident_responders,omitempty"`
+}
+
+// ResponderRequestTargetWrapper is a wrapper for a ResponderRequestTarget.
+type ResponderRequestTargetWrapper struct {
+	Target ResponderRequestTarget `json:"responder_request_target"`
 }
 
 // ResponderRequestOptions defines the input options for the Create Responder function.
@@ -665,7 +670,7 @@ type ResponderRequestOptions struct {
 	From        string                   `json:"-"`
 	Message     string                   `json:"message"`
 	RequesterID string                   `json:"requester_id"`
-	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
+	Targets     []ResponderRequestTargetWrapper `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
@@ -674,7 +679,7 @@ type ResponderRequest struct {
 	Requester   User                     `json:"requester,omitempty"`
 	RequestedAt string                   `json:"request_at,omitempty"`
 	Message     string                   `json:"message,omitempty"`
-	Targets     []ResponderRequestTarget `json:"responder_request_targets"`
+	Targets     []ResponderRequestTargetWrapper `json:"responder_request_targets"`
 }
 
 // ResponderRequest will submit a request to have a responder join an incident.
