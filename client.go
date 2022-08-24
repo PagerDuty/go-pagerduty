@@ -499,17 +499,25 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 }
 
 func dupeRequest(r *http.Request) (*http.Request, error) {
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to copy request body: %w", err)
-	}
+	var data []byte
+	// Body can be nil in GET requests, for example.
+	if r.Body != nil {
+		bodyData, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to copy request body: %w", err)
+		}
 
-	_ = r.Body.Close()
+		_ = r.Body.Close()
+
+		data = bodyData
+	}
 
 	dreq := r.Clone(r.Context())
 
-	r.Body = ioutil.NopCloser(bytes.NewReader(data))
-	dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+	if data != nil {
+		r.Body = ioutil.NopCloser(bytes.NewReader(data))
+		dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+	}
 
 	return dreq, nil
 }
