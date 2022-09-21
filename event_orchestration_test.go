@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestOrchestration_List(t *testing.T) {
 	var opts ListOrchestrationsOptions
 	client := defaultTestClient(server.URL, "foo")
 
-	res, err := client.ListOrchestrations(opts)
+	res, err := client.ListOrchestrationsWithContext(context.Background(), opts)
 
 	want := &ListOrchestrationsResponse{
 		APIListObject: listObj,
@@ -47,7 +48,7 @@ func TestOrchestration_Create(t *testing.T) {
 		_, _ = w.Write([]byte(`{"orchestration": {"name": "foo", "id": "1"}}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
-	res, err := client.CreateOrchestration(input)
+	res, err := client.CreateOrchestrationWithContext(context.Background(), input)
 
 	want := &Orchestration{
 		Name: "foo",
@@ -71,7 +72,7 @@ func TestOrchestration_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 	client := defaultTestClient(server.URL, "foo")
-	err := client.DeleteOrchestration("1")
+	err := client.DeleteOrchestrationWithContext(context.Background(), "1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +88,7 @@ func TestOrchestration_Get(t *testing.T) {
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var opts *GetOrchestrationOptions
-	res, err := client.GetOrchestration("1", opts)
+	res, err := client.GetOrchestrationWithContext(context.Background(), "1", opts)
 
 	want := &Orchestration{
 		APIObject: APIObject{
@@ -118,7 +119,7 @@ func TestOrchestration_Update(t *testing.T) {
 		},
 		Name: "foo",
 	}
-	res, err := client.UpdateOrchestration("1", input)
+	res, err := client.UpdateOrchestrationWithContext(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +136,7 @@ func TestOrchestrationRouter_Get(t *testing.T) {
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var opts *GetOrchestrationRouterOptions
-	res, err := client.GetOrchestrationRouter("1", opts)
+	res, err := client.GetOrchestrationRouterWithContext(context.Background(), "1", opts)
 
 	want := &OrchestrationRouter{
 		Type: "router",
@@ -164,7 +165,7 @@ func TestOrchestrationRouter_Update(t *testing.T) {
 			ID: "1",
 		},
 	}
-	res, err := client.UpdateOrchestrationRouter("1", input)
+	res, err := client.UpdateOrchestrationRouterWithContext(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +182,7 @@ func TestOrchestrationUnrouted_Get(t *testing.T) {
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var opts *GetOrchestrationUnroutedOptions
-	res, err := client.GetOrchestrationUnrouted("1", opts)
+	res, err := client.GetOrchestrationUnroutedWithContext(context.Background(), "1", opts)
 
 	want := &OrchestrationUnrouted{
 		Type: "unrouted",
@@ -213,7 +214,7 @@ func TestOrchestrationUnrouted_Update(t *testing.T) {
 			ID: "1",
 		},
 	}
-	res, err := client.UpdateOrchestrationUnrouted("1", input)
+	res, err := client.UpdateOrchestrationUnroutedWithContext(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -230,7 +231,7 @@ func TestServiceOrchestration_Get(t *testing.T) {
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var opts *GetServiceOrchestrationOptions
-	res, err := client.GetServiceOrchestration("1", opts)
+	res, err := client.GetServiceOrchestrationWithContext(context.Background(), "1", opts)
 
 	want := &ServiceOrchestration{
 		Type: "service",
@@ -262,7 +263,7 @@ func TestServiceOrchestration_Update(t *testing.T) {
 			ID: "1",
 		},
 	}
-	res, err := client.UpdateServiceOrchestration("1", input)
+	res, err := client.UpdateServiceOrchestrationWithContext(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,7 +279,7 @@ func TestServiceOrchestrationActive_Get(t *testing.T) {
 		_, _ = w.Write([]byte(`{"active": true}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
-	res, err := client.GetServiceOrchestrationActive("1")
+	res, err := client.GetServiceOrchestrationActiveWithContext(context.Background(), "1")
 
 	want := &ServiceOrchestrationActive{
 		Active: true,
@@ -304,7 +305,7 @@ func TestServiceOrchestrationActive_Update(t *testing.T) {
 	want := &ServiceOrchestrationActive{
 		Active: true,
 	}
-	res, err := client.UpdateServiceOrchestrationActive("1", input)
+	res, err := client.UpdateServiceOrchestrationActiveWithContext(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}

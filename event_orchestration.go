@@ -69,13 +69,6 @@ type ListOrchestrationsOptions struct {
 	SortBy string `url:"sort_by,omitempty"`
 }
 
-// ListOrchestrations lists all the existing event orchestrations.
-//
-// Deprecated: Use ListOrchestrationsWithContext instead.
-func (c *Client) ListOrchestrations(o ListOrchestrationsOptions) (*ListOrchestrationsResponse, error) {
-	return c.ListOrchestrationsWithContext(context.Background(), o)
-}
-
 // ListOrchestrationsWithContext lists all the existing event orchestrations.
 func (c *Client) ListOrchestrationsWithContext(ctx context.Context, o ListOrchestrationsOptions) (*ListOrchestrationsResponse, error) {
 	v, err := query.Values(o)
@@ -96,13 +89,6 @@ func (c *Client) ListOrchestrationsWithContext(ctx context.Context, o ListOrches
 	return &result, nil
 }
 
-// CreateOrchestration creates a new event orchestration.
-//
-// Deprecated: Use CreateOrchestrationWithContext instead.
-func (c *Client) CreateOrchestration(e Orchestration) (*Orchestration, error) {
-	return c.CreateOrchestrationWithContext(context.Background(), e)
-}
-
 // CreateOrchestrationWithContext creates a new event orchestration.
 func (c *Client) CreateOrchestrationWithContext(ctx context.Context, e Orchestration) (*Orchestration, error) {
 	d := map[string]Orchestration{
@@ -111,13 +97,6 @@ func (c *Client) CreateOrchestrationWithContext(ctx context.Context, e Orchestra
 
 	resp, err := c.post(ctx, eoPath, d, nil)
 	return getOrchestrationFromResponse(c, resp, err)
-}
-
-// DeleteOrchestration deletes an existing event orchestration.
-//
-// Deprecated: Use DeleteOrchestrationWithContext instead.
-func (c *Client) DeleteOrchestration(id string) error {
-	return c.DeleteOrchestrationWithContext(context.Background(), id)
 }
 
 // DeleteOrchestrationWithContext deletes an existing event orchestration.
@@ -130,13 +109,6 @@ func (c *Client) DeleteOrchestrationWithContext(ctx context.Context, id string) 
 type GetOrchestrationOptions struct {
 }
 
-// GetOrchestration gets information about an existing event orchestration.
-//
-// Deprecated: Use GetOrchestrationWithContext instead.
-func (c *Client) GetOrchestration(id string, o *GetOrchestrationOptions) (*Orchestration, error) {
-	return c.GetOrchestrationWithContext(context.Background(), id, o)
-}
-
 // GetOrchestrationWithContext gets information about an event orchestration.
 func (c *Client) GetOrchestrationWithContext(ctx context.Context, id string, o *GetOrchestrationOptions) (*Orchestration, error) {
 	v, err := query.Values(o)
@@ -146,13 +118,6 @@ func (c *Client) GetOrchestrationWithContext(ctx context.Context, id string, o *
 
 	resp, err := c.get(ctx, eoPath+"/"+id+"?"+v.Encode())
 	return getOrchestrationFromResponse(c, resp, err)
-}
-
-// UpdateOrchestration updates an existing event orchestration.
-//
-// Deprecated: Use UpdateOrchestrationWithContext instead.
-func (c *Client) UpdateOrchestration(id string, e *Orchestration) (*Orchestration, error) {
-	return c.UpdateOrchestrationWithContext(context.Background(), id, *e)
 }
 
 // UpdateOrchestrationWithContext updates an existing event orchestration.
@@ -229,13 +194,6 @@ type OrchestrationRouterActions struct {
 type GetOrchestrationRouterOptions struct {
 }
 
-// GetOrchestrationRouter gets the routing rules about an existing event orchestration.
-//
-// Deprecated: Use GetOrchestrationRouterWithContext instead.
-func (c *Client) GetOrchestrationRouter(id string, o *GetOrchestrationRouterOptions) (*OrchestrationRouter, error) {
-	return c.GetOrchestrationRouterWithContext(context.Background(), id, o)
-}
-
 // GetOrchestrationRouterWithContext gets information about an event orchestration.
 func (c *Client) GetOrchestrationRouterWithContext(ctx context.Context, id string, o *GetOrchestrationRouterOptions) (*OrchestrationRouter, error) {
 	v, err := query.Values(o)
@@ -245,13 +203,6 @@ func (c *Client) GetOrchestrationRouterWithContext(ctx context.Context, id strin
 
 	resp, err := c.get(ctx, eoPath+"/"+id+"/router"+"?"+v.Encode())
 	return getOrchestrationRouterFromResponse(c, resp, err)
-}
-
-// UpdateOrchestrationRouter updates the routing rules of an existing event orchestration.
-//
-// Deprecated: Use UpdateOrchestrationRouterWithContext instead.
-func (c *Client) UpdateOrchestrationRouter(id string, e *OrchestrationRouter) (*OrchestrationRouter, error) {
-	return c.UpdateOrchestrationRouterWithContext(context.Background(), id, *e)
 }
 
 // UpdateOrchestrationRouterWithContext updates the routing rules of an existing event orchestration.
@@ -342,13 +293,6 @@ type ServiceOrchestrationActive struct {
 type GetServiceOrchestrationOptions struct {
 }
 
-// GetServiceOrchestration gets the routing rules about a service orchestration.
-//
-// Deprecated: Use GetServiceOrchestrationWithContext instead.
-func (c *Client) GetServiceOrchestration(id string, o *GetServiceOrchestrationOptions) (*ServiceOrchestration, error) {
-	return c.GetServiceOrchestrationWithContext(context.Background(), id, o)
-}
-
 // GetServiceOrchestrationWithContext gets information about a service orchestration.
 func (c *Client) GetServiceOrchestrationWithContext(ctx context.Context, id string, o *GetServiceOrchestrationOptions) (*ServiceOrchestration, error) {
 	v, err := query.Values(o)
@@ -358,13 +302,6 @@ func (c *Client) GetServiceOrchestrationWithContext(ctx context.Context, id stri
 
 	resp, err := c.get(ctx, eoPath+"/services/"+id+"?"+v.Encode())
 	return getServiceOrchestrationFromResponse(c, resp, err)
-}
-
-// UpdateServiceOrchestration updates the routing rules of a service orchestration.
-//
-// Deprecated: Use UpdateServiceOrchestrationWithContext instead.
-func (c *Client) UpdateServiceOrchestration(id string, e *ServiceOrchestration) (*ServiceOrchestration, error) {
-	return c.UpdateServiceOrchestrationWithContext(context.Background(), id, *e)
 }
 
 // UpdateServiceOrchestrationWithContext updates the routing rules of a service orchestration.
@@ -377,24 +314,10 @@ func (c *Client) UpdateServiceOrchestrationWithContext(ctx context.Context, id s
 	return getServiceOrchestrationFromResponse(c, resp, err)
 }
 
-// GetServiceOrchestrationActive gets a service orchestration's active status.
-//
-// Deprecated: Use GetServiceOrchestrationActiveWithContext instead.
-func (c *Client) GetServiceOrchestrationActive(id string) (*ServiceOrchestrationActive, error) {
-	return c.GetServiceOrchestrationActiveWithContext(context.Background(), id)
-}
-
 // GetServiceOrchestrationActiveWithContext gets a service orchestration's active status.
 func (c *Client) GetServiceOrchestrationActiveWithContext(ctx context.Context, id string) (*ServiceOrchestrationActive, error) {
 	resp, err := c.get(ctx, eoPath+"/services/"+id+"/active")
 	return getServiceOrchestrationActiveFromResponse(c, resp, err)
-}
-
-// UpdateServiceOrchestrationActive updates a service orchestration's active status.
-//
-// Deprecated: Use UpdateServiceOrchestrationActiveWithContext instead.
-func (c *Client) UpdateServiceOrchestrationActive(id string, e *ServiceOrchestrationActive) (*ServiceOrchestrationActive, error) {
-	return c.UpdateServiceOrchestrationActiveWithContext(context.Background(), id, *e)
 }
 
 // UpdateServiceOrchestrationActiveWithContext updates a service orchestration's active status.
@@ -483,13 +406,6 @@ type OrchestrationUnroutedRuleActions struct {
 type GetOrchestrationUnroutedOptions struct {
 }
 
-// GetOrchestrationUnrouted gets the routing rules for unrouted events.
-//
-// Deprecated: Use GetOrchestrationUnroutedWithContext instead.
-func (c *Client) GetOrchestrationUnrouted(id string, o *GetOrchestrationUnroutedOptions) (*OrchestrationUnrouted, error) {
-	return c.GetOrchestrationUnroutedWithContext(context.Background(), id, o)
-}
-
 // GetOrchestrationUnroutedWithContext gets the routing rules for unrouted events.
 func (c *Client) GetOrchestrationUnroutedWithContext(ctx context.Context, id string, o *GetOrchestrationUnroutedOptions) (*OrchestrationUnrouted, error) {
 	v, err := query.Values(o)
@@ -499,13 +415,6 @@ func (c *Client) GetOrchestrationUnroutedWithContext(ctx context.Context, id str
 
 	resp, err := c.get(ctx, eoPath+"/"+id+"/unrouted"+"?"+v.Encode())
 	return getOrchestrationUnroutedFromResponse(c, resp, err)
-}
-
-// UpdateOrchestrationUnrouted updates the routing rules for unrouted events.
-//
-// Deprecated: Use UpdateOrchestrationUnroutedWithContext instead.
-func (c *Client) UpdateOrchestrationUnrouted(id string, e *OrchestrationUnrouted) (*OrchestrationUnrouted, error) {
-	return c.UpdateOrchestrationUnroutedWithContext(context.Background(), id, *e)
 }
 
 // UpdateOrchestrationUnroutedWithContext updates the routing rules for unrouted events.
