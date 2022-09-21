@@ -179,7 +179,7 @@ func TestService_CreateWithAlertGroupParamsTime(t *testing.T) {
 		AlertGroupingParameters: &AlertGroupingParameters{
 			Type: "time",
 			Config: &AlertGroupParamsConfig{
-				Timeout: 2,
+				Timeout: new(uint),
 			},
 		},
 	}
