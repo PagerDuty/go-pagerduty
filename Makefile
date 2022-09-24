@@ -10,7 +10,7 @@
 
 .PHONY: build
 build: build-deps
-	go build -mod=vendor -o pd ./command
+	go build -mod=vendor ./command/pd
 
 .PHONY: build-deps
 build-deps:
