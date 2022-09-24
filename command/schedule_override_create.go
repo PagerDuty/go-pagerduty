@@ -1,13 +1,14 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strings"
 )
 
 type ScheduleOverrideCreate struct {

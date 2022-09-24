@@ -5,15 +5,8 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 ## Installation
 
-First, download the source code
 ```cli
-go get github.com/PagerDuty/go-pagerduty
-```
-
-Next build the application.
-```cli
-cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
-make install
+go get -u github.com/PagerDuty/go-pagerduty/pd
 ```
 
 ## Usage

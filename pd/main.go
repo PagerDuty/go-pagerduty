@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	. "github.com/PagerDuty/go-pagerduty/command"
 	"github.com/mitchellh/cli"
 )
 

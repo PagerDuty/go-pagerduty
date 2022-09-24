@@ -1,8 +1,9 @@
-package main
+package cmd
 
 import (
-	"github.com/mitchellh/cli"
 	"strings"
+
+	"github.com/mitchellh/cli"
 )
 
 type TeamAddEscalationPolicy struct {
