@@ -5,15 +5,14 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 ## Installation
 
-First, download the source code
+To add the latest stable version to your project:
 ```cli
-go get github.com/PagerDuty/go-pagerduty
+go get github.com/PagerDuty/go-pagerduty@v1.6
 ```
 
-Next build the application.
+If you instead wish to work with the latest code from main:
 ```cli
-cd $GOPATH/src/github.com/PagerDuty/go-pagerduty
-make install
+go get github.com/PagerDuty/go-pagerduty@latest
 ```
 
 ## Usage
@@ -162,15 +161,15 @@ responses. You can then use one of the methods to make an API call, and then
 inspect the API response received. For example:
 
 ```Go
-client := pagerduty.NewClient("exmaple")
+client := pagerduty.NewClient("example")
 
 client.SetDebugFlag(pagerduty.DebugCaptureLastResponse)
 
 oncalls, err := client.ListOnCallsWithContext(ctx, pagerduty.ListOnCallOptions{})
 
-resp, ok := client.LastAPIReponse()
+resp, ok := client.LastAPIResponse()
 if ok { // resp is an *http.Response we can inspect
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := httputil.DumpResponse(resp, true)
     // ...
 }
 ```
