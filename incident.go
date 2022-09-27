@@ -817,9 +817,9 @@ type AddIncidentNotificationSubscribersResponse struct {
 
 // RemoveIncidentNotificationSubscribersResponse is the response structure when calling the RemoveNotificationSubscriber API endpoint.
 type RemoveIncidentNotificationSubscribersResponse struct {
-	DeleteCount       int `json:"deleted_count"`
-	UnauthorizedCount int `json:"unauthorized_count"`
-	NonExistentCount  int `json:"non_existent_count"`
+	DeleteCount       uint `json:"deleted_count"`
+	UnauthorizedCount uint `json:"unauthorized_count"`
+	NonExistentCount  uint `json:"non_existent_count"`
 }
 
 // ListIncidentNotificationSubscribersWithContext lists notification subscribers for the specified incident.
