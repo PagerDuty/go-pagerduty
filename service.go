@@ -107,7 +107,7 @@ type AlertGroupingParameters struct {
 
 // AlertGroupParamsConfig is the config object on alert_grouping_parameters
 type AlertGroupParamsConfig struct {
-	Timeout   uint     `json:"timeout,omitempty"`
+	Timeout   *uint    `json:"timeout,omitempty"`
 	Aggregate string   `json:"aggregate,omitempty"`
 	Fields    []string `json:"fields,omitempty"`
 }

@@ -25,7 +25,7 @@ import (
 )
 
 // Version is current version of this client.
-const Version = "1.6.0-alpha"
+const Version = "1.7.0-alpha"
 
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
@@ -499,17 +499,19 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 }
 
 func dupeRequest(r *http.Request) (*http.Request, error) {
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to copy request body: %w", err)
-	}
-
-	_ = r.Body.Close()
-
 	dreq := r.Clone(r.Context())
 
-	r.Body = ioutil.NopCloser(bytes.NewReader(data))
-	dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+	if r.Body != nil {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to copy request body: %w", err)
+		}
+
+		_ = r.Body.Close()
+
+		r.Body = ioutil.NopCloser(bytes.NewReader(data))
+		dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+	}
 
 	return dreq, nil
 }
@@ -590,6 +592,8 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 	// check whether the error response is declared as JSON
 	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {
+		defer resp.Body.Close()
+
 		aerr := APIError{
 			StatusCode: resp.StatusCode,
 			message:    fmt.Sprintf("HTTP response with status code %d does not contain Content-Type: application/json", resp.StatusCode),

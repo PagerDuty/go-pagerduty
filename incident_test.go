@@ -808,12 +808,14 @@ func TestIncident_ResponderRequest(t *testing.T) {
 		},
 		"message": "Help",
 		"responder_request_targets": [{
-			"id": "PJ25ZYX",
-			"type": "user_reference",
-			"incident_responders": {
-				"state": "pending",
-				"user": {
-					"id": "PJ25ZYX"
+			"responder_request_target": {
+				"id": "PJ25ZYX",
+				"type": "user_reference",
+				"incident_responders": {
+					"state": "pending",
+					"user": {
+						"id": "PJ25ZYX"
+					}
 				}
 			}
 		}]
@@ -823,37 +825,39 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	from := "foo@bar.com"
 
-	r := ResponderRequestTarget{}
-	r.ID = "PJ25ZYX"
-	r.Type = "user_reference"
+	request_target := ResponderRequestTarget{}
+	request_target.ID = "PJ25ZYX"
+	request_target.Type = "user_reference"
 
-	targets := []ResponderRequestTarget{r}
+	request_target_wrapper := ResponderRequestTargetWrapper{Target: request_target}
+	request_targets := []ResponderRequestTargetWrapper{request_target_wrapper}
 
 	input := ResponderRequestOptions{
 		From:        from,
-		Message:     "help",
+		Message:     "Help",
 		RequesterID: "PL1JMK5",
-		Targets:     targets,
+		Targets:     request_targets,
 	}
 
 	user := User{}
 	user.ID = "PL1JMK5"
 	user.Type = "user_reference"
 
-	target := ResponderRequestTarget{}
-	target.ID = "PJ25ZYX"
-	target.Type = "user_reference"
-	target.Responders.State = "pending"
-	target.Responders.User.ID = "PJ25ZYX"
+	want_target := ResponderRequestTarget{}
+	want_target.ID = "PJ25ZYX"
+	want_target.Type = "user_reference"
+	want_target.Responders.State = "pending"
+	want_target.Responders.User.ID = "PJ25ZYX"
 
-	targets = []ResponderRequestTarget{target}
+	want_target_wrapper := ResponderRequestTargetWrapper{Target: want_target}
+	want_targets := []ResponderRequestTargetWrapper{want_target_wrapper}
 
 	want := &ResponderRequestResponse{
 		ResponderRequest: ResponderRequest{
 			Incident:  Incident{},
 			Requester: user,
 			Message:   "Help",
-			Targets:   targets,
+			Targets:   want_targets,
 		},
 	}
 	res, err := client.ResponderRequest(id, input)
@@ -985,6 +989,125 @@ func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_ListIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/status_updates/subscribers", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"subscribers": [ { "subscriber_id": "PD1234", "subscriber_type": "user", "has_indirect_subscription": false, "subscribed_via": null }, { "subscriber_id": "PD1234", "subscriber_type": "team", "has_indirect_subscription": true, "subscribed_via": [ { "id": "PD1234", "type": "business_service" } ] } ], "account_id": "PD1234"}`))
+	})
+
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+
+	res, err := client.ListIncidentNotificationSubscribersWithContext(context.Background(), id)
+
+	want := &ListIncidentNotificationSubscribersResponse{
+		APIListObject: listObj,
+		Subscribers: []IncidentNotificationSubscriptionWithContext{
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "user",
+				},
+				HasIndirectSubscription: false,
+				SubscribedVia:           nil,
+			},
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "team",
+				},
+				HasIndirectSubscription: true,
+				SubscribedVia: []IncidentNotificationSubscriberVia{
+					{
+						ID:   "PD1234",
+						Type: "business_service",
+					},
+				},
+			},
+		},
+		AccountID: "PD1234",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_AddIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := []IncidentNotificationSubscriber{
+		{
+			SubscriberID:   "PD1234",
+			SubscriberType: "team",
+		},
+	}
+
+	mux.HandleFunc("/incidents/1/status_updates/subscribers", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{ "subscriptions": [ { "account_id": "PD1234", "subscribable_id": "PD1234", "subscribable_type": "incident", "subscriber_id": "PD1234", "subscriber_type": "team", "result": "success" } ] }`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.AddIncidentNotificationSubscribersWithContext(context.Background(), id, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &AddIncidentNotificationSubscribersResponse{
+		Subscriptions: []IncidentNotificationSubscriptionWithContext{
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "team",
+				},
+				SubscribableID:   "PD1234",
+				SubscribableType: "incident",
+				Result:           "success",
+				AccountID:        "PD1234",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_RemoveIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := []IncidentNotificationSubscriber{
+		{
+			SubscriberID:   "PD1234",
+			SubscriberType: "team",
+		},
+	}
+
+	mux.HandleFunc("/incidents/1/status_updates/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"deleted_count": 1, "unauthorized_count": 0, "non_existent_count": 0}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.RemoveIncidentNotificationSubscribersWithContext(context.Background(), id, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &RemoveIncidentNotificationSubscribersResponse{
+		DeleteCount:       1,
+		UnauthorizedCount: 0,
+		NonExistentCount:  0,
 	}
 	testEqual(t, want, res)
 }

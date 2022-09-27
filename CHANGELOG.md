@@ -1,5 +1,56 @@
 # Changelog
 
+## [v1.6.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.6.0) (2022-09-21)
+
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.5.0...1.6.0)
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/7)
+
+### A Quick Word from Us
+Hello there! We just wanted to drop in and address the elephant in the room. In a [previous release](https://github.com/PagerDuty/go-pagerduty/releases/tag/v1.5.0) we made a promise to maintain API compatibility for future v1 releases. This release contains a few changes that may require minor updates to the way your code interacts with API request and response objects. These changes are necessary in order to make these APIs work properly for as many of you as possible.
+
+One of our goals with this client library is to provide a working client that properly interacts with the [PagerDuty Public API](https://developer.pagerduty.com/api-reference/). While we remain committed to not breaking API compatibility for reasons such as "making the library [better | easier to use | etc.]"; we believe it is in all of our best interest to make this client library work.
+
+As always, we welcome your feedback on this decision via a GitHub issue.
+
+### Highlights
+* Returns custom error type `EventsAPIV2Error` for errors that occur with Events API (V2) calls by @theckman in https://github.com/PagerDuty/go-pagerduty/pull/419
+* List notifications API now works when using `includes` by @jaimegago in https://github.com/PagerDuty/go-pagerduty/pull/439
+* Improves support for macOS builds by @mjlshen in https://github.com/PagerDuty/go-pagerduty/pull/434
+* Fix potential panic when debug request captures are enabled by @theckman in https://github.com/PagerDuty/go-pagerduty/pull/443
+* Fixes memory leak by @attilakunelwood in https://github.com/PagerDuty/go-pagerduty/pull/453
+* Prevent leak on error responses by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/454
+
+### Breaking Changes
+* Fix unmarshaling error with AlertGroupingParameters timeout by @mjlshen in https://github.com/PagerDuty/go-pagerduty/pull/459
+* Fix parsing bug for AlertGroupingParameters by @mjlshen in https://github.com/PagerDuty/go-pagerduty/pull/448
+* Fix ResponderRequest regression by @ehlerorngard in https://github.com/PagerDuty/go-pagerduty/pull/452
+
+### New Contributors
+* @jaimegago made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/439
+* @mjlshen made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/434
+* @attilakunelwood made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/453
+* @ChuckCrawford made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/454
+* @ehlerorngard made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/452
+
+## [v1.5.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.1) (2022-04-24) - Bug Fixes
+
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/8)  
+[Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.5.0...v1.5.1)
+
+**Highlights**
+
+- Fix panic that would occur when debug request capturing is enabled, and request has a nil HTTP body (GET request)
+- Fix options for ListNotifications, where URL parameters weren't being set correctly.
+
+**Closed issues**
+
+None
+
+**Merged pull requests**
+
+- Backport fix for panic when debug request captures are enabled [\#444](https://github.com/PagerDuty/go-pagerduty/pull/444) ([theckman](https://github.com/theckman))
+- Backport: Fix list notifications options [\#445](https://github.com/PagerDuty/go-pagerduty/pull/445) ([jaimegago](https://github.com/jaimegago), backported by [theckman](https://github.com/theckman))
+
 ## [v1.5.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.0) (2022-01-22) - BREAKING CHANGES
 
 [Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2)  
