@@ -992,3 +992,122 @@ func TestIncident_CreateIncidentStatusUpdate(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestIncident_ListIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/status_updates/subscribers", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"subscribers": [ { "subscriber_id": "PD1234", "subscriber_type": "user", "has_indirect_subscription": false, "subscribed_via": null }, { "subscriber_id": "PD1234", "subscriber_type": "team", "has_indirect_subscription": true, "subscribed_via": [ { "id": "PD1234", "type": "business_service" } ] } ], "account_id": "PD1234"}`))
+	})
+
+	listObj := APIListObject{Limit: 0, Offset: 0, More: false, Total: 0}
+
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+
+	res, err := client.ListIncidentNotificationSubscribersWithContext(context.Background(), id)
+
+	want := &ListIncidentNotificationSubscribersResponse{
+		APIListObject: listObj,
+		Subscribers: []IncidentNotificationSubscriptionWithContext{
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "user",
+				},
+				HasIndirectSubscription: false,
+				SubscribedVia:           nil,
+			},
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "team",
+				},
+				HasIndirectSubscription: true,
+				SubscribedVia: []IncidentNotificationSubscriberVia{
+					{
+						ID:   "PD1234",
+						Type: "business_service",
+					},
+				},
+			},
+		},
+		AccountID: "PD1234",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_AddIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := []IncidentNotificationSubscriber{
+		{
+			SubscriberID:   "PD1234",
+			SubscriberType: "team",
+		},
+	}
+
+	mux.HandleFunc("/incidents/1/status_updates/subscribers", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{ "subscriptions": [ { "account_id": "PD1234", "subscribable_id": "PD1234", "subscribable_type": "incident", "subscriber_id": "PD1234", "subscriber_type": "team", "result": "success" } ] }`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.AddIncidentNotificationSubscribersWithContext(context.Background(), id, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &AddIncidentNotificationSubscribersResponse{
+		Subscriptions: []IncidentNotificationSubscriptionWithContext{
+			{
+				IncidentNotificationSubscriber: IncidentNotificationSubscriber{
+					SubscriberID:   "PD1234",
+					SubscriberType: "team",
+				},
+				SubscribableID:   "PD1234",
+				SubscribableType: "incident",
+				Result:           "success",
+				AccountID:        "PD1234",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_RemoveIncidentNotificationSubscribersWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := []IncidentNotificationSubscriber{
+		{
+			SubscriberID:   "PD1234",
+			SubscriberType: "team",
+		},
+	}
+
+	mux.HandleFunc("/incidents/1/status_updates/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"deleted_count": 1, "unauthorized_count": 0, "non_existent_count": 0}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.RemoveIncidentNotificationSubscribersWithContext(context.Background(), id, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &RemoveIncidentNotificationSubscribersResponse{
+		DeleteCount:       1,
+		UnauthorizedCount: 0,
+		NonExistentCount:  0,
+	}
+	testEqual(t, want, res)
+}

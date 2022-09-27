@@ -781,3 +781,96 @@ func (c *Client) CreateIncidentStatusUpdate(ctx context.Context, id string, from
 
 	return result.IncidentStatusUpdate, nil
 }
+
+// IncidentNotificationSubscriber is a Notification Subscriber on a Incident.
+type IncidentNotificationSubscriber struct {
+	SubscriberID   string `json:"subscriber_id"`
+	SubscriberType string `json:"subscriber_type"`
+}
+
+// IncidentNotificationSubscriptionWithContext contains extra context returned from the API.
+type IncidentNotificationSubscriptionWithContext struct {
+	IncidentNotificationSubscriber
+	HasIndirectSubscription bool                                `json:"has_indirect_subscription,omitempty"`
+	SubscribedVia           []IncidentNotificationSubscriberVia `json:"subscribed_via,omitempty"`
+	SubscribableID          string                              `json:"subscribable_id,omitempty"`
+	SubscribableType        string                              `json:"subscribable_type,omitempty"`
+	AccountID               string                              `json:"account_id,omitempty"`
+	Result                  string                              `json:"result,omitempty"`
+}
+type IncidentNotificationSubscriberVia struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
+// ListIncidentNotificationSubscribersResponse is the response structure when calling the ListNotificationSubscribers API endpoint.
+type ListIncidentNotificationSubscribersResponse struct {
+	APIListObject
+	Subscribers []IncidentNotificationSubscriptionWithContext `json:"subscribers,omitempty"`
+	AccountID   string                                        `json:"account_id,omitempty"`
+}
+
+// AddIncidentNotificationSubscribersResponse is the response structure when calling the AddNotificationSubscribers API endpoint.
+type AddIncidentNotificationSubscribersResponse struct {
+	Subscriptions []IncidentNotificationSubscriptionWithContext `json:"subscriptions,omitempty"`
+}
+
+// RemoveIncidentNotificationSubscribersResponse is the response structure when calling the RemoveNotificationSubscriber API endpoint.
+type RemoveIncidentNotificationSubscribersResponse struct {
+	DeleteCount       uint `json:"deleted_count"`
+	UnauthorizedCount uint `json:"unauthorized_count"`
+	NonExistentCount  uint `json:"non_existent_count"`
+}
+
+// ListIncidentNotificationSubscribersWithContext lists notification subscribers for the specified incident.
+func (c *Client) ListIncidentNotificationSubscribersWithContext(ctx context.Context, id string) (*ListIncidentNotificationSubscribersResponse, error) {
+	resp, err := c.get(ctx, "/incidents/"+id+"/status_updates/subscribers")
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListIncidentNotificationSubscribersResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// AddIncidentNotificationSubscribersWithContext adds notification subscribers for the specified incident.
+func (c *Client) AddIncidentNotificationSubscribersWithContext(ctx context.Context, id string, subscribers []IncidentNotificationSubscriber) (*AddIncidentNotificationSubscribersResponse, error) {
+	d := map[string][]IncidentNotificationSubscriber{
+		"subscribers": subscribers,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/status_updates/subscribers", d, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result AddIncidentNotificationSubscribersResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// RemoveIncidentNotificationSubscribersWithContext removes notification subscribers for the specified incident.
+func (c *Client) RemoveIncidentNotificationSubscribersWithContext(ctx context.Context, id string, subscribers []IncidentNotificationSubscriber) (*RemoveIncidentNotificationSubscribersResponse, error) {
+	d := map[string][]IncidentNotificationSubscriber{
+		"subscribers": subscribers,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/status_updates/unsubscribe", d, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result RemoveIncidentNotificationSubscribersResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
