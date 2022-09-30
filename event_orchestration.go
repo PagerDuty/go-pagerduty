@@ -20,7 +20,7 @@ type Orchestration struct {
 	Description  string                      `json:"description,omitempty"`
 	Team         *APIReference               `json:"team,omitempty"`
 	Integrations []*OrchestrationIntegration `json:"integrations,omitempty"`
-	Routes       int32                       `json:"routes,omitempty"`
+	Routes       uint                        `json:"routes,omitempty"`
 	CreatedAt    string                      `json:"created_at,omitempty"`
 	CreatedBy    *APIReference               `json:"created_by,omitempty"`
 	UpdatedAt    string                      `json:"updated_at,omitempty"`
@@ -137,7 +137,7 @@ func getOrchestrationFromResponse(c *Client, resp *http.Response, err error) (*O
 
 	var target map[string]Orchestration
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "orchestration"
@@ -222,7 +222,7 @@ func getOrchestrationRouterFromResponse(c *Client, resp *http.Response, err erro
 
 	var target map[string]OrchestrationRouter
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "orchestration_path"
@@ -274,7 +274,7 @@ type ServiceOrchestrationRuleCondition struct {
 type ServiceOrchestrationRuleActions struct {
 	RouteTo                    string                       `json:"route_to,omitempty"`
 	Suppress                   bool                         `json:"suppress,omitempty"`
-	Suspend                    int32                        `json:"suspend,omitempty"`
+	Suspend                    uint                         `json:"suspend,omitempty"`
 	Priority                   string                       `json:"priority,omitempty"`
 	Annotate                   string                       `json:"annotate,omitempty"`
 	PagerDutyAutomationActions []*PagerDutyAutomationAction `json:"pagerduty_automation_actions,omitempty"`
@@ -333,7 +333,7 @@ func getServiceOrchestrationFromResponse(c *Client, resp *http.Response, err err
 
 	var target map[string]ServiceOrchestration
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "orchestration_path"
@@ -353,7 +353,7 @@ func getServiceOrchestrationActiveFromResponse(c *Client, resp *http.Response, e
 
 	var target ServiceOrchestrationActive
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("could not decode JSON response: %v", dErr)
 	}
 
 	return &target, nil
@@ -434,7 +434,7 @@ func getOrchestrationUnroutedFromResponse(c *Client, resp *http.Response, err er
 
 	var target map[string]OrchestrationUnrouted
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+		return nil, fmt.Errorf("could not decode JSON response: %v", dErr)
 	}
 
 	const rootNode = "orchestration_path"
