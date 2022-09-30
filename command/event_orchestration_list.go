@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -53,7 +54,7 @@ func (c *EventOrchestrationList) Run(args []string) int {
 	opts := pagerduty.ListOrchestrationsOptions{
 		SortBy: sortBy,
 	}
-	if eps, err := client.ListOrchestrations(opts); err != nil {
+	if eps, err := client.ListOrchestrationsWithContext(context.Background(), opts); err != nil {
 		log.Error(err)
 		return -1
 	} else {

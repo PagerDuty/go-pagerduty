@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -60,7 +61,7 @@ func (c *EventOrchestrationCreate) Run(args []string) int {
 		return -1
 	}
 	log.Debugf("%#v", eo)
-	if _, err := client.CreateOrchestration(eo); err != nil {
+	if _, err := client.CreateOrchestrationWithContext(context.Background(), eo); err != nil {
 		log.Error(err)
 		return -1
 	}

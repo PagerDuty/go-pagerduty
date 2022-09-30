@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -53,7 +54,7 @@ func (c *EventOrchestrationShow) Run(args []string) int {
 	}
 	client := c.Meta.Client()
 	o := &pagerduty.GetOrchestrationOptions{}
-	ep, err := client.GetOrchestration(eoID, o)
+	ep, err := client.GetOrchestrationWithContext(context.Background(), eoID, o)
 	if err != nil {
 		log.Error(err)
 		return -1
@@ -67,7 +68,7 @@ func (c *EventOrchestrationShow) Run(args []string) int {
 	fmt.Println("---")
 
 	ro := &pagerduty.GetOrchestrationRouterOptions{}
-	rules, err := client.GetOrchestrationRouter(eoID, ro)
+	rules, err := client.GetOrchestrationRouterWithContext(context.Background(), eoID, ro)
 	if err != nil {
 		log.Error(err)
 		return -1
