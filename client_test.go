@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.org/x/oauth2"
 )
 
 var (
@@ -42,7 +43,7 @@ func defaultTestClient(serverURL, authToken string) *Client {
 	return &Client{
 		v2EventsAPIEndpoint: serverURL,
 		apiEndpoint:         serverURL,
-		authToken:           authToken,
+		oauthTokenSource:    oauth2.StaticTokenSource(&oauth2.Token{AccessToken: authToken}),
 		HTTPClient:          defaultHTTPClient,
 		debugFlag:           new(uint64),
 		lastRequest:         &atomic.Value{},
