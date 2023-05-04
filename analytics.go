@@ -17,6 +17,8 @@ type AnalyticsRequest struct {
 	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
+// RawDataRequest represents the request to be sent to PagerDuty when you want
+// raw analytics.
 type RawDataRequest struct {
 	Filters       *AnalyticsFilter `json:"filters,omitempty"`
 	StartingAfter string           `json:"starting_after,omitempty"`
@@ -35,6 +37,7 @@ type AnalyticsResponse struct {
 	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
+// RawDataResponse represents the response from the PagerDuty API.
 type RawDataResponse struct {
 	First    string           `json:"first,omitempty"`
 	Last     string           `json:"last,omitempty"`
@@ -60,7 +63,7 @@ type AnalyticsFilter struct {
 	PriorityNames  []string `json:"priority_names,omitempty"`
 }
 
-// AnalyticsData represents the structure of the analytics we have available.
+// AnalyticsData represents the structure of the aggregated analytics we have available.
 type AnalyticsData struct {
 	ServiceID                      string  `json:"service_id,omitempty"`
 	ServiceName                    string  `json:"service_name,omitempty"`
@@ -85,6 +88,7 @@ type AnalyticsData struct {
 	RangeStart                     string  `json:"range_start,omitempty"`
 }
 
+// RawData represents the structure of the raw analytics we have available.
 type RawData struct {
 	AssignmentCount           int    `json:"assignment_count,omitempty"`
 	BusinessHourInterruptions int    `json:"business_hour_interruptions,omitempty"`
@@ -148,6 +152,7 @@ func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsReque
 	return analyticsResponse, nil
 }
 
+// GetRawDataSingleIncident gets the raw analytics for the requested incident.
 func (c *Client) GetRawDataSingleIncident(ctx context.Context, id string) (RawData, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "analytics-v2",
@@ -168,6 +173,7 @@ func (c *Client) GetRawDataSingleIncident(ctx context.Context, id string) (RawDa
 	return rawData, nil
 }
 
+// GetRawDataMultipleIncidents gets the raw analytics for the requested data.
 func (c *Client) GetRawDataMultipleIncidents(ctx context.Context, rawDataReq RawDataRequest) (RawDataResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "analytics-v2",
