@@ -100,6 +100,8 @@ type Incident struct {
 	Occurrence           *Occurrence          `json:"occurrence,omitempty"`
 	IncidentResponders   []IncidentResponders `json:"incidents_responders,omitempty"`
 	ResponderRequests    []ResponderRequest   `json:"responder_requests,omitempty"`
+	ResolvedAt           string               `json:"resolved_at,omitempty"`
+	UpdatedAt            string               `json:"updated_at,omitempty"`
 }
 
 // ListIncidentsResponse is the response structure when calling the ListIncident API endpoint.
