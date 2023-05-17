@@ -1,7 +1,6 @@
 # Changelog
 
 ## What's Changed
-* Prepares for next version development by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/465
 * Upgades Go and dependencies by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/466
 * Add Incident Notification Subscribers by @caveman280 in https://github.com/PagerDuty/go-pagerduty/pull/461
 * Implement Event Orchestrations API by @EronWright in https://github.com/PagerDuty/go-pagerduty/pull/450
