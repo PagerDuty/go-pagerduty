@@ -1,5 +1,16 @@
 # Changelog
 
+## What's Changed
+* Upgades Go and dependencies by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/466
+* Add Incident Notification Subscribers by @caveman280 in https://github.com/PagerDuty/go-pagerduty/pull/461
+* Implement Event Orchestrations API by @EronWright in https://github.com/PagerDuty/go-pagerduty/pull/450
+
+## New Contributors
+* @caveman280 made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/461
+* @EronWright made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/450
+
+**Full Changelog**: https://github.com/PagerDuty/go-pagerduty/compare/v1.6.0...v1.7.0
+
 ## [v1.6.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.6.0) (2022-09-21)
 
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.5.0...1.6.0)
@@ -34,7 +45,7 @@ As always, we welcome your feedback on this decision via a GitHub issue.
 
 ## [v1.5.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.1) (2022-04-24) - Bug Fixes
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/8)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/8)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.5.0...v1.5.1)
 
 **Highlights**
@@ -53,7 +64,7 @@ None
 
 ## [v1.5.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.5.0) (2022-01-22) - BREAKING CHANGES
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/2)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.3...v1.5.0)
 
 **NOTICE**
@@ -155,7 +166,7 @@ We commit henceforth to maintaining API compatibility for future v1 releases.
 
 ## [v1.4.3](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.3) (2021-11-13)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/6)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/6)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.2...v1.4.3)
 
 **Highlights**
@@ -169,7 +180,7 @@ We commit henceforth to maintaining API compatibility for future v1 releases.
 
 ## [v1.4.2](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.2) (2021-08-30)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/5)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/5)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.1...v1.4.2)
 
 **Highlights**
@@ -183,7 +194,7 @@ We commit henceforth to maintaining API compatibility for future v1 releases.
 
 ## [v1.4.1](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.1) (2021-05-13)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/4)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/4)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.4.0...v1.4.1)
 
 **Highlights**
@@ -196,7 +207,7 @@ We commit henceforth to maintaining API compatibility for future v1 releases.
 
 ## [v1.4.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.4.0) (2021-04-23)
 
-[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/3)  
+[Milestone](https://github.com/PagerDuty/go-pagerduty/milestone/3)
 [Full Changelog](https://github.com/PagerDuty/go-pagerduty/compare/v1.3.0...v1.4.0)
 
 **Highlights**
@@ -241,7 +252,7 @@ We commit henceforth to maintaining API compatibility for future v1 releases.
 - Add context.Context support to * (fixes [\#267](https://github.com/PagerDuty/go-pagerduty/issues/267)) ([theckman](https://github.com/theckman/))
   - [\#283](https://github.com/PagerDuty/go-pagerduty/pull/283), [\#284](https://github.com/PagerDuty/go-pagerduty/pull/284), [\#285](https://github.com/PagerDuty/go-pagerduty/pull/285), [\#286](https://github.com/PagerDuty/go-pagerduty/pull/286), [\#287](https://github.com/PagerDuty/go-pagerduty/pull/287), [\#288](https://github.com/PagerDuty/go-pagerduty/pull/288)
   - [\#289](https://github.com/PagerDuty/go-pagerduty/pull/289), [\#290](https://github.com/PagerDuty/go-pagerduty/pull/290), [\#291](https://github.com/PagerDuty/go-pagerduty/pull/291), [\#292](https://github.com/PagerDuty/go-pagerduty/pull/292), [\#293](https://github.com/PagerDuty/go-pagerduty/pull/293), [\#294](https://github.com/PagerDuty/go-pagerduty/pull/294)
-  - [\#297](https://github.com/PagerDuty/go-pagerduty/pull/297), [\#298](https://github.com/PagerDuty/go-pagerduty/pull/298), [\#299](https://github.com/PagerDuty/go-pagerduty/pull/299), [\#300](https://github.com/PagerDuty/go-pagerduty/pull/300), [\#301](https://github.com/PagerDuty/go-pagerduty/pull/301), [\#303](https://github.com/PagerDuty/go-pagerduty/pull/303) 
+  - [\#297](https://github.com/PagerDuty/go-pagerduty/pull/297), [\#298](https://github.com/PagerDuty/go-pagerduty/pull/298), [\#299](https://github.com/PagerDuty/go-pagerduty/pull/299), [\#300](https://github.com/PagerDuty/go-pagerduty/pull/300), [\#301](https://github.com/PagerDuty/go-pagerduty/pull/301), [\#303](https://github.com/PagerDuty/go-pagerduty/pull/303)
   - [\#306](https://github.com/PagerDuty/go-pagerduty/pull/306), [\#307](https://github.com/PagerDuty/go-pagerduty/pull/307), [\#308](https://github.com/PagerDuty/go-pagerduty/pull/308), [\#309](https://github.com/PagerDuty/go-pagerduty/pull/309), [\#322](https://github.com/PagerDuty/go-pagerduty/pull/322)
 - Add support for Service Event Rules [\#304](https://github.com/PagerDuty/go-pagerduty/pull/304) ([mrzacarias](https://github.com/mrzacarias))
 - teams and services analytics endpoints [\#312](https://github.com/PagerDuty/go-pagerduty/pull/312) ([newbootz](https://github.com/newbootz))
