@@ -667,18 +667,18 @@ type ResponderRequestTargetWrapper struct {
 
 // ResponderRequestOptions defines the input options for the Create Responder function.
 type ResponderRequestOptions struct {
-	From        string                   `json:"-"`
-	Message     string                   `json:"message"`
-	RequesterID string                   `json:"requester_id"`
+	From        string                          `json:"-"`
+	Message     string                          `json:"message"`
+	RequesterID string                          `json:"requester_id"`
 	Targets     []ResponderRequestTargetWrapper `json:"responder_request_targets"`
 }
 
 // ResponderRequest contains the API structure for an incident responder request.
 type ResponderRequest struct {
-	Incident    Incident                 `json:"incident"`
-	Requester   User                     `json:"requester,omitempty"`
-	RequestedAt string                   `json:"request_at,omitempty"`
-	Message     string                   `json:"message,omitempty"`
+	Incident    Incident                        `json:"incident"`
+	Requester   User                            `json:"requester,omitempty"`
+	RequestedAt string                          `json:"request_at,omitempty"`
+	Message     string                          `json:"message,omitempty"`
 	Targets     []ResponderRequestTargetWrapper `json:"responder_request_targets"`
 }
 
@@ -868,6 +868,62 @@ func (c *Client) RemoveIncidentNotificationSubscribersWithContext(ctx context.Co
 	}
 
 	var result RemoveIncidentNotificationSubscribersResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+type IncidentCustomFieldUpdateOption struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type IncidentCustomField struct {
+	ID          string `json:"id"`
+	Type        string `json:"type"`
+	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
+	Description string `json:"description"`
+	DataType    string `json:"data_type"`
+	FieldType   string `json:"field_type"`
+	Value       string `json:"value"`
+}
+
+type UpdateIncidentCustomFieldsResponse struct {
+	CustomFields []IncidentCustomField `json:"custom_fields"`
+}
+
+type ListIncidentCustomFieldsResponse struct {
+	CustomFields []IncidentCustomField `json:"custom_fields"`
+}
+
+func (c *Client) UpdateIncidentCustomFieldsWithContext(ctx context.Context, id string, fields []IncidentCustomFieldUpdateOption) (*UpdateIncidentCustomFieldsResponse, error) {
+	d := map[string][]IncidentCustomFieldUpdateOption{
+		"custom_fields": fields,
+	}
+
+	resp, err := c.post(ctx, "/incidents/"+id+"/custom_fields/values", d, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result UpdateIncidentCustomFieldsResponse
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (c *Client) ListIncidentCustomFieldsWithContext(ctx context.Context, id string) (*ListIncidentCustomFieldsResponse, error) {
+	resp, err := c.get(ctx, "/incidents/"+id+"/custom_fields/values")
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListIncidentCustomFieldsResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
