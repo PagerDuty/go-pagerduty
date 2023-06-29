@@ -904,7 +904,7 @@ func (c *Client) UpdateIncidentCustomFieldsWithContext(ctx context.Context, id s
 		"custom_fields": fields,
 	}
 
-	resp, err := c.post(ctx, "/incidents/"+id+"/custom_fields/values", d, nil)
+	resp, err := c.put(ctx, "/incidents/"+id+"/custom_fields/values", d, nil)
 	if err != nil {
 		return nil, err
 	}
