@@ -294,6 +294,10 @@ func TestIntegrationEmailFilterRule(t *testing.T) {
 }
 
 func TestIntegrationEmailFilterRule_UnmarshalJSON(t *testing.T) {
+	subjectRegex := ""
+	bodyRegex := "testbody"
+	fromEmailRegex := "testform"
+
 	tests := []struct {
 		name  string
 		input string
@@ -302,14 +306,14 @@ func TestIntegrationEmailFilterRule_UnmarshalJSON(t *testing.T) {
 	}{
 		{
 			name:  "full",
-			input: `{"subject_mode":"always", "subject_regex":"", "body_mode":"match", "body_regex":"testbody", "from_email_mode":"no-match", "from_email_regex":"testfrom"}`,
+			input: fmt.Sprintf(`{"subject_mode":"always", "subject_regex":"%s", "body_mode":"match", "body_regex":"%s", "from_email_mode":"no-match", "from_email_regex":"%s"}`, subjectRegex, bodyRegex, fromEmailRegex),
 			want: IntegrationEmailFilterRule{
 				SubjectMode:    EmailFilterRuleModeAlways,
-				SubjectRegex:   strPtr(""),
+				SubjectRegex:   &subjectRegex,
 				BodyMode:       EmailFilterRuleModeMatch,
-				BodyRegex:      strPtr("testbody"),
+				BodyRegex:      &bodyRegex,
 				FromEmailMode:  EmailFilterRuleModeNoMatch,
-				FromEmailRegex: strPtr("testfrom"),
+				FromEmailRegex: &fromEmailRegex,
 			},
 		},
 
@@ -318,11 +322,11 @@ func TestIntegrationEmailFilterRule_UnmarshalJSON(t *testing.T) {
 			input: `{}`,
 			want: IntegrationEmailFilterRule{
 				SubjectMode:    EmailFilterRuleModeInvalid,
-				SubjectRegex:   strPtr(""),
+				SubjectRegex:   new(string),
 				BodyMode:       EmailFilterRuleModeInvalid,
-				BodyRegex:      strPtr(""),
+				BodyRegex:      new(string),
 				FromEmailMode:  EmailFilterRuleModeInvalid,
-				FromEmailRegex: strPtr(""),
+				FromEmailRegex: new(string),
 			},
 		},
 	}
