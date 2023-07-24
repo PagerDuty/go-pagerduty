@@ -266,6 +266,39 @@ func TestService_CreateWithAlertGroupParamsIntelligent(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+// Create Service with AutoPauseNotificationsParameters
+func TestService_CreateWithAutoPauseNotificationsParameters(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	input := Service{
+		Name: "foo",
+		AutoPauseNotificationsParameters: &AutoPauseNotificationsParameters{
+			Enabled: true,
+			Timeout: 60,
+		},
+	}
+	res, err := client.CreateService(input)
+
+	want := &Service{
+		APIObject: APIObject{
+			ID: "1",
+		},
+		Name: "foo",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 // Update Service
 func TestService_Update(t *testing.T) {
 	setup()
