@@ -172,7 +172,7 @@ func (c *Client) ListIncidentsWithContext(ctx context.Context, o ListIncidentsOp
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/incidents?"+v.Encode())
+	resp, err := c.get(ctx, "/incidents?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (c *Client) GetIncident(id string) (*Incident, error) {
 
 // GetIncidentWithContext shows detailed information about an incident.
 func (c *Client) GetIncidentWithContext(ctx context.Context, id string) (*Incident, error) {
-	resp, err := c.get(ctx, "/incidents/"+id)
+	resp, err := c.get(ctx, "/incidents/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -389,7 +389,7 @@ func (c *Client) ListIncidentNotes(id string) ([]IncidentNote, error) {
 
 // ListIncidentNotesWithContext lists existing notes for the specified incident.
 func (c *Client) ListIncidentNotesWithContext(ctx context.Context, id string) ([]IncidentNote, error) {
-	resp, err := c.get(ctx, "/incidents/"+id+"/notes")
+	resp, err := c.get(ctx, "/incidents/"+id+"/notes", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +485,7 @@ func (c *Client) ListIncidentAlertsWithContext(ctx context.Context, id string, o
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/incidents/"+id+"/alerts?"+v.Encode())
+	resp, err := c.get(ctx, "/incidents/"+id+"/alerts?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +626,7 @@ func (c *Client) ListIncidentLogEntriesWithContext(ctx context.Context, id strin
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/incidents/"+id+"/log_entries?"+v.Encode())
+	resp, err := c.get(ctx, "/incidents/"+id+"/log_entries?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -719,7 +719,7 @@ func (c *Client) GetIncidentAlert(incidentID, alertID string) (*IncidentAlertRes
 
 // GetIncidentAlertWithContext gets the alert that triggered the incident.
 func (c *Client) GetIncidentAlertWithContext(ctx context.Context, incidentID, alertID string) (*IncidentAlertResponse, error) {
-	resp, err := c.get(ctx, "/incidents/"+incidentID+"/alerts/"+alertID)
+	resp, err := c.get(ctx, "/incidents/"+incidentID+"/alerts/"+alertID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -826,7 +826,7 @@ type RemoveIncidentNotificationSubscribersResponse struct {
 
 // ListIncidentNotificationSubscribersWithContext lists notification subscribers for the specified incident.
 func (c *Client) ListIncidentNotificationSubscribersWithContext(ctx context.Context, id string) (*ListIncidentNotificationSubscribersResponse, error) {
-	resp, err := c.get(ctx, "/incidents/"+id+"/status_updates/subscribers")
+	resp, err := c.get(ctx, "/incidents/"+id+"/status_updates/subscribers", nil)
 	if err != nil {
 		return nil, err
 	}

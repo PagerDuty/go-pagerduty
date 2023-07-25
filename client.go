@@ -468,8 +468,8 @@ func (c *Client) post(ctx context.Context, path string, payload interface{}, hea
 	return c.do(ctx, http.MethodPost, path, bytes.NewBuffer(data), headers)
 }
 
-func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
-	return c.do(ctx, http.MethodGet, path, nil, nil)
+func (c *Client) get(ctx context.Context, path string, headers map[string]string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, path, nil, headers)
 }
 
 const (

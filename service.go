@@ -160,7 +160,7 @@ func (c *Client) ListServicesWithContext(ctx context.Context, o ListServiceOptio
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services?"+v.Encode())
+	resp, err := c.get(ctx, "/services?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (c *Client) GetServiceWithContext(ctx context.Context, id string, o *GetSer
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/services/"+id+"?"+v.Encode(), nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -308,7 +308,7 @@ func (c *Client) ListServiceRulesPaginated(ctx context.Context, serviceID string
 
 // GetServiceRule gets a service rule.
 func (c *Client) GetServiceRule(ctx context.Context, serviceID, ruleID string) (ServiceRule, error) {
-	resp, err := c.get(ctx, "/services/"+serviceID+"/rules/"+ruleID)
+	resp, err := c.get(ctx, "/services/"+serviceID+"/rules/"+ruleID, nil)
 	return getServiceRuleFromResponse(c, resp, err)
 }
 
