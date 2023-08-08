@@ -659,7 +659,7 @@ type ResponderRequestResponse struct {
 // ResponderRequestTarget specifies an individual target for the responder request.
 type ResponderRequestTarget struct {
 	APIObject
-	Responders IncidentResponders `json:"incident_responders,omitempty"`
+	Responders []IncidentResponders `json:"incidents_responders,omitempty"`
 }
 
 // ResponderRequestTargetWrapper is a wrapper for a ResponderRequestTarget.

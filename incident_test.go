@@ -811,12 +811,16 @@ func TestIncident_ResponderRequest(t *testing.T) {
 			"responder_request_target": {
 				"id": "PJ25ZYX",
 				"type": "user_reference",
-				"incident_responders": {
-					"state": "pending",
-					"user": {
-						"id": "PJ25ZYX"
+				"incidents_responders": [
+					{
+						"state": "pending",
+						"user": {
+							"id": "PJ25ZYX",
+							"type": "user_reference",
+							"summary": "dave"
+						}
 					}
-				}
+				]
 			}
 		}]
 	}
@@ -846,8 +850,17 @@ func TestIncident_ResponderRequest(t *testing.T) {
 	want_target := ResponderRequestTarget{}
 	want_target.ID = "PJ25ZYX"
 	want_target.Type = "user_reference"
-	want_target.Responders.State = "pending"
-	want_target.Responders.User.ID = "PJ25ZYX"
+
+	want_target.Responders = []IncidentResponders{
+		{
+			State: "pending",
+			User: APIObject{
+				ID:      "PJ25ZYX",
+				Type:    "user_reference",
+				Summary: "dave",
+			},
+		},
+	}
 
 	want_target_wrapper := ResponderRequestTargetWrapper{Target: want_target}
 	want_targets := []ResponderRequestTargetWrapper{want_target_wrapper}
