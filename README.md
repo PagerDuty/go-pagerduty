@@ -70,9 +70,11 @@ import (
 var	authtoken = "" // Set your auth token here
 
 func main() {
-	var opts pagerduty.ListEscalationPoliciesOptions
+	ctx := context.Background()
 	client := pagerduty.NewClient(authtoken)
-	eps, err := client.ListEscalationPolicies(opts)
+
+	var opts pagerduty.ListEscalationPoliciesOptions
+	eps, err := client.ListEscalationPoliciesWithContext(ctx, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -105,8 +107,9 @@ import (
 var	authtoken = "" // Set your auth token here
 
 func main() {
+	ctx := context.Background()
 	client := pagerduty.NewClient(authtoken)
-	user, err := client.GetUser("NOTREAL", pagerduty.GetUserOptions{})
+	user, err := client.GetUserWithContext(ctx, "NOTREAL", pagerduty.GetUserOptions{})
 	if err != nil {
 		var aerr pagerduty.APIError
 
