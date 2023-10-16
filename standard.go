@@ -62,6 +62,15 @@ type ResourceStandard struct {
 	Type        string `json:"type,omitemtpy"`
 }
 
+type ListMultiResourcesStandardScoresResponse struct {
+	Resources []ResourceStandardScore `json:"resources,omitempty"`
+}
+
+type ListMultiResourcesStandardScoresOptions struct {
+	// Ids of resources to apply the standards. Maximum of 100 items
+	IDs []string `url:"ids,omitempty,brackets"`
+}
+
 // ListStandardsWithContext lists all the existing standards.
 func (c *Client) ListStandardsWithContext(ctx context.Context, o ListStandardsOptions) (*ListStandardsResponse, error) {
 	v, err := query.Values(o)
@@ -108,6 +117,29 @@ func (c *Client) ListResourceStandardScores(ctx context.Context, id string, rt s
 	}
 
 	var result ResourceStandardScore
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListMultiResourcesStandardScores
+//
+//	rt - Resource type
+//	Allowed values: technical_services
+func (c *Client) ListMultiResourcesStandardScores(ctx context.Context, rt string, o ListMultiResourcesStandardScoresOptions) (*ListMultiResourcesStandardScoresResponse, error) {
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"?"+v.Encode())
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListMultiResourcesStandardScoresResponse
 	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
