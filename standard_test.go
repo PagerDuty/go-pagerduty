@@ -75,3 +75,40 @@ func TestStandard_Update(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
+
+func TestStandard_ListTechniServiceStandardScores(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/standards/scores/technical_services/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"resource_id":"1","resource_type":"technical_service","score":{"passing":1,"total":1},"standards":[{"active":true,"description":"A description provides critical context about what a service represents or is used for to inform team members and responders. The description should be kept concise and understandable by those without deep knowledge of the service.","id":"01CXX38Q0U8XKHO4LNKXUJTBFG","pass":true,"name":"Service has a description","type":"has_technical_service_description"}]}`))
+	})
+
+	client := defaultTestClient(server.URL, standardPath)
+
+	res, err := client.ListResourceStandardScores(context.Background(), "1", "technical_services")
+
+	want := &ResourceStandardScore{
+		ResourceID:   "1",
+		ResourceType: "technical_service",
+		Score: &ResourceScore{
+			Passing: 1,
+			Total:   1,
+		},
+		Standards: []ResourceStandard{
+			{
+				Active:      true,
+				Description: "A description provides critical context about what a service represents or is used for to inform team members and responders. The description should be kept concise and understandable by those without deep knowledge of the service.",
+				ID:          "01CXX38Q0U8XKHO4LNKXUJTBFG",
+				Pass:        true,
+				Name:        "Service has a description",
+				Type:        "has_technical_service_description",
+			},
+		},
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}

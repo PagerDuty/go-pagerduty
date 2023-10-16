@@ -41,6 +41,27 @@ type ListStandardsOptions struct {
 	ResourceType string `url:"resource_type,omitempty"`
 }
 
+type ResourceStandardScore struct {
+	ResourceID   string             `json:"resource_id,omitempty"`
+	ResourceType string             `json:"resource_type,omitempty"`
+	Score        *ResourceScore     `json:"score,omitempty"`
+	Standards    []ResourceStandard `json:"standards,omitempty"`
+}
+
+type ResourceScore struct {
+	Passing int `json:"passing,omitempty"`
+	Total   int `json:"total,omitempty"`
+}
+
+type ResourceStandard struct {
+	Active      bool   `json:"active"`
+	Description string `json:"description,omitempty"`
+	ID          string `json:"id,omitempty"`
+	Name        string `json:"name,omitemtpy"`
+	Pass        bool   `json:"pass"`
+	Type        string `json:"type,omitemtpy"`
+}
+
 // ListStandardsWithContext lists all the existing standards.
 func (c *Client) ListStandardsWithContext(ctx context.Context, o ListStandardsOptions) (*ListStandardsResponse, error) {
 	v, err := query.Values(o)
@@ -69,6 +90,24 @@ func (c *Client) UpdateStandardWithContext(ctx context.Context, id string, s Sta
 	}
 
 	var result Standard
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListResourceStandardScores
+//
+//	rt - Resource type
+//	Allowed values: technical_services
+func (c *Client) ListResourceStandardScores(ctx context.Context, id string, rt string) (*ResourceStandardScore, error) {
+	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"/"+id)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ResourceStandardScore
 	if err = c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}

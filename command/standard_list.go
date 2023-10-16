@@ -58,15 +58,15 @@ func (c *StandardList) Run(args []string) int {
 		Active:       active,
 		ResourceType: resourceType,
 	}
-	if eps, err := client.ListStandardsWithContext(context.Background(), opts); err != nil {
+	if res, err := client.ListStandardsWithContext(context.Background(), opts); err != nil {
 		log.Error(err)
 		return -1
 	} else {
-		for i, p := range eps.Standards {
+		for i, r := range res.Standards {
 			if i > 0 {
 				fmt.Println("---")
 			}
-			data, err := yaml.Marshal(p)
+			data, err := yaml.Marshal(r)
 			if err != nil {
 				log.Error(err)
 				return -1

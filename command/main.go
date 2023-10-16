@@ -82,8 +82,9 @@ func loadCommands() map[string]cli.CommandFactory {
 		"service rule show":          ServiceRuleShowCommand,
 		"service rule update":        ServiceRuleUpdateCommand,
 
-		"standard list":   StandardListCommand,
-		"standard update": StandardUpdateCommand,
+		"standard list":                 StandardListCommand,
+		"standard update":               StandardUpdateCommand,
+		"standard resource-scores list": StandardListResourceScoresCommand,
 
 		"team list":                     TeamListCommand,
 		"team create":                   TeamShowCommand,
