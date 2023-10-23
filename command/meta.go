@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -31,6 +31,11 @@ func (a *ArrayFlags) Set(v string) error {
 type Meta struct {
 	Authtoken string
 	Loglevel  string
+	// ScopedOauthPersistedConfig this field exist here because config file is
+	// being used in Go library and CLI client, however up to this point this
+	// field is mainly applicable to Go library, nevertheless helps to keep both
+	// uses of config file aware of each other.
+	pagerduty.ScopedOauthPersistentConfig
 }
 
 type FlagSetFlags uint

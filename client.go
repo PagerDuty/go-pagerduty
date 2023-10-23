@@ -14,14 +14,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/mitchellh/go-homedir"
+	"gopkg.in/yaml.v2"
 )
 
 // Version is current version of this client.
@@ -30,6 +35,7 @@ const Version = "1.9.0-alpha"
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
 	v2EventsAPIEndpoint = "https://events.pagerduty.com"
+	identityEndpoint    = "https://identity.pagerduty.com"
 )
 
 // The type of authentication to use with the API client
@@ -41,6 +47,9 @@ const (
 
 	// OAuth token authentication
 	oauthToken
+
+	// scopedOauthAppToken use OAuth App scoped token
+	scopedOauthAppToken
 )
 
 // APIObject represents generic api json response that is shared by most
@@ -268,6 +277,13 @@ type HTTPClient interface {
 // Keep this unexported so consumers of the package can't make changes to it.
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
+type ScopedOauthCredentials struct {
+	ClientID     string
+	ClientSecret string
+	Scope        string
+	AccessToken  string
+}
+
 // Client wraps http client
 type Client struct {
 	debugFlag    *uint64
@@ -281,12 +297,27 @@ type Client struct {
 	// Authentication type to use for API
 	authType authType
 
+	// scopedOauthCredentials Credentials needed when an Oauth Scoped Token is in
+	// use.
+	scopedOauthCredentials ScopedOauthCredentials
+
 	// HTTPClient is the HTTP client used for making requests against the
 	// PagerDuty API. You can use either *http.Client here, or your own
 	// implementation.
 	HTTPClient HTTPClient
 
 	userAgent string
+}
+
+type ScopedOauthPersistentConfig struct {
+	ClientID    string
+	AccessToken string
+}
+
+type persistentConfig struct {
+	Authtoken   string
+	Loglevel    string
+	ScopedOauth ScopedOauthPersistentConfig
 }
 
 // NewClient creates an API client using an account/user API token
@@ -312,6 +343,10 @@ func NewClient(authToken string, options ...ClientOptions) *Client {
 // NewOAuthClient creates an API client using an OAuth token
 func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
 	return NewClient(authToken, WithOAuth())
+}
+
+func NewScopedOAuthAppClient(creds ScopedOauthCredentials, options ...ClientOptions) *Client {
+	return NewClient("", WithScopedOAuthApp(creds))
 }
 
 // ClientOptions allows for options to be passed into the Client for customization
@@ -343,6 +378,15 @@ func WithV2EventsAPIEndpoint(endpoint string) ClientOptions {
 func WithOAuth() ClientOptions {
 	return func(c *Client) {
 		c.authType = oauthToken
+	}
+}
+
+// WithScopedOAuthApp allows for OAuth App scoped token credentials to be passed
+// into the client.
+func WithScopedOAuthApp(creds ScopedOauthCredentials) ClientOptions {
+	return func(c *Client) {
+		c.authType = scopedOauthAppToken
+		c.scopedOauthCredentials = creds
 	}
 }
 
@@ -501,6 +545,8 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 
 	if authRequired {
 		switch c.authType {
+		case scopedOauthAppToken:
+			req.Header.Set("Authorization", "Bearer "+c.scopedOauthCredentials.AccessToken)
 		case oauthToken:
 			req.Header.Set("Authorization", "Bearer "+c.authToken)
 		default:
@@ -522,15 +568,15 @@ func dupeRequest(r *http.Request) (*http.Request, error) {
 	dreq := r.Clone(r.Context())
 
 	if r.Body != nil {
-		data, err := ioutil.ReadAll(r.Body)
+		data, err := io.ReadAll(r.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to copy request body: %w", err)
 		}
 
 		_ = r.Body.Close()
 
-		r.Body = ioutil.NopCloser(bytes.NewReader(data))
-		dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+		r.Body = io.NopCloser(bytes.NewReader(data))
+		dreq.Body = io.NopCloser(bytes.NewReader(data))
 	}
 
 	return dreq, nil
@@ -561,6 +607,10 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
+	err = c.readPersistentConfig()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation")
+	}
 	c.prepRequest(req, authRequired, headers)
 
 	// if in debug mode, copy request before making it
@@ -571,6 +621,15 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 	}
 
 	resp, err = c.HTTPClient.Do(req)
+
+	needToObtainNewScopedOAuthAppToken := c.authType == scopedOauthAppToken && resp.StatusCode == http.StatusUnauthorized
+	if needToObtainNewScopedOAuthAppToken {
+		if err = c.obtainScopedOAuthAppToken(ctx); err != nil {
+			c.checkResponse(resp, err)
+		}
+		c.prepRequest(req, authRequired, headers)
+		resp, err = c.HTTPClient.Do(req)
+	}
 
 	return c.checkResponse(resp, err)
 }
@@ -585,13 +644,13 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	orb := resp.Body
 	defer func() { _ = orb.Close() }() // explicitly discard error
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if c.debugCaptureResponse() { // reset body as we capture the response elsewhere
-		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+		resp.Body = io.NopCloser(bytes.NewReader(body))
 	}
 
 	return json.Unmarshal(body, payload)
@@ -607,6 +666,69 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 	}
 
 	return resp, nil
+}
+
+type scopedOauthResponse struct {
+	AccessToken string `json:"access_token"`
+	Scope       string `json:"scope"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
+func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
+	data := url.Values{}
+	data.Add("grant_type", "client_credentials")
+	data.Add("client_id", c.scopedOauthCredentials.ClientID)
+	data.Add("client_secret", c.scopedOauthCredentials.ClientSecret)
+	data.Add("scope", c.scopedOauthCredentials.Scope)
+	encodedData := data.Encode()
+	payload := strings.NewReader(encodedData)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, identityEndpoint+"/oauth/token", payload)
+	if err != nil {
+		return fmt.Errorf("failed to build request: %w", err)
+	}
+
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("User-Agent", userAgentHeader)
+
+	internalOneUseHttpClient := &http.Client{}
+
+	v := new(scopedOauthResponse)
+	resp, err := internalOneUseHttpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode > 400 {
+		return fmt.Errorf("failed to obtain new Oauth Scoped token with http %d", resp.StatusCode)
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(bodyBytes, v)
+	if err != nil {
+		return err
+	}
+
+	p := persistentConfig{
+		ScopedOauth: ScopedOauthPersistentConfig{
+			AccessToken: v.AccessToken,
+			ClientID:    c.scopedOauthCredentials.ClientID,
+		},
+	}
+	err = c.writePersistentConfig(&p)
+	if err != nil {
+		return err
+	}
+
+	c.scopedOauthCredentials.AccessToken = v.AccessToken
+
+	return nil
 }
 
 func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
@@ -637,6 +759,72 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 	document.StatusCode = resp.StatusCode
 
 	return document
+}
+
+func (c *Client) readPersistentConfig() error {
+	isUsingPersistentConfig := c.authType == scopedOauthAppToken
+	if !isUsingPersistentConfig {
+		return nil
+	}
+
+	path, err := homedir.Dir()
+	if err != nil {
+		return err
+	}
+	configFilePath := filepath.Join(path, ".pd.yml")
+
+	_, err = os.Stat(configFilePath)
+	if os.IsNotExist(err) {
+		if _, err = os.Create(configFilePath); err != nil {
+			return err
+		}
+	}
+
+	data, err := os.ReadFile(configFilePath)
+	if err != nil {
+		return err
+	}
+	p := &persistentConfig{}
+	if err := yaml.Unmarshal(data, p); err != nil {
+		return err
+	}
+
+	needToSkipNotSameCredentials := c.scopedOauthCredentials.ClientID != p.ScopedOauth.ClientID
+	if !needToSkipNotSameCredentials {
+		c.scopedOauthCredentials.AccessToken = p.ScopedOauth.AccessToken
+	}
+	return nil
+}
+
+func (c *Client) writePersistentConfig(config *persistentConfig) error {
+	path, err := homedir.Dir()
+	if err != nil {
+		return err
+	}
+	configFilePath := filepath.Join(path, ".pd.yml")
+	fs, err := os.Stat(configFilePath)
+	if err != nil {
+		return err
+	}
+	persistedData, err := os.ReadFile(configFilePath)
+	if err != nil {
+		return err
+	}
+	p := &persistentConfig{}
+	if err := yaml.Unmarshal(persistedData, p); err != nil {
+		return err
+	}
+	p.ScopedOauth = config.ScopedOauth
+	updatedPersistedData, err := yaml.Marshal(p)
+	if err != nil {
+		return err
+	}
+
+	if err = os.WriteFile(configFilePath, updatedPersistedData, fs.Mode()); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Helper function to determine wither additional parameters should use ? or & to append args
