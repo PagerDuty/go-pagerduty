@@ -58,7 +58,7 @@ func (c *StandardList) Run(args []string) int {
 		Active:       active,
 		ResourceType: resourceType,
 	}
-	if res, err := client.ListStandardsWithContext(context.Background(), opts); err != nil {
+	if res, err := client.ListStandards(context.Background(), opts); err != nil {
 		log.Error(err)
 		return -1
 	} else {

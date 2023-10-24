@@ -75,7 +75,7 @@ func (c *StandardUpdate) Run(args []string) int {
 	}
 
 	log.Debugf("%#v", standard)
-	if _, err := client.UpdateStandardWithContext(context.Background(), standardID, standard); err != nil {
+	if _, err := client.UpdateStandard(context.Background(), standardID, standard); err != nil {
 		log.Error(err)
 		return -1
 	}

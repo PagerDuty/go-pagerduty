@@ -10,7 +10,7 @@ const (
 	standardPath = "/standards"
 )
 
-// Standard defines a PagerDuty's resource standard.
+// Standard defines a PagerDuty resource standard.
 type Standard struct {
 	Active       bool                         `json:"active"`
 	Description  string                       `json:"description,omitempty"`
@@ -57,9 +57,9 @@ type ResourceStandard struct {
 	Active      bool   `json:"active"`
 	Description string `json:"description,omitempty"`
 	ID          string `json:"id,omitempty"`
-	Name        string `json:"name,omitemtpy"`
+	Name        string `json:"name,omitempty"`
 	Pass        bool   `json:"pass"`
-	Type        string `json:"type,omitemtpy"`
+	Type        string `json:"type,omitempty"`
 }
 
 type ListMultiResourcesStandardScoresResponse struct {
@@ -71,8 +71,8 @@ type ListMultiResourcesStandardScoresOptions struct {
 	IDs []string `url:"ids,omitempty,brackets"`
 }
 
-// ListStandardsWithContext lists all the existing standards.
-func (c *Client) ListStandardsWithContext(ctx context.Context, o ListStandardsOptions) (*ListStandardsResponse, error) {
+// ListStandards lists all the existing standards.
+func (c *Client) ListStandards(ctx context.Context, o ListStandardsOptions) (*ListStandardsResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -91,8 +91,8 @@ func (c *Client) ListStandardsWithContext(ctx context.Context, o ListStandardsOp
 	return &result, nil
 }
 
-// UpdateStandardWithContext updates an existing standard.
-func (c *Client) UpdateStandardWithContext(ctx context.Context, id string, s Standard) (*Standard, error) {
+// UpdateStandard updates an existing standard.
+func (c *Client) UpdateStandard(ctx context.Context, id string, s Standard) (*Standard, error) {
 	resp, err := c.put(ctx, standardPath+"/"+id, s, nil)
 	if err != nil {
 		return nil, err

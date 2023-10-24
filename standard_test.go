@@ -18,7 +18,7 @@ func TestStandard_List(t *testing.T) {
 	var opts ListStandardsOptions
 	client := defaultTestClient(server.URL, standardPath)
 
-	res, err := client.ListStandardsWithContext(context.Background(), opts)
+	res, err := client.ListStandards(context.Background(), opts)
 
 	want := &ListStandardsResponse{
 		Standards: []Standard{
@@ -69,7 +69,7 @@ func TestStandard_Update(t *testing.T) {
 		ResourceType: "technical_service",
 		Type:         "has_technical_service_description",
 	}
-	res, err := client.UpdateStandardWithContext(context.Background(), "1", *input)
+	res, err := client.UpdateStandard(context.Background(), "1", *input)
 	if err != nil {
 		t.Fatal(err)
 	}
