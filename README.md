@@ -57,13 +57,14 @@ upgrade for some reason, the `v1.4.x` line of releases should still work. At the
 time of writing `v1.4.3` was the latest, and we intend to backport any critical
 fixes for the time being.
 
-#### Example Usage
+#### Example Usage with [API Token authentication](https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTUx-authentication)
 
 ```go
 package main
 
 import (
 	"fmt"
+    "context"
 	"github.com/PagerDuty/go-pagerduty"
 )
 
@@ -88,6 +89,40 @@ The PagerDuty API client also exposes its HTTP client as the `HTTPClient` field.
 If you need to use your own HTTP client, for doing things like defining your own
 transport settings, you can replace the default HTTP client with your own by
 simply by setting a new value in the `HTTPClient` field.
+
+#### Example Usage with [Scoped OAuth App authentication](https://developer.pagerduty.com/docs/e518101fde5f3-obtaining-an-app-o-auth-token)
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/PagerDuty/go-pagerduty"
+)
+
+var scopedOAuthConfig = pagerduty.ScopedOauthConfig{
+	// Set your Scoped OAuth App permissions scoped. The following is an example
+	// of how it may look...
+	// "as_account-us.<your-pagerduty-account-subdomain> abilities.read addons.read addons.write analytics.read audit_records.read change_events.read change_events.write custom_fields.read custom_fields.write escalation_policies.read escalation_policies.write event_orchestrations.read event_orchestrations.write event_rules.read event_rules.write extension_schemas.read extensions.read extensions.write incident_workflows.read incident_workflows.write incident_workflows:instances.write incidents.read incidents.write licenses.read notifications.read oncalls.read priorities.read response_plays.read response_plays.write schedules.read schedules.write services.read services.write standards.read standards.write status_dashboards.read subscribers.read subscribers.write tags.read tags.write teams.read teams.write templates.read templates.write users.read users.write users:contact_methods.read users:contact_methods.write users:sessions.read users:sessions.write vendors.read",
+	Scope:          "",
+	ClientID:       "", // Set your Scoped OAuth Client ID here
+	ClientSecret:   "", // Set your Scoped OAuth Client Secret here
+	ConfigFilePath: "", // (Optional) Defaults to "~/.pd.yml". Set a custom one if needed.
+}
+
+func main() {
+	var opts pagerduty.ListEscalationPoliciesOptions
+	client := pagerduty.NewScopedOAuthAppClient(scopedOAuthConfig)
+	eps, err := client.ListEscalationPoliciesWithContext(context.Background(), opts)
+	if err != nil {
+		panic(err)
+	}
+	for _, p := range eps.EscalationPolicies {
+		fmt.Println(p.Name)
+	}
+}
+```
 
 #### API Error Responses
 
