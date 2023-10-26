@@ -3,13 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
-	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -91,15 +88,11 @@ func (m *Meta) setupLogging() {
 }
 
 func (m *Meta) loadConfig() error {
-	path, err := homedir.Dir()
+	configFile, _, err := pagerduty.PersistentConfigFilePath("") // Passing in an empty string will default to ".pd.yml"
 	if err != nil {
 		return err
 	}
-	configFile := filepath.Join(path, ".pd.yml")
-	if _, err := os.Stat(configFile); err != nil {
-		return err
-	}
-	data, err := ioutil.ReadFile(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return err
 	}

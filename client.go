@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
@@ -33,9 +34,10 @@ import (
 const Version = "1.9.0-alpha"
 
 const (
-	apiEndpoint         = "https://api.pagerduty.com"
-	v2EventsAPIEndpoint = "https://events.pagerduty.com"
-	identityEndpoint    = "https://identity.pagerduty.com"
+	apiEndpoint              = "https://api.pagerduty.com"
+	v2EventsAPIEndpoint      = "https://events.pagerduty.com"
+	identityEndpoint         = "https://identity.pagerduty.com"
+	persistentConfigFileName = ".pd.yml"
 )
 
 // The type of authentication to use with the API client
@@ -277,11 +279,15 @@ type HTTPClient interface {
 // Keep this unexported so consumers of the package can't make changes to it.
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
-type ScopedOauthCredentials struct {
+type ScopedOauthConfig struct {
 	ClientID     string
 	ClientSecret string
 	Scope        string
-	AccessToken  string
+	accessToken  string
+	// ConfigFilePath path to file where configuration for Scoped OAuth
+	// Configuration is persisted. This is needed because Access Token must be
+	// ure-used until its expiration.
+	ConfigFilePath string
 }
 
 // Client wraps http client
@@ -297,9 +303,9 @@ type Client struct {
 	// Authentication type to use for API
 	authType authType
 
-	// scopedOauthCredentials Credentials needed when an Oauth Scoped Token is in
+	// scopedOauthConfig Configuration needed when an Oauth Scoped Token is in
 	// use.
-	scopedOauthCredentials ScopedOauthCredentials
+	scopedOauthConfig ScopedOauthConfig
 
 	// HTTPClient is the HTTP client used for making requests against the
 	// PagerDuty API. You can use either *http.Client here, or your own
@@ -345,8 +351,8 @@ func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
 	return NewClient(authToken, WithOAuth())
 }
 
-func NewScopedOAuthAppClient(creds ScopedOauthCredentials, options ...ClientOptions) *Client {
-	return NewClient("", WithScopedOAuthApp(creds))
+func NewScopedOAuthAppClient(config ScopedOauthConfig, options ...ClientOptions) *Client {
+	return NewClient("", WithScopedOAuthApp(config))
 }
 
 // ClientOptions allows for options to be passed into the Client for customization
@@ -381,12 +387,12 @@ func WithOAuth() ClientOptions {
 	}
 }
 
-// WithScopedOAuthApp allows for OAuth App scoped token credentials to be passed
-// into the client.
-func WithScopedOAuthApp(creds ScopedOauthCredentials) ClientOptions {
+// WithScopedOAuthApp allows for OAuth App scoped token configuration to be
+// passed into the client.
+func WithScopedOAuthApp(config ScopedOauthConfig) ClientOptions {
 	return func(c *Client) {
 		c.authType = scopedOauthAppToken
-		c.scopedOauthCredentials = creds
+		c.scopedOauthConfig = config
 	}
 }
 
@@ -546,7 +552,7 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 	if authRequired {
 		switch c.authType {
 		case scopedOauthAppToken:
-			req.Header.Set("Authorization", "Bearer "+c.scopedOauthCredentials.AccessToken)
+			req.Header.Set("Authorization", "Bearer "+c.scopedOauthConfig.accessToken)
 		case oauthToken:
 			req.Header.Set("Authorization", "Bearer "+c.authToken)
 		default:
@@ -678,9 +684,9 @@ type scopedOauthResponse struct {
 func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 	data := url.Values{}
 	data.Add("grant_type", "client_credentials")
-	data.Add("client_id", c.scopedOauthCredentials.ClientID)
-	data.Add("client_secret", c.scopedOauthCredentials.ClientSecret)
-	data.Add("scope", c.scopedOauthCredentials.Scope)
+	data.Add("client_id", c.scopedOauthConfig.ClientID)
+	data.Add("client_secret", c.scopedOauthConfig.ClientSecret)
+	data.Add("scope", c.scopedOauthConfig.Scope)
 	encodedData := data.Encode()
 	payload := strings.NewReader(encodedData)
 
@@ -718,7 +724,7 @@ func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 	p := persistentConfig{
 		ScopedOauth: ScopedOauthPersistentConfig{
 			AccessToken: v.AccessToken,
-			ClientID:    c.scopedOauthCredentials.ClientID,
+			ClientID:    c.scopedOauthConfig.ClientID,
 		},
 	}
 	err = c.writePersistentConfig(&p)
@@ -726,7 +732,7 @@ func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 		return err
 	}
 
-	c.scopedOauthCredentials.AccessToken = v.AccessToken
+	c.scopedOauthConfig.accessToken = v.AccessToken
 
 	return nil
 }
@@ -767,13 +773,7 @@ func (c *Client) readPersistentConfig() error {
 		return nil
 	}
 
-	path, err := homedir.Dir()
-	if err != nil {
-		return err
-	}
-	configFilePath := filepath.Join(path, ".pd.yml")
-
-	_, err = os.Stat(configFilePath)
+	configFilePath, _, err := PersistentConfigFilePath(c.scopedOauthConfig.ConfigFilePath)
 	if os.IsNotExist(err) {
 		if _, err = os.Create(configFilePath); err != nil {
 			return err
@@ -789,20 +789,15 @@ func (c *Client) readPersistentConfig() error {
 		return err
 	}
 
-	needToSkipNotSameCredentials := c.scopedOauthCredentials.ClientID != p.ScopedOauth.ClientID
+	needToSkipNotSameCredentials := c.scopedOauthConfig.ClientID != p.ScopedOauth.ClientID
 	if !needToSkipNotSameCredentials {
-		c.scopedOauthCredentials.AccessToken = p.ScopedOauth.AccessToken
+		c.scopedOauthConfig.accessToken = p.ScopedOauth.AccessToken
 	}
 	return nil
 }
 
 func (c *Client) writePersistentConfig(config *persistentConfig) error {
-	path, err := homedir.Dir()
-	if err != nil {
-		return err
-	}
-	configFilePath := filepath.Join(path, ".pd.yml")
-	fs, err := os.Stat(configFilePath)
+	configFilePath, finfo, err := PersistentConfigFilePath(c.scopedOauthConfig.ConfigFilePath)
 	if err != nil {
 		return err
 	}
@@ -820,7 +815,7 @@ func (c *Client) writePersistentConfig(config *persistentConfig) error {
 		return err
 	}
 
-	if err = os.WriteFile(configFilePath, updatedPersistedData, fs.Mode()); err != nil {
+	if err = os.WriteFile(configFilePath, updatedPersistedData, finfo.Mode()); err != nil {
 		return err
 	}
 
@@ -919,4 +914,28 @@ func (c *Client) cursorGet(ctx context.Context, basePath string, handler cursorH
 	}
 
 	return nil
+}
+
+// PersistentConfigFilePath is a helper function which returns the default file
+// path "~/.pd.yml" to persist Scoped OAuth client configuration when
+// `customPath` is not provided.
+//
+// Additionally returns configuration file info as `fs.FileInfo` object and
+// `fs.stat` error, which can be checked with `os.IsNotExists/IsExists`.
+func PersistentConfigFilePath(customPath string) (string, fs.FileInfo, error) {
+	var configFilePath = customPath
+
+	if configFilePath == "" {
+		homePath, err := homedir.Dir()
+		if err != nil {
+			return "", nil, err
+		}
+		configFilePath = filepath.Join(homePath, persistentConfigFileName)
+	}
+	fstat, err := os.Stat(configFilePath)
+	if err != nil {
+		return configFilePath, nil, err
+	}
+
+	return configFilePath, fstat, nil
 }
