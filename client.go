@@ -472,6 +472,10 @@ func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
 	return c.do(ctx, http.MethodGet, path, nil, nil)
 }
 
+func (c *Client) getWithHeaders(ctx context.Context, path string, headers map[string]string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, path, nil, headers)
+}
+
 const (
 	userAgentHeader   = "go-pagerduty/" + Version
 	acceptHeader      = "application/vnd.pagerduty+json;version=2"

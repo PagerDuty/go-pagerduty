@@ -42,6 +42,8 @@ type ListResponsePlaysOptions struct {
 	FilterForManualRun bool `url:"filter_for_manual_run,omitempty"`
 
 	Query string `url:"query,omitempty"`
+
+	From string
 }
 
 // ListResponsePlays lists existing response plays.
@@ -51,7 +53,11 @@ func (c *Client) ListResponsePlays(ctx context.Context, o ListResponsePlaysOptio
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/response_plays?"+v.Encode())
+	h := map[string]string{
+		"From": o.From,
+	}
+
+	resp, err := c.getWithHeaders(ctx, "/response_plays?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}
