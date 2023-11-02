@@ -48,7 +48,7 @@ type ListLicenseAllocationsOptions struct {
 
 func (c *Client) ListLicensesWithContext(ctx context.Context) (*ListLicensesResponse, error) {
 
-	resp, err := c.get(ctx, "/licenses")
+	resp, err := c.get(ctx, "/licenses", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Client) ListLicenseAllocationsWithContext(ctx context.Context, o ListLi
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/license_allocations?"+v.Encode())
+	resp, err := c.get(ctx, "/license_allocations?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

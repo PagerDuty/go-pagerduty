@@ -321,7 +321,7 @@ func (c *Client) GetIntegrationWithContext(ctx context.Context, serviceID, integ
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
+	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode(), nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 
