@@ -57,7 +57,7 @@ func (c *Client) ListResponsePlays(ctx context.Context, o ListResponsePlaysOptio
 		"From": o.From,
 	}
 
-	resp, err := c.getWithHeaders(ctx, "/response_plays?"+v.Encode(), h)
+	resp, err := c.get(ctx, "/response_plays?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *Client) CreateResponsePlay(ctx context.Context, rp ResponsePlay) (Respo
 
 // GetResponsePlay gets details about an existing response play.
 func (c *Client) GetResponsePlay(ctx context.Context, id string) (ResponsePlay, error) {
-	resp, err := c.get(ctx, "/response_plays/"+id)
+	resp, err := c.get(ctx, "/response_plays/"+id, nil)
 	return getResponsePlayFromResponse(c, resp, err)
 }
 

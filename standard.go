@@ -78,7 +78,7 @@ func (c *Client) ListStandards(ctx context.Context, o ListStandardsOptions) (*Li
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, standardPath+"?"+v.Encode())
+	resp, err := c.get(ctx, standardPath+"?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *Client) UpdateStandard(ctx context.Context, id string, s Standard) (*St
 //	rt - Resource type
 //	Allowed values: technical_services
 func (c *Client) ListResourceStandardScores(ctx context.Context, id string, rt string) (*ResourceStandardScore, error) {
-	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"/"+id)
+	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (c *Client) ListMultiResourcesStandardScores(ctx context.Context, rt string
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"?"+v.Encode())
+	resp, err := c.get(ctx, standardPath+"/scores/"+rt+"?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
