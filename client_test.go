@@ -136,6 +136,11 @@ func TestAPIError_Error(t *testing.T) {
 				input: `{"error":{"code": 420, "message": "Enhance Your Calm", "errors":["No Seriously, Enhance Your Calm", "Slow Your Roll", "No, really..."]}}`,
 				want:  "HTTP response failed with status code 429, message: Enhance Your Calm (code: 420): No Seriously, Enhance Your Calm (and 2 more errors...)",
 			},
+			{
+				name:  "issue_478",
+				input: `{"error":["links should have at most 50 item(s)"]}`,
+				want:  "HTTP response failed with status code 429, message: none (code: 0): links should have at most 50 item(s)",
+			},
 		}
 
 		for _, tt := range tests {
