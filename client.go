@@ -22,6 +22,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"golang.org/x/oauth2"
 )
 
 // Version is current version of this client.
@@ -274,7 +276,7 @@ type Client struct {
 	lastRequest  *atomic.Value
 	lastResponse *atomic.Value
 
-	authToken           string
+	oauthTokenSource    oauth2.TokenSource
 	apiEndpoint         string
 	v2EventsAPIEndpoint string
 
@@ -287,13 +289,12 @@ type Client struct {
 	HTTPClient HTTPClient
 }
 
-// NewClient creates an API client using an account/user API token
-func NewClient(authToken string, options ...ClientOptions) *Client {
+func newClient(oauthTokenSource oauth2.TokenSource, options ...ClientOptions) *Client {
 	client := Client{
 		debugFlag:           new(uint64),
 		lastRequest:         &atomic.Value{},
 		lastResponse:        &atomic.Value{},
-		authToken:           authToken,
+		oauthTokenSource:    oauthTokenSource,
 		apiEndpoint:         apiEndpoint,
 		v2EventsAPIEndpoint: v2EventsAPIEndpoint,
 		authType:            apiToken,
@@ -307,9 +308,19 @@ func NewClient(authToken string, options ...ClientOptions) *Client {
 	return &client
 }
 
+// NewClient creates an API client using an account/user API token
+func NewClient(authToken string, options ...ClientOptions) *Client {
+	return newClient(oauth2.StaticTokenSource(&oauth2.Token{AccessToken: authToken}), options...)
+}
+
 // NewOAuthClient creates an API client using an OAuth token
 func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
-	return NewClient(authToken, WithOAuth())
+	return newClient(oauth2.StaticTokenSource(&oauth2.Token{AccessToken: authToken}), append(options, WithOAuth())...)
+}
+
+// NewOAuthClientWithTokenSource creates an API client using an OAuth token
+func NewOAuthClientWithTokenSource(authToken oauth2.TokenSource, options ...ClientOptions) *Client {
+	return newClient(authToken, append(options, WithOAuth())...)
 }
 
 // ClientOptions allows for options to be passed into the Client for customization
@@ -444,7 +455,9 @@ func (c *Client) LastAPIResponse() (*http.Response, bool) {
 // assumes any request body is in JSON format and sets the Content-Type to
 // application/json.
 func (c *Client) Do(r *http.Request, authRequired bool) (*http.Response, error) {
-	c.prepRequest(r, authRequired, nil)
+	if err := c.prepRequest(r, authRequired, nil); err != nil {
+		return nil, fmt.Errorf("failed to prepare request: %w", err)
+	}
 
 	return c.HTTPClient.Do(r)
 }
@@ -482,7 +495,7 @@ const (
 	contentTypeHeader = "application/json"
 )
 
-func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[string]string) {
+func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[string]string) error {
 	req.Header.Set("Accept", acceptHeader)
 
 	for k, v := range headers {
@@ -490,16 +503,21 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 	}
 
 	if authRequired {
+		token, err := c.oauthTokenSource.Token()
+		if err != nil {
+			return err
+		}
 		switch c.authType {
 		case oauthToken:
-			req.Header.Set("Authorization", "Bearer "+c.authToken)
+			req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 		default:
-			req.Header.Set("Authorization", "Token token="+c.authToken)
+			req.Header.Set("Authorization", "Token token="+token.AccessToken)
 		}
 	}
 
 	req.Header.Set("User-Agent", userAgentHeader)
 	req.Header.Set("Content-Type", contentTypeHeader)
+	return nil
 }
 
 func dupeRequest(r *http.Request) (*http.Request, error) {
@@ -545,7 +563,9 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	c.prepRequest(req, authRequired, headers)
+	if err := c.prepRequest(req, authRequired, headers); err != nil {
+		return nil, fmt.Errorf("failed to prepare request: %w", err)
+	}
 
 	// if in debug mode, copy request before making it
 	if c.debugCaptureRequest() {
