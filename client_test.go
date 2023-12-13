@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -684,6 +685,54 @@ func TestClient_Do(t *testing.T) {
 				t.Fatalf("body = %s, want ok", bs)
 			}
 		})
+	}
+}
+
+func TestClient_UserAgentDefault(t *testing.T) {
+	setup()
+	defer teardown()
+
+	defaultUserAgent := userAgentHeader
+	mux.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		userAgentHeader := r.Header.Get("User-Agent")
+		if userAgentHeader != defaultUserAgent {
+			t.Fatalf("want %q, but got %q", defaultUserAgent, userAgentHeader)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	_, err := client.do(context.Background(), "GET", "/foo", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestClient_UserAgentOverwrite(t *testing.T) {
+	setup()
+	defer teardown()
+
+	terraformVersion := "terraform-version-for-testing"
+	newUserAgent := fmt.Sprintf("(%s %s) Terraform/%s", runtime.GOOS, runtime.GOARCH, terraformVersion)
+	mux.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		userAgentHeader := r.Header.Get("User-Agent")
+		if userAgentHeader != newUserAgent {
+			t.Fatalf("want %q, but got %q", newUserAgent, userAgentHeader)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	client := NewClient("foo",
+		WithAPIEndpoint(server.URL),
+		WithTerraformProvider(terraformVersion),
+	)
+
+	_, err := client.do(context.Background(), "GET", "/foo", nil, nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

@@ -285,6 +285,8 @@ type Client struct {
 	// PagerDuty API. You can use either *http.Client here, or your own
 	// implementation.
 	HTTPClient HTTPClient
+
+	userAgent string
 }
 
 // NewClient creates an API client using an account/user API token
@@ -319,6 +321,14 @@ type ClientOptions func(*Client)
 func WithAPIEndpoint(endpoint string) ClientOptions {
 	return func(c *Client) {
 		c.apiEndpoint = endpoint
+	}
+}
+
+// WithTerraformProvider configures the client to be used as the PagerDuty
+// Terraform provider
+func WithTerraformProvider(version string) ClientOptions {
+	return func(c *Client) {
+		c.userAgent = fmt.Sprintf("(%s %s) Terraform/%s", runtime.GOOS, runtime.GOARCH, version)
 	}
 }
 
@@ -498,7 +508,13 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 		}
 	}
 
-	req.Header.Set("User-Agent", userAgentHeader)
+	var userAgent string
+	if c.userAgent != "" {
+		userAgent = c.userAgent
+	} else {
+		userAgent = userAgentHeader
+	}
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", contentTypeHeader)
 }
 
