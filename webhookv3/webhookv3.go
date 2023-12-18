@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -52,13 +51,13 @@ func VerifySignature(r *http.Request, secret string) error {
 
 	orb := r.Body
 
-	b, err := ioutil.ReadAll(io.LimitReader(r.Body, webhookBodyReaderLimit))
+	b, err := io.ReadAll(io.LimitReader(r.Body, webhookBodyReaderLimit))
 	if err != nil {
 		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	defer func() { _ = orb.Close() }()
-	r.Body = ioutil.NopCloser(bytes.NewReader(b))
+	r.Body = io.NopCloser(bytes.NewReader(b))
 
 	if len(b) == 0 {
 		return ErrMalformedBody

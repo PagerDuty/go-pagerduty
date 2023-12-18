@@ -2,7 +2,7 @@ package pagerduty
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -102,7 +102,7 @@ func TestBusinessService_Update(t *testing.T) {
 
 	mux.HandleFunc("/business_services/1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		reqText, err := ioutil.ReadAll(r.Body)
+		reqText, err := io.ReadAll(r.Body)
 		if err != nil {
 			t.Fatal(err)
 		}
