@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -613,9 +614,11 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	err = c.readPersistentConfig()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation")
+	isUsingScopedOAuthAppToken := c.authType == scopedOauthAppToken
+	if isUsingScopedOAuthAppToken && c.scopedOauthConfig.accessToken == "" {
+		if err = c.readPersistentConfig(); err != nil {
+			return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation; %v", err)
+		}
 	}
 	c.prepRequest(req, authRequired, headers)
 
@@ -628,7 +631,7 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 
 	resp, err = c.HTTPClient.Do(req)
 
-	needToObtainNewScopedOAuthAppToken := c.authType == scopedOauthAppToken && resp.StatusCode == http.StatusUnauthorized
+	needToObtainNewScopedOAuthAppToken := isUsingScopedOAuthAppToken && resp.StatusCode == http.StatusUnauthorized
 	if needToObtainNewScopedOAuthAppToken {
 		if err = c.obtainScopedOAuthAppToken(ctx); err != nil {
 			c.checkResponse(resp, err)
@@ -780,6 +783,7 @@ func (c *Client) readPersistentConfig() error {
 		}
 	}
 
+	log.Println("Reading persistent configuration")
 	data, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return err
