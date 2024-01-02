@@ -17,7 +17,6 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -28,6 +27,8 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-homedir"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
 )
 
@@ -297,11 +298,12 @@ type ScopedOauthConfig struct {
 	ClientID     string
 	ClientSecret string
 	Scope        string
-	accessToken  string
 	// ConfigFilePath path to file where configuration for Scoped OAuth
 	// Configuration is persisted. This is needed because Access Token must be
 	// ure-used until its expiration.
 	ConfigFilePath string
+
+	accessToken string
 }
 
 // Client wraps http client
@@ -707,48 +709,21 @@ type scopedOauthResponse struct {
 }
 
 func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
-	data := url.Values{}
-	data.Add("grant_type", "client_credentials")
-	data.Add("client_id", c.scopedOauthConfig.ClientID)
-	data.Add("client_secret", c.scopedOauthConfig.ClientSecret)
-	data.Add("scope", c.scopedOauthConfig.Scope)
-	encodedData := data.Encode()
-	payload := strings.NewReader(encodedData)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, identityEndpoint+"/oauth/token", payload)
-	if err != nil {
-		return fmt.Errorf("failed to build request: %w", err)
+	oauthConfig := clientcredentials.Config{
+		ClientID:     c.scopedOauthConfig.ClientID,
+		ClientSecret: c.scopedOauthConfig.ClientSecret,
+		Scopes:       strings.Split(c.scopedOauthConfig.Scope, " "),
+		AuthStyle:    oauth2.AuthStyleInParams,
+		TokenURL:     identityEndpoint + "/oauth/token",
 	}
-
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Add("User-Agent", userAgentHeader)
-
-	internalOneUseHttpClient := &http.Client{}
-
-	v := new(scopedOauthResponse)
-	resp, err := internalOneUseHttpClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode > 400 {
-		return fmt.Errorf("failed to obtain new Oauth Scoped token with http %d", resp.StatusCode)
-	}
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(bodyBytes, v)
+	token, err := oauthConfig.Token(ctx)
 	if err != nil {
 		return err
 	}
 
 	p := persistentConfig{
 		ScopedOauth: ScopedOauthPersistentConfig{
-			AccessToken: v.AccessToken,
+			AccessToken: token.AccessToken,
 			ClientID:    c.scopedOauthConfig.ClientID,
 			Scope:       c.scopedOauthConfig.Scope,
 		},
@@ -758,7 +733,7 @@ func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 		return err
 	}
 
-	c.scopedOauthConfig.accessToken = v.AccessToken
+	c.scopedOauthConfig.accessToken = token.AccessToken
 
 	return nil
 }
