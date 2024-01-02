@@ -701,13 +701,6 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 	return resp, nil
 }
 
-type scopedOauthResponse struct {
-	AccessToken string `json:"access_token"`
-	Scope       string `json:"scope"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-
 func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 	oauthConfig := clientcredentials.Config{
 		ClientID:     c.scopedOauthConfig.ClientID,
