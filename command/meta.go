@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -28,11 +31,6 @@ func (a *ArrayFlags) Set(v string) error {
 type Meta struct {
 	Authtoken string
 	Loglevel  string
-	// ScopedOauthPersistedConfig this field exist here because config file is
-	// being used in Go library and CLI client, however up to this point this
-	// field is mainly applicable to Go library, nevertheless helps to keep both
-	// uses of config file aware of each other.
-	pagerduty.ScopedOauthPersistentConfig
 }
 
 type FlagSetFlags uint
@@ -88,11 +86,15 @@ func (m *Meta) setupLogging() {
 }
 
 func (m *Meta) loadConfig() error {
-	configFile, _, err := pagerduty.PersistentConfigFilePath("") // Passing in an empty string will default to ".pd.yml"
+	path, err := homedir.Dir()
 	if err != nil {
 		return err
 	}
-	data, err := os.ReadFile(configFile)
+	configFile := filepath.Join(path, ".pd.yml")
+	if _, err := os.Stat(configFile); err != nil {
+		return err
+	}
+	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return err
 	}
