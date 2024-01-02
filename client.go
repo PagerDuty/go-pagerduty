@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -24,6 +23,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -90,9 +90,10 @@ type APIDetails struct {
 // occurs. This includes messages that should hopefully provide useful context
 // to the end user.
 type APIErrorObject struct {
-	Code    int      `json:"code,omitempty"`
-	Message string   `json:"message,omitempty"`
-	Errors  []string `json:"errors,omitempty"`
+	Code           int      `json:"code,omitempty"`
+	Message        string   `json:"message,omitempty"`
+	Errors         []string `json:"errors,omitempty"`
+	RequiredScopes string   `json:"required_scopes,omitempty"`
 }
 
 func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
@@ -107,14 +108,16 @@ func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/339
 	// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
 	var fallback1 struct {
-		Code    int    `json:"code,omitempty"`
-		Message string `json:"message,omitempty"`
-		Errors  string `json:"errors,omitempty"`
+		Code           int    `json:"code,omitempty"`
+		Message        string `json:"message,omitempty"`
+		Errors         string `json:"errors,omitempty"`
+		RequiredScopes string `json:"required_scopes,omitempty"`
 	}
 	if json.Unmarshal(data, &fallback1) == nil {
 		aeo.Code = fallback1.Code
 		aeo.Message = fallback1.Message
 		aeo.Errors = []string{fallback1.Errors}
+		aeo.RequiredScopes = fallback1.RequiredScopes
 		return aeo, nil
 	}
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/478
@@ -191,6 +194,13 @@ func (a APIError) Error() string {
 
 	if !a.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
+	}
+
+	if a.APIError.ErrorObject.RequiredScopes != "" {
+		return fmt.Sprintf(
+			"HTTP response failed with status code %d, message: %s (code: %d), required scopes: %s",
+			a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, a.APIError.ErrorObject.RequiredScopes,
+		)
 	}
 
 	if len(a.APIError.ErrorObject.Errors) == 0 {
@@ -280,6 +290,9 @@ type HTTPClient interface {
 // Keep this unexported so consumers of the package can't make changes to it.
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
+var readPersistentConfigOnce sync.Once
+var writePersistentConfigOnce sync.Once
+
 type ScopedOauthConfig struct {
 	ClientID     string
 	ClientSecret string
@@ -319,6 +332,7 @@ type Client struct {
 type ScopedOauthPersistentConfig struct {
 	ClientID    string
 	AccessToken string
+	Scope       string
 }
 
 type persistentConfig struct {
@@ -616,8 +630,12 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 
 	isUsingScopedOAuthAppToken := c.authType == scopedOauthAppToken
 	if isUsingScopedOAuthAppToken && c.scopedOauthConfig.accessToken == "" {
-		if err = c.readPersistentConfig(); err != nil {
-			return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation; %v", err)
+		var readConfigError error
+		readPersistentConfigOnce.Do(func() {
+			readConfigError = c.readPersistentConfig()
+		})
+		if readConfigError != nil {
+			return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation; %w", err)
 		}
 	}
 	c.prepRequest(req, authRequired, headers)
@@ -633,8 +651,12 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 
 	needToObtainNewScopedOAuthAppToken := isUsingScopedOAuthAppToken && resp.StatusCode == http.StatusUnauthorized
 	if needToObtainNewScopedOAuthAppToken {
-		if err = c.obtainScopedOAuthAppToken(ctx); err != nil {
-			c.checkResponse(resp, err)
+		var writeConfigError error
+		writePersistentConfigOnce.Do(func() {
+			writeConfigError = c.obtainScopedOAuthAppToken(ctx)
+		})
+		if writeConfigError != nil {
+			return c.checkResponse(resp, err)
 		}
 		c.prepRequest(req, authRequired, headers)
 		resp, err = c.HTTPClient.Do(req)
@@ -728,6 +750,7 @@ func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
 		ScopedOauth: ScopedOauthPersistentConfig{
 			AccessToken: v.AccessToken,
 			ClientID:    c.scopedOauthConfig.ClientID,
+			Scope:       c.scopedOauthConfig.Scope,
 		},
 	}
 	err = c.writePersistentConfig(&p)
@@ -783,7 +806,6 @@ func (c *Client) readPersistentConfig() error {
 		}
 	}
 
-	log.Println("Reading persistent configuration")
 	data, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return err
@@ -793,8 +815,9 @@ func (c *Client) readPersistentConfig() error {
 		return err
 	}
 
+	needToSkipNotSameScope := c.scopedOauthConfig.Scope != p.ScopedOauth.Scope
 	needToSkipNotSameCredentials := c.scopedOauthConfig.ClientID != p.ScopedOauth.ClientID
-	if !needToSkipNotSameCredentials {
+	if !needToSkipNotSameCredentials && !needToSkipNotSameScope {
 		c.scopedOauthConfig.accessToken = p.ScopedOauth.AccessToken
 	}
 	return nil
