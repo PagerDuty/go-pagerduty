@@ -332,15 +332,15 @@ type Client struct {
 }
 
 type ScopedOauthPersistentConfig struct {
-	ClientID    string
-	AccessToken string
-	Scope       string
+	ClientID    string `yaml:"clientid"`
+	AccessToken string `yaml:"accesstoken"`
+	Scope       string `yaml:"scope"`
 }
 
 type persistentConfig struct {
-	Authtoken   string
-	Loglevel    string
-	ScopedOauth ScopedOauthPersistentConfig
+	Authtoken   string                      `yaml:"authtoken,omitempty"`
+	Loglevel    string                      `yaml:"loglevel,omitempty"`
+	ScopedOauth ScopedOauthPersistentConfig `yaml:"scopedoauth"`
 }
 
 // NewClient creates an API client using an account/user API token
