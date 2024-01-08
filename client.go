@@ -14,32 +14,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/fs"
+	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"path"
-	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/mitchellh/go-homedir"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/yaml.v2"
 )
 
 // Version is current version of this client.
 const Version = "1.9.0-alpha"
 
 const (
-	apiEndpoint              = "https://api.pagerduty.com"
-	v2EventsAPIEndpoint      = "https://events.pagerduty.com"
-	identityEndpoint         = "https://identity.pagerduty.com"
-	persistentConfigFileName = ".pd.yml"
+	apiEndpoint         = "https://api.pagerduty.com"
+	v2EventsAPIEndpoint = "https://events.pagerduty.com"
 )
 
 // The type of authentication to use with the API client
@@ -51,9 +41,6 @@ const (
 
 	// OAuth token authentication
 	oauthToken
-
-	// scopedOauthAppToken use OAuth App scoped token
-	scopedOauthAppToken
 )
 
 // APIObject represents generic api json response that is shared by most
@@ -91,10 +78,9 @@ type APIDetails struct {
 // occurs. This includes messages that should hopefully provide useful context
 // to the end user.
 type APIErrorObject struct {
-	Code           int      `json:"code,omitempty"`
-	Message        string   `json:"message,omitempty"`
-	Errors         []string `json:"errors,omitempty"`
-	RequiredScopes string   `json:"required_scopes,omitempty"`
+	Code    int      `json:"code,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
 }
 
 func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
@@ -109,16 +95,14 @@ func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/339
 	// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
 	var fallback1 struct {
-		Code           int    `json:"code,omitempty"`
-		Message        string `json:"message,omitempty"`
-		Errors         string `json:"errors,omitempty"`
-		RequiredScopes string `json:"required_scopes,omitempty"`
+		Code    int    `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+		Errors  string `json:"errors,omitempty"`
 	}
 	if json.Unmarshal(data, &fallback1) == nil {
 		aeo.Code = fallback1.Code
 		aeo.Message = fallback1.Message
 		aeo.Errors = []string{fallback1.Errors}
-		aeo.RequiredScopes = fallback1.RequiredScopes
 		return aeo, nil
 	}
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/478
@@ -195,13 +179,6 @@ func (a APIError) Error() string {
 
 	if !a.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
-	}
-
-	if a.APIError.ErrorObject.RequiredScopes != "" {
-		return fmt.Sprintf(
-			"HTTP response failed with status code %d, message: %s (code: %d), required scopes: %s",
-			a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, a.APIError.ErrorObject.RequiredScopes,
-		)
 	}
 
 	if len(a.APIError.ErrorObject.Errors) == 0 {
@@ -291,21 +268,6 @@ type HTTPClient interface {
 // Keep this unexported so consumers of the package can't make changes to it.
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
-var readPersistentConfigOnce sync.Once
-var writePersistentConfigOnce sync.Once
-
-type ScopedOauthConfig struct {
-	ClientID     string
-	ClientSecret string
-	Scope        string
-	// ConfigFilePath path to file where configuration for Scoped OAuth
-	// Configuration is persisted. This is needed because Access Token must be
-	// ure-used until its expiration.
-	ConfigFilePath string
-
-	accessToken string
-}
-
 // Client wraps http client
 type Client struct {
 	debugFlag    *uint64
@@ -319,28 +281,12 @@ type Client struct {
 	// Authentication type to use for API
 	authType authType
 
-	// scopedOauthConfig Configuration needed when an Oauth Scoped Token is in
-	// use.
-	scopedOauthConfig ScopedOauthConfig
-
 	// HTTPClient is the HTTP client used for making requests against the
 	// PagerDuty API. You can use either *http.Client here, or your own
 	// implementation.
 	HTTPClient HTTPClient
 
 	userAgent string
-}
-
-type ScopedOauthPersistentConfig struct {
-	ClientID    string `yaml:"clientid"`
-	AccessToken string `yaml:"accesstoken"`
-	Scope       string `yaml:"scope"`
-}
-
-type persistentConfig struct {
-	Authtoken   string                      `yaml:"authtoken,omitempty"`
-	Loglevel    string                      `yaml:"loglevel,omitempty"`
-	ScopedOauth ScopedOauthPersistentConfig `yaml:"scopedoauth"`
 }
 
 // NewClient creates an API client using an account/user API token
@@ -366,10 +312,6 @@ func NewClient(authToken string, options ...ClientOptions) *Client {
 // NewOAuthClient creates an API client using an OAuth token
 func NewOAuthClient(authToken string, options ...ClientOptions) *Client {
 	return NewClient(authToken, WithOAuth())
-}
-
-func NewScopedOAuthAppClient(config ScopedOauthConfig, options ...ClientOptions) *Client {
-	return NewClient("", WithScopedOAuthApp(config))
 }
 
 // ClientOptions allows for options to be passed into the Client for customization
@@ -401,15 +343,6 @@ func WithV2EventsAPIEndpoint(endpoint string) ClientOptions {
 func WithOAuth() ClientOptions {
 	return func(c *Client) {
 		c.authType = oauthToken
-	}
-}
-
-// WithScopedOAuthApp allows for OAuth App scoped token configuration to be
-// passed into the client.
-func WithScopedOAuthApp(config ScopedOauthConfig) ClientOptions {
-	return func(c *Client) {
-		c.authType = scopedOauthAppToken
-		c.scopedOauthConfig = config
 	}
 }
 
@@ -568,8 +501,6 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 
 	if authRequired {
 		switch c.authType {
-		case scopedOauthAppToken:
-			req.Header.Set("Authorization", "Bearer "+c.scopedOauthConfig.accessToken)
 		case oauthToken:
 			req.Header.Set("Authorization", "Bearer "+c.authToken)
 		default:
@@ -591,15 +522,15 @@ func dupeRequest(r *http.Request) (*http.Request, error) {
 	dreq := r.Clone(r.Context())
 
 	if r.Body != nil {
-		data, err := io.ReadAll(r.Body)
+		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to copy request body: %w", err)
 		}
 
 		_ = r.Body.Close()
 
-		r.Body = io.NopCloser(bytes.NewReader(data))
-		dreq.Body = io.NopCloser(bytes.NewReader(data))
+		r.Body = ioutil.NopCloser(bytes.NewReader(data))
+		dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
 	}
 
 	return dreq, nil
@@ -630,16 +561,6 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	isUsingScopedOAuthAppToken := c.authType == scopedOauthAppToken
-	if isUsingScopedOAuthAppToken && c.scopedOauthConfig.accessToken == "" {
-		var readConfigError error
-		readPersistentConfigOnce.Do(func() {
-			readConfigError = c.readPersistentConfig()
-		})
-		if readConfigError != nil {
-			return nil, fmt.Errorf("failed to read persistent config for using Scoped Oauth authencation; %w", err)
-		}
-	}
 	c.prepRequest(req, authRequired, headers)
 
 	// if in debug mode, copy request before making it
@@ -650,19 +571,6 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 	}
 
 	resp, err = c.HTTPClient.Do(req)
-
-	needToObtainNewScopedOAuthAppToken := isUsingScopedOAuthAppToken && resp.StatusCode == http.StatusUnauthorized
-	if needToObtainNewScopedOAuthAppToken {
-		var writeConfigError error
-		writePersistentConfigOnce.Do(func() {
-			writeConfigError = c.obtainScopedOAuthAppToken(ctx)
-		})
-		if writeConfigError != nil {
-			return c.checkResponse(resp, err)
-		}
-		c.prepRequest(req, authRequired, headers)
-		resp, err = c.HTTPClient.Do(req)
-	}
 
 	return c.checkResponse(resp, err)
 }
@@ -677,13 +585,13 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	orb := resp.Body
 	defer func() { _ = orb.Close() }() // explicitly discard error
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if c.debugCaptureResponse() { // reset body as we capture the response elsewhere
-		resp.Body = io.NopCloser(bytes.NewReader(body))
+		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
 	}
 
 	return json.Unmarshal(body, payload)
@@ -699,36 +607,6 @@ func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, 
 	}
 
 	return resp, nil
-}
-
-func (c *Client) obtainScopedOAuthAppToken(ctx context.Context) error {
-	oauthConfig := clientcredentials.Config{
-		ClientID:     c.scopedOauthConfig.ClientID,
-		ClientSecret: c.scopedOauthConfig.ClientSecret,
-		Scopes:       strings.Split(c.scopedOauthConfig.Scope, " "),
-		AuthStyle:    oauth2.AuthStyleInParams,
-		TokenURL:     identityEndpoint + "/oauth/token",
-	}
-	token, err := oauthConfig.Token(ctx)
-	if err != nil {
-		return err
-	}
-
-	p := persistentConfig{
-		ScopedOauth: ScopedOauthPersistentConfig{
-			AccessToken: token.AccessToken,
-			ClientID:    c.scopedOauthConfig.ClientID,
-			Scope:       c.scopedOauthConfig.Scope,
-		},
-	}
-	err = c.writePersistentConfig(&p)
-	if err != nil {
-		return err
-	}
-
-	c.scopedOauthConfig.accessToken = token.AccessToken
-
-	return nil
 }
 
 func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
@@ -759,62 +637,6 @@ func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
 	document.StatusCode = resp.StatusCode
 
 	return document
-}
-
-func (c *Client) readPersistentConfig() error {
-	isUsingPersistentConfig := c.authType == scopedOauthAppToken
-	if !isUsingPersistentConfig {
-		return nil
-	}
-
-	configFilePath, _, err := PersistentConfigFilePath(c.scopedOauthConfig.ConfigFilePath)
-	if os.IsNotExist(err) {
-		if _, err = os.Create(configFilePath); err != nil {
-			return err
-		}
-	}
-
-	data, err := os.ReadFile(configFilePath)
-	if err != nil {
-		return err
-	}
-	p := &persistentConfig{}
-	if err := yaml.Unmarshal(data, p); err != nil {
-		return err
-	}
-
-	needToSkipNotSameScope := c.scopedOauthConfig.Scope != p.ScopedOauth.Scope
-	needToSkipNotSameCredentials := c.scopedOauthConfig.ClientID != p.ScopedOauth.ClientID
-	if !needToSkipNotSameCredentials && !needToSkipNotSameScope {
-		c.scopedOauthConfig.accessToken = p.ScopedOauth.AccessToken
-	}
-	return nil
-}
-
-func (c *Client) writePersistentConfig(config *persistentConfig) error {
-	configFilePath, finfo, err := PersistentConfigFilePath(c.scopedOauthConfig.ConfigFilePath)
-	if err != nil {
-		return err
-	}
-	persistedData, err := os.ReadFile(configFilePath)
-	if err != nil {
-		return err
-	}
-	p := &persistentConfig{}
-	if err := yaml.Unmarshal(persistedData, p); err != nil {
-		return err
-	}
-	p.ScopedOauth = config.ScopedOauth
-	updatedPersistedData, err := yaml.Marshal(p)
-	if err != nil {
-		return err
-	}
-
-	if err = os.WriteFile(configFilePath, updatedPersistedData, finfo.Mode()); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Helper function to determine wither additional parameters should use ? or & to append args
@@ -909,28 +731,4 @@ func (c *Client) cursorGet(ctx context.Context, basePath string, handler cursorH
 	}
 
 	return nil
-}
-
-// PersistentConfigFilePath is a helper function which returns the default file
-// path "~/.pd.yml" to persist Scoped OAuth client configuration when
-// `customPath` is not provided.
-//
-// Additionally returns configuration file info as `fs.FileInfo` object and
-// `fs.stat` error, which can be checked with `os.IsNotExists/IsExists`.
-func PersistentConfigFilePath(customPath string) (string, fs.FileInfo, error) {
-	var configFilePath = customPath
-
-	if configFilePath == "" {
-		homePath, err := homedir.Dir()
-		if err != nil {
-			return "", nil, err
-		}
-		configFilePath = filepath.Join(homePath, persistentConfigFileName)
-	}
-	fstat, err := os.Stat(configFilePath)
-	if err != nil {
-		return configFilePath, nil, err
-	}
-
-	return configFilePath, fstat, nil
 }
