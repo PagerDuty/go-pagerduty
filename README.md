@@ -7,7 +7,7 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 To add the latest stable version to your project:
 ```cli
-go get github.com/PagerDuty/go-pagerduty@v1.7
+go get github.com/PagerDuty/go-pagerduty@v1.8
 ```
 
 If you instead wish to work with the latest code from main:
