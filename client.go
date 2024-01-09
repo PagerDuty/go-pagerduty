@@ -25,7 +25,7 @@ import (
 )
 
 // Version is current version of this client.
-const Version = "1.8.0"
+const Version = "1.9.0-alpha"
 
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
