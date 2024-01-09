@@ -1,7 +1,7 @@
 # Changelog
 
 ## [v1.8.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.8.0) (2024-01-09)
-## What's Changed
+### What's Changed
 * Adds resolved_at and updated_at fields to Incident by @surik in https://github.com/PagerDuty/go-pagerduty/pull/482
 * Adds support for auto_pause_notifications_parameters by @darrendao in https://github.com/PagerDuty/go-pagerduty/pull/490
 * Fixes ResponderRequest unmarshalling of IncidentResponders by @allyjweir in https://github.com/PagerDuty/go-pagerduty/pull/493
@@ -15,7 +15,7 @@
 * Updates go to 1.19 and a few dependencies by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/504
 * Bump golang.org/x/crypto from 0.16.0 to 0.17.0 by @dependabot in https://github.com/PagerDuty/go-pagerduty/pull/505
 
-## New Contributors
+### New Contributors
 * @surik made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/482
 * @darrendao made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/490
 * @allyjweir made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/493
