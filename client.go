@@ -14,7 +14,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"path"
@@ -22,6 +21,9 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 // Version is current version of this client.
@@ -29,6 +31,7 @@ const Version = "1.9.0-alpha"
 
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
+	identityEndpoint    = "https://identity.pagerduty.com"
 	v2EventsAPIEndpoint = "https://events.pagerduty.com"
 )
 
@@ -41,6 +44,8 @@ const (
 
 	// OAuth token authentication
 	oauthToken
+
+	scopedOAuthAppToken
 )
 
 // APIObject represents generic api json response that is shared by most
@@ -78,9 +83,10 @@ type APIDetails struct {
 // occurs. This includes messages that should hopefully provide useful context
 // to the end user.
 type APIErrorObject struct {
-	Code    int      `json:"code,omitempty"`
-	Message string   `json:"message,omitempty"`
-	Errors  []string `json:"errors,omitempty"`
+	Code           int      `json:"code,omitempty"`
+	Message        string   `json:"message,omitempty"`
+	Errors         []string `json:"errors,omitempty"`
+	RequiredScopes string   `json:"required_scopes,omitempty"`
 }
 
 func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
@@ -95,14 +101,16 @@ func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/339
 	// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
 	var fallback1 struct {
-		Code    int    `json:"code,omitempty"`
-		Message string `json:"message,omitempty"`
-		Errors  string `json:"errors,omitempty"`
+		Code           int    `json:"code,omitempty"`
+		Message        string `json:"message,omitempty"`
+		Errors         string `json:"errors,omitempty"`
+		RequiredScopes string `json:"required_scopes,omitempty"`
 	}
 	if json.Unmarshal(data, &fallback1) == nil {
 		aeo.Code = fallback1.Code
 		aeo.Message = fallback1.Message
 		aeo.Errors = []string{fallback1.Errors}
+		aeo.RequiredScopes = fallback1.RequiredScopes
 		return aeo, nil
 	}
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/478
@@ -179,6 +187,13 @@ func (a APIError) Error() string {
 
 	if !a.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
+	}
+
+	if a.APIError.ErrorObject.RequiredScopes != "" {
+		return fmt.Sprintf(
+			"HTTP response failed with status code %d, message: %s (code: %d), required scopes: %s",
+			a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, a.APIError.ErrorObject.RequiredScopes,
+		)
 	}
 
 	if len(a.APIError.ErrorObject.Errors) == 0 {
@@ -278,6 +293,8 @@ type Client struct {
 	apiEndpoint         string
 	v2EventsAPIEndpoint string
 
+	tokenSource oauth2.TokenSource
+
 	// Authentication type to use for API
 	authType authType
 
@@ -344,6 +361,34 @@ func WithOAuth() ClientOptions {
 	return func(c *Client) {
 		c.authType = oauthToken
 	}
+}
+
+func WithScopedOAuthApp(clientId string, clientSecret string, scopes []string) ClientOptions {
+	ts := baseTokenSource(context.Background(), clientId, clientSecret, scopes)
+
+	return func(c *Client) {
+		c.authType = scopedOAuthAppToken
+		c.tokenSource = ts
+	}
+}
+
+func WithScopedOAuthAppTokenSource(tokenSource oauth2.TokenSource) ClientOptions {
+	return func(c *Client) {
+		c.authType = scopedOAuthAppToken
+		c.tokenSource = tokenSource
+	}
+}
+
+func baseTokenSource(context context.Context, clientId string, clientSecret string, scopes []string) oauth2.TokenSource {
+	config := clientcredentials.Config{
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
+		Scopes:       scopes,
+		AuthStyle:    oauth2.AuthStyleInParams,
+		TokenURL:     identityEndpoint + "/oauth/token",
+	}
+
+	return config.TokenSource(context)
 }
 
 // DebugFlag represents a set of debug bit flags that can be bitwise-ORed
@@ -492,7 +537,7 @@ const (
 	contentTypeHeader = "application/json"
 )
 
-func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[string]string) {
+func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[string]string) error {
 	req.Header.Set("Accept", acceptHeader)
 
 	for k, v := range headers {
@@ -503,6 +548,12 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 		switch c.authType {
 		case oauthToken:
 			req.Header.Set("Authorization", "Bearer "+c.authToken)
+		case scopedOAuthAppToken:
+			token, err := c.tokenSource.Token()
+			if err != nil {
+				return fmt.Errorf("failed to prep request: %w", err)
+			}
+			token.SetAuthHeader(req)
 		default:
 			req.Header.Set("Authorization", "Token token="+c.authToken)
 		}
@@ -516,21 +567,23 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 	}
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", contentTypeHeader)
+
+	return nil
 }
 
 func dupeRequest(r *http.Request) (*http.Request, error) {
 	dreq := r.Clone(r.Context())
 
 	if r.Body != nil {
-		data, err := ioutil.ReadAll(r.Body)
+		data, err := io.ReadAll(r.Body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to copy request body: %w", err)
 		}
 
 		_ = r.Body.Close()
 
-		r.Body = ioutil.NopCloser(bytes.NewReader(data))
-		dreq.Body = ioutil.NopCloser(bytes.NewReader(data))
+		r.Body = io.NopCloser(bytes.NewReader(data))
+		dreq.Body = io.NopCloser(bytes.NewReader(data))
 	}
 
 	return dreq, nil
@@ -561,7 +614,9 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	c.prepRequest(req, authRequired, headers)
+	if err := c.prepRequest(req, authRequired, headers); err != nil {
+		return nil, err
+	}
 
 	// if in debug mode, copy request before making it
 	if c.debugCaptureRequest() {
@@ -585,13 +640,13 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	orb := resp.Body
 	defer func() { _ = orb.Close() }() // explicitly discard error
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if c.debugCaptureResponse() { // reset body as we capture the response elsewhere
-		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+		resp.Body = io.NopCloser(bytes.NewReader(body))
 	}
 
 	return json.Unmarshal(body, payload)
