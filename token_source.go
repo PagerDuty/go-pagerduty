@@ -25,6 +25,9 @@ type persistedToken struct {
 	Scopes   string `json:"scopes"`
 }
 
+// NewFileTokenSource creates an oauth2.TokenSource with a Token method which is
+// able to load/save the token info in a file located at configFilePath (e.g.,
+// "token.json" to use the file token.json at CWD).
 func NewFileTokenSource(context context.Context, clientId string, clientSecret string, scopes []string, configFilePath string) oauth2.TokenSource {
 	base := baseTokenSource(context, clientId, clientSecret, scopes)
 
