@@ -98,24 +98,22 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
 )
 
-var config = pagerduty.ScopedOauthConfig{
-	// Set your Scoped OAuth App permissions scoped. The following is an example
-	// of how it may look...
-	// "as_account-us.<your-pagerduty-account-subdomain> abilities.read addons.read addons.write analytics.read audit_records.read change_events.read change_events.write custom_fields.read custom_fields.write escalation_policies.read escalation_policies.write event_orchestrations.read event_orchestrations.write event_rules.read event_rules.write extension_schemas.read extensions.read extensions.write incident_workflows.read incident_workflows.write incident_workflows:instances.write incidents.read incidents.write licenses.read notifications.read oncalls.read priorities.read response_plays.read response_plays.write schedules.read schedules.write services.read services.write standards.read standards.write status_dashboards.read subscribers.read subscribers.write tags.read tags.write teams.read teams.write templates.read templates.write users.read users.write users:contact_methods.read users:contact_methods.write users:sessions.read users:sessions.write vendors.read",
-	Scope:          "",
-	ClientID:       "", // Set your Scoped OAuth Client ID here
-	ClientSecret:   "", // Set your Scoped OAuth Client Secret here
-	ConfigFilePath: "", // (Optional) Defaults to "~/.pd.yml". Set a custom one if needed.
-}
-
 func main() {
 	ctx := context.Background()
 	var opts pagerduty.ListEscalationPoliciesOptions
-	client := pagerduty.NewScopedOAuthAppClient(config)
+	clientId := "client_id_goes_here"
+	clientSecret := "secret_goes_here"
+	scopes := strings.Split("as_account-us.companysubdomain escalation_policies.read", " ")
+	scopedOAuthOpts := pagerduty.WithScopedOAuthAppTokenSource(
+		pagerduty.NewFileTokenSource(ctx, clientId, clientSecret, scopes, "token.json"),
+	)
+
+	client := pagerduty.NewClient("", scopedOAuthOpts)
 	eps, err := client.ListEscalationPoliciesWithContext(ctx, opts)
 	if err != nil {
 		panic(err)
