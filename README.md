@@ -63,12 +63,13 @@ fixes for the time being.
 package main
 
 import (
+	"context"
 	"fmt"
-    "context"
+
 	"github.com/PagerDuty/go-pagerduty"
 )
 
-var	authtoken = "" // Set your auth token here
+var authtoken = "" // Set your auth token here
 
 func main() {
 	ctx := context.Background()
