@@ -57,7 +57,7 @@ upgrade for some reason, the `v1.4.x` line of releases should still work. At the
 time of writing `v1.4.3` was the latest, and we intend to backport any critical
 fixes for the time being.
 
-#### Example Usage with [API Token authentication](https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTUx-authentication)
+#### Example Usage with [API Token Authentication](https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTUx-authentication)
 
 ```go
 package main
@@ -90,7 +90,7 @@ If you need to use your own HTTP client, for doing things like defining your own
 transport settings, you can replace the default HTTP client with your own by
 simply by setting a new value in the `HTTPClient` field.
 
-#### Example Usage with [Scoped OAuth App authentication](https://developer.pagerduty.com/docs/e518101fde5f3-obtaining-an-app-o-auth-token)
+#### Example Usage with [Scoped OAuth App Authentication](https://developer.pagerduty.com/docs/e518101fde5f3-obtaining-an-app-o-auth-token)
 
 ```go
 package main

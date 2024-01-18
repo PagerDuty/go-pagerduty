@@ -363,8 +363,8 @@ func WithOAuth() ClientOptions {
 	}
 }
 
-func WithScopedOAuthApp(clientId string, clientSecret string, scopes []string) ClientOptions {
-	ts := baseTokenSource(context.Background(), clientId, clientSecret, scopes)
+func WithScopedOAuthApp(ctx context.Context, clientId string, clientSecret string, scopes []string) ClientOptions {
+	ts := baseTokenSource(ctx, clientId, clientSecret, scopes)
 
 	return func(c *Client) {
 		c.authType = scopedOAuthAppToken

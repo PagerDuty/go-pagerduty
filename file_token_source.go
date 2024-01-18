@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -28,8 +27,8 @@ type persistedToken struct {
 // NewFileTokenSource creates an oauth2.TokenSource with a Token method which is
 // able to load/save the token info in a file located at configFilePath (e.g.,
 // "token.json" to use the file token.json at CWD).
-func NewFileTokenSource(context context.Context, clientId string, clientSecret string, scopes []string, configFilePath string) oauth2.TokenSource {
-	base := baseTokenSource(context, clientId, clientSecret, scopes)
+func NewFileTokenSource(ctx context.Context, clientId string, clientSecret string, scopes []string, configFilePath string) oauth2.TokenSource {
+	base := baseTokenSource(ctx, clientId, clientSecret, scopes)
 
 	fts := &fileTokenSource{
 		base:           base,
@@ -42,8 +41,6 @@ func NewFileTokenSource(context context.Context, clientId string, clientSecret s
 }
 
 func (c *fileTokenSource) loadToken() (*oauth2.Token, error) {
-	log.Printf("[FTS] Loading token from file\n")
-
 	_, err := os.Stat(c.configFilePath)
 	if os.IsNotExist(err) {
 		return &oauth2.Token{}, nil
@@ -60,13 +57,8 @@ func (c *fileTokenSource) loadToken() (*oauth2.Token, error) {
 
 	t := pt.Token
 
-	// [*] TODO: Persisted token is already expired in config file.
 	needToRefreshTokenExpired := time.Now().After(pt.Expiry)
-	// [*] TODO: Addresss case when scopes are missing and token is not refreshed
-	// after scopes are corrected until config file is deleted.
 	needToRefreshTokenNotSameScopes := !isSameScope(pt.Scopes, strings.Join(c.scopes, " "))
-	// [*] TODO: Address case when credentials are swaped and previous generated
-	// token is not refreshed untill config file is deleted.
 	needToRefreshTokenNotSameCredentials := pt.ClientId != c.clientId
 	if needToRefreshTokenExpired || needToRefreshTokenNotSameScopes || needToRefreshTokenNotSameCredentials {
 		t.AccessToken = ""
@@ -76,8 +68,6 @@ func (c *fileTokenSource) loadToken() (*oauth2.Token, error) {
 }
 
 func (c *fileTokenSource) saveToken(tok *oauth2.Token) error {
-	log.Printf("[FTS] Saving token to file\n")
-
 	_, err := os.Stat(c.configFilePath)
 	if os.IsNotExist(err) {
 		if _, err := os.Create(c.configFilePath); err != nil {
@@ -103,15 +93,11 @@ func (c *fileTokenSource) saveToken(tok *oauth2.Token) error {
 }
 
 func (c *fileTokenSource) Token() (t *oauth2.Token, err error) {
-	// [*] TODO: Address case when token expires before its end of life, because
-	// it's revoked.
-	//    * This should be addressed in client when receiving the 401 response.
 	t, _ = c.loadToken()
 	if t != nil && t.Valid() {
 		return t, nil
 	}
 
-	log.Printf("[FTS] Fetching new token\n")
 	if t, err = c.base.Token(); err != nil {
 		return nil, err
 	}
