@@ -142,11 +142,6 @@ func TestAPIError_Error(t *testing.T) {
 				input: `{"error":["links should have at most 50 item(s)"]}`,
 				want:  "HTTP response failed with status code 429, message: none (code: 0): links should have at most 50 item(s)",
 			},
-			{
-				name:  "required_scopes",
-				input: `{"error":{"code": 0, "message": "Token missing required scopes", "required_scopes":"escalation_policies.read"}}`,
-				want:  "HTTP response failed with status code 429, message: Token missing required scopes (code: 0), required scopes: escalation_policies.read",
-			},
 		}
 
 		for _, tt := range tests {

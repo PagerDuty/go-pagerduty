@@ -83,10 +83,9 @@ type APIDetails struct {
 // occurs. This includes messages that should hopefully provide useful context
 // to the end user.
 type APIErrorObject struct {
-	Code           int      `json:"code,omitempty"`
-	Message        string   `json:"message,omitempty"`
-	Errors         []string `json:"errors,omitempty"`
-	RequiredScopes string   `json:"required_scopes,omitempty"`
+	Code    int      `json:"code,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
 }
 
 func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
@@ -101,16 +100,14 @@ func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/339
 	// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
 	var fallback1 struct {
-		Code           int    `json:"code,omitempty"`
-		Message        string `json:"message,omitempty"`
-		Errors         string `json:"errors,omitempty"`
-		RequiredScopes string `json:"required_scopes,omitempty"`
+		Code    int    `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+		Errors  string `json:"errors,omitempty"`
 	}
 	if json.Unmarshal(data, &fallback1) == nil {
 		aeo.Code = fallback1.Code
 		aeo.Message = fallback1.Message
 		aeo.Errors = []string{fallback1.Errors}
-		aeo.RequiredScopes = fallback1.RequiredScopes
 		return aeo, nil
 	}
 	// See - https://github.com/PagerDuty/go-pagerduty/issues/478
@@ -187,13 +184,6 @@ func (a APIError) Error() string {
 
 	if !a.APIError.Valid {
 		return fmt.Sprintf("HTTP response failed with status code %d and no JSON error object was present", a.StatusCode)
-	}
-
-	if a.APIError.ErrorObject.RequiredScopes != "" {
-		return fmt.Sprintf(
-			"HTTP response failed with status code %d, message: %s (code: %d), required scopes: %s",
-			a.StatusCode, a.APIError.ErrorObject.Message, a.APIError.ErrorObject.Code, a.APIError.ErrorObject.RequiredScopes,
-		)
 	}
 
 	if len(a.APIError.ErrorObject.Errors) == 0 {
