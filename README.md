@@ -57,17 +57,19 @@ upgrade for some reason, the `v1.4.x` line of releases should still work. At the
 time of writing `v1.4.3` was the latest, and we intend to backport any critical
 fixes for the time being.
 
-#### Example Usage
+#### Example Usage with [API Token Authentication](https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTUx-authentication)
 
 ```go
 package main
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/PagerDuty/go-pagerduty"
 )
 
-var	authtoken = "" // Set your auth token here
+var authtoken = "" // Set your auth token here
 
 func main() {
 	ctx := context.Background()
@@ -88,6 +90,40 @@ The PagerDuty API client also exposes its HTTP client as the `HTTPClient` field.
 If you need to use your own HTTP client, for doing things like defining your own
 transport settings, you can replace the default HTTP client with your own by
 simply by setting a new value in the `HTTPClient` field.
+
+#### Example Usage with [Scoped OAuth App Authentication](https://developer.pagerduty.com/docs/e518101fde5f3-obtaining-an-app-o-auth-token)
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/PagerDuty/go-pagerduty"
+)
+
+func main() {
+	ctx := context.Background()
+	var opts pagerduty.ListEscalationPoliciesOptions
+	clientId := "client_id_goes_here"
+	clientSecret := "secret_goes_here"
+	scopes := strings.Split("as_account-us.companysubdomain escalation_policies.read", " ")
+	scopedOAuthOpts := pagerduty.WithScopedOAuthAppTokenSource(
+		pagerduty.NewFileTokenSource(ctx, clientId, clientSecret, scopes, "token.json"),
+	)
+
+	client := pagerduty.NewClient("", scopedOAuthOpts)
+	eps, err := client.ListEscalationPoliciesWithContext(ctx, opts)
+	if err != nil {
+		panic(err)
+	}
+	for _, p := range eps.EscalationPolicies {
+		fmt.Println(p.Name)
+	}
+}
+```
 
 #### API Error Responses
 
