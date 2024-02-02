@@ -1124,3 +1124,74 @@ func TestIncident_RemoveIncidentNotificationSubscribersWithContext(t *testing.T)
 	}
 	testEqual(t, want, res)
 }
+
+func TestIncident_UpdateIncidentCustomFieldsWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	input := []IncidentCustomFieldUpdateOption{
+		{
+			Name:  "account_id",
+			Value: "fba35a45-ee19-4480-b903-74f354033980",
+		},
+	}
+
+	mux.HandleFunc("/incidents/1/custom_fields/values", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		_, _ = w.Write([]byte(`{"custom_fields":[{"data_type":"string","description":"account id of the incident reporter","display_name":"Account ID","field_type":"single_value","id":"P8BCDGH","name":"account_id","type":"field_value","value":"fba35a45-ee19-4480-b903-74f354033980"}]}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.UpdateIncidentCustomFieldsWithContext(context.Background(), id, input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &UpdateIncidentCustomFieldsResponse{
+		CustomFields: []IncidentCustomField{
+			{
+				ID:          "P8BCDGH",
+				Type:        "field_value",
+				Name:        "account_id",
+				DisplayName: "Account ID",
+				Description: "account id of the incident reporter",
+				DataType:    "string",
+				FieldType:   "single_value",
+				Value:       "fba35a45-ee19-4480-b903-74f354033980",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
+
+func TestIncident_ListIncidentCustomFieldsWithContext(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/incidents/1/custom_fields/values", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"custom_fields":[{"data_type":"string","description":"account id of the incident reporter","display_name":"Account ID","field_type":"single_value","id":"P8BCDGH","name":"account_id","type":"field_value","value":"fba35a45-ee19-4480-b903-74f354033980"}]}`))
+	})
+	client := defaultTestClient(server.URL, "foo")
+	id := "1"
+	res, err := client.ListIncidentCustomFieldsWithContext(context.Background(), id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &ListIncidentCustomFieldsResponse{
+		CustomFields: []IncidentCustomField{
+			{
+				ID:          "P8BCDGH",
+				Type:        "field_value",
+				Name:        "account_id",
+				DisplayName: "Account ID",
+				Description: "account id of the incident reporter",
+				DataType:    "string",
+				FieldType:   "single_value",
+				Value:       "fba35a45-ee19-4480-b903-74f354033980",
+			},
+		},
+	}
+	testEqual(t, want, res)
+}
