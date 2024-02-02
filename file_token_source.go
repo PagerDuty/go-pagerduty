@@ -111,9 +111,5 @@ func isSameScope(a, b string) bool {
 	ta := strings.TrimSpace(a)
 	tb := strings.TrimSpace(b)
 
-	if strings.Compare(ta, tb) == 0 {
-		return true
-	}
-
-	return false
+	return strings.Compare(ta, tb) == 0
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
@@ -62,7 +62,7 @@ func (c *EventOrchestrationUpdate) Run(args []string) int {
 	}
 
 	log.Info("Input file is:", flags.Arg(0))
-	f, err := ioutil.ReadFile(flags.Arg(0))
+	f, err := os.ReadFile(flags.Arg(0))
 	if err != nil {
 		log.Error(err)
 		return -1

@@ -1,10 +1,15 @@
-version: 2
+version: 2.1
+
+orbs:
+  git: pagerduty/git@0.1.0
+
 jobs:
   build:
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/go:1.19
     steps:
       - checkout
+      - git/rebase_on_main
       - run:
           name: "Test"
           command: make test
