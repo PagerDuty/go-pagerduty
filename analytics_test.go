@@ -141,12 +141,12 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-func TestAnalytics_GetRawDataSingleIncident(t *testing.T) {
+func TestAnalytics_GetAnalyticsIncidentsById(t *testing.T) {
 	setup()
 	defer teardown()
 
 	id := "PFGEDX0"
-	rawDataWanted := RawData{
+	rawDataWanted := AnalyticsRawIncident{
 		AssignmentCount:           10,
 		BusinessHourInterruptions: 1,
 		CreatedAt:                 "2021-01-06T00:00:00.000000",
@@ -186,19 +186,19 @@ func TestAnalytics_GetRawDataSingleIncident(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 
-	res, err := client.GetRawDataSingleIncident(context.Background(), id)
+	res, err := client.GetAnalyticsIncidentsById(context.Background(), id)
 	if err != nil {
 		t.Fatal(err)
 	}
-	testEqual(t, rawDataWanted, res)
+	testEqual(t, &rawDataWanted, res)
 }
 
-func TestAnalytics_GetRawDataMultipleIncidents(t *testing.T) {
+func TestAnalytics_GetAnalyticsIncidents(t *testing.T) {
 	setup()
 	defer teardown()
 
 	id := "PFGEDX0"
-	rawDataWanted := RawData{
+	rawDataWanted := AnalyticsRawIncident{
 		AssignmentCount:           10,
 		BusinessHourInterruptions: 1,
 		CreatedAt:                 "2021-01-06T00:00:00.000000",
@@ -227,7 +227,7 @@ func TestAnalytics_GetRawDataMultipleIncidents(t *testing.T) {
 		UserDefinedEffortSeconds:  0,
 	}
 
-	rawDataRequest := RawDataRequest{
+	rawDataRequest := AnalyticsRawIncidentsRequest{
 		Filters: &AnalyticsFilter{
 			CreatedAtStart: "2021-01-01T15:00:32Z",
 			CreatedAtEnd:   "2021-01-08T15:00:32Z",
@@ -241,8 +241,8 @@ func TestAnalytics_GetRawDataMultipleIncidents(t *testing.T) {
 		TimeZone:      "Etc/UTC",
 	}
 	rawFilterWanted := AnalyticsFilter{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", TeamIDs: []string{"PCDYDX0"}}
-	rawDataResponse := RawDataResponse{
-		Data:     []RawData{rawDataWanted},
+	rawDataResponse := AnalyticsRawIncidentsResponse{
+		Data:     []AnalyticsRawIncident{rawDataWanted},
 		Filters:  &rawFilterWanted,
 		First:    "eyJpZCI6IlEwTUlFTUtXTVNYOFZFIiwib3JkZXJfYnkiOiJjcmVhdGVkX2F0IiwidmFsdWUiOiIyMDIzLTA0LTMwVDA4OjU0OjAzIn0=",
 		Last:     "eyJpZCI6IlEzQU1DSlhWU05HTjZEIiwib3JkZXJfYnkiOiJjcmVhdGVkX2F0IiwidmFsdWUiOiIyMDIzLTA0LTI2VDE4OjA3OjIyIn0=",
@@ -263,9 +263,9 @@ func TestAnalytics_GetRawDataMultipleIncidents(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 
-	res, err := client.GetRawDataMultipleIncidents(context.Background(), rawDataRequest)
-	want := RawDataResponse{
-		Data:     []RawData{rawDataWanted},
+	res, err := client.GetAnalyticsIncidents(context.Background(), rawDataRequest)
+	want := &AnalyticsRawIncidentsResponse{
+		Data:     []AnalyticsRawIncident{rawDataWanted},
 		Filters:  &rawFilterWanted,
 		First:    "eyJpZCI6IlEwTUlFTUtXTVNYOFZFIiwib3JkZXJfYnkiOiJjcmVhdGVkX2F0IiwidmFsdWUiOiIyMDIzLTA0LTMwVDA4OjU0OjAzIn0=",
 		Last:     "eyJpZCI6IlEzQU1DSlhWU05HTjZEIiwib3JkZXJfYnkiOiJjcmVhdGVkX2F0IiwidmFsdWUiOiIyMDIzLTA0LTI2VDE4OjA3OjIyIn0=",
