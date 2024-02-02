@@ -154,7 +154,7 @@ func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsReque
 // GetAnalyticsIncidentsById gets the raw analytics for the requested incident.
 func (c *Client) GetAnalyticsIncidentsById(ctx context.Context, id string) (*AnalyticsRawIncident, error) {
 	path := fmt.Sprintf("%s/%s/%s", rawDataBaseURL, "incidents", id)
-	resp, err := c.get(ctx, path)
+	resp, err := c.get(ctx, path, nil)
 
 	if err != nil {
 		return &AnalyticsRawIncident{}, err
