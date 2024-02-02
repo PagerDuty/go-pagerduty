@@ -3,7 +3,6 @@ package pagerduty
 import (
 	"context"
 	"fmt"
-	"net/http"
 )
 
 const analyticsBaseURL = "/analytics/metrics/incidents"
@@ -17,9 +16,9 @@ type AnalyticsRequest struct {
 	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
-// RawDataRequest represents the request to be sent to PagerDuty when you want
+// AnalyticsRawIncidentsRequest represents the request to be sent to PagerDuty when you want
 // raw analytics.
-type RawDataRequest struct {
+type AnalyticsRawIncidentsRequest struct {
 	Filters       *AnalyticsFilter `json:"filters,omitempty"`
 	StartingAfter string           `json:"starting_after,omitempty"`
 	EndingBefore  string           `json:"ending_before,omitempty"`
@@ -37,17 +36,17 @@ type AnalyticsResponse struct {
 	TimeZone      string           `json:"time_zone,omitempty"`
 }
 
-// RawDataResponse represents the response from the PagerDuty API.
-type RawDataResponse struct {
-	First    string           `json:"first,omitempty"`
-	Last     string           `json:"last,omitempty"`
-	Limit    int              `json:"limit,omitempty"`
-	More     bool             `json:"more,omitempty"`
-	Order    string           `json:"order,omitempty"`
-	OrderBy  string           `json:"order_by,omitempty"`
-	Filters  *AnalyticsFilter `json:"filters,omitempty"`
-	TimeZone string           `json:"time_zone,omitempty"`
-	Data     []RawData        `json:"data,omitempty"`
+// AnalyticsRawIncidentsResponse represents the response from the PagerDuty API.
+type AnalyticsRawIncidentsResponse struct {
+	First    string                 `json:"first,omitempty"`
+	Last     string                 `json:"last,omitempty"`
+	Limit    int                    `json:"limit,omitempty"`
+	More     bool                   `json:"more,omitempty"`
+	Order    string                 `json:"order,omitempty"`
+	OrderBy  string                 `json:"order_by,omitempty"`
+	Filters  *AnalyticsFilter       `json:"filters,omitempty"`
+	TimeZone string                 `json:"time_zone,omitempty"`
+	Data     []AnalyticsRawIncident `json:"data,omitempty"`
 }
 
 // AnalyticsFilter represents the set of filters as part of the request to PagerDuty when
@@ -88,8 +87,8 @@ type AnalyticsData struct {
 	RangeStart                     string  `json:"range_start,omitempty"`
 }
 
-// RawData represents the structure of the raw analytics we have available.
-type RawData struct {
+// AnalyticsRawIncident represents the structure of the raw incident analytics we have available.
+type AnalyticsRawIncident struct {
 	AssignmentCount           int    `json:"assignment_count,omitempty"`
 	BusinessHourInterruptions int    `json:"business_hour_interruptions,omitempty"`
 	CreatedAt                 string `json:"created_at,omitempty"`
@@ -152,44 +151,38 @@ func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsReque
 	return analyticsResponse, nil
 }
 
-// GetRawDataSingleIncident gets the raw analytics for the requested incident.
-func (c *Client) GetRawDataSingleIncident(ctx context.Context, id string) (RawData, error) {
-	h := map[string]string{
-		"X-EARLY-ACCESS": "analytics-v2",
-	}
-
+// GetAnalyticsIncidentsById gets the raw analytics for the requested incident.
+func (c *Client) GetAnalyticsIncidentsById(ctx context.Context, id string) (*AnalyticsRawIncident, error) {
 	path := fmt.Sprintf("%s/%s/%s", rawDataBaseURL, "incidents", id)
-	resp, err := c.do(ctx, http.MethodGet, path, nil, h)
+	resp, err := c.get(ctx, path)
 
 	if err != nil {
-		return RawData{}, err
+		return &AnalyticsRawIncident{}, err
 	}
 
-	var rawData RawData
+	var rawData AnalyticsRawIncident
 	if err = c.decodeJSON(resp, &rawData); err != nil {
-		return RawData{}, err
+		return &AnalyticsRawIncident{}, err
 	}
 
-	return rawData, nil
+	return &rawData, nil
 }
 
-// GetRawDataMultipleIncidents gets the raw analytics for the requested data.
-func (c *Client) GetRawDataMultipleIncidents(ctx context.Context, rawDataReq RawDataRequest) (RawDataResponse, error) {
-	h := map[string]string{
-		"X-EARLY-ACCESS": "analytics-v2",
-	}
+// GetAnalyticsIncidents gets the raw analytics for the requested data.
+func (c *Client) GetAnalyticsIncidents(ctx context.Context, rawDataReq AnalyticsRawIncidentsRequest) (*AnalyticsRawIncidentsResponse, error) {
+	h := map[string]string{}
 
 	path := fmt.Sprintf("%s/%s", rawDataBaseURL, "incidents")
 	resp, err := c.post(ctx, path, rawDataReq, h)
 
 	if err != nil {
-		return RawDataResponse{}, err
+		return &AnalyticsRawIncidentsResponse{}, err
 	}
 
-	var rawDataResponse RawDataResponse
+	var rawDataResponse AnalyticsRawIncidentsResponse
 	if err = c.decodeJSON(resp, &rawDataResponse); err != nil {
-		return RawDataResponse{}, err
+		return &AnalyticsRawIncidentsResponse{}, err
 	}
 
-	return rawDataResponse, nil
+	return &rawDataResponse, nil
 }
