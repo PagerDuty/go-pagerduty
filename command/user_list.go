@@ -5,9 +5,8 @@ import (
 	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type UserList struct {
@@ -65,9 +64,8 @@ func (c *UserList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, p := range resp.Users {
-			fmt.Println("Entry: ", i)
-			data, err := yaml.Marshal(p)
+		for _, p := range resp.Users {
+			data, err := c.Marshaler(p)
 			if err != nil {
 				log.Error(err)
 				return -1

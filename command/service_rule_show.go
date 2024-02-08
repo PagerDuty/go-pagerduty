@@ -7,7 +7,6 @@ import (
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type ServiceRuleShow struct {
@@ -53,7 +52,7 @@ func (c *ServiceRuleShow) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	data, err := yaml.Marshal(rule)
+	data, err := c.Marshaler(rule)
 	if err != nil {
 		log.Error(err)
 		return -1

@@ -8,7 +8,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type EventOrchestrationShow struct {
@@ -59,7 +58,7 @@ func (c *EventOrchestrationShow) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	data, err := yaml.Marshal(ep)
+	data, err := c.Marshaler(ep)
 	if err != nil {
 		log.Error(err)
 		return -1
@@ -73,7 +72,7 @@ func (c *EventOrchestrationShow) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	data, err = yaml.Marshal(rules)
+	data, err = c.Marshaler(rules)
 	if err != nil {
 		log.Error(err)
 		return -1

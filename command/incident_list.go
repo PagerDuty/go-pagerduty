@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
+
+	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 )
 
 type IncidentList struct {
@@ -60,9 +60,8 @@ func (c *IncidentList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, incident := range incidentList.Incidents {
-			fmt.Println("Entry: ", i+1)
-			data, err := yaml.Marshal(incident)
+		for _, incident := range incidentList.Incidents {
+			data, err := c.Marshaler(incident)
 			if err != nil {
 				log.Error(err)
 				return -1

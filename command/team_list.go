@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
-	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
+
+	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 )
 
 type TeamList struct {
@@ -53,9 +53,8 @@ func (c *TeamList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	for i, p := range result.Teams {
-		fmt.Println("Entry: ", i)
-		data, err := yaml.Marshal(p)
+	for _, p := range result.Teams {
+		data, err := c.Marshaler(p)
 		if err != nil {
 			log.Error(err)
 			return -1
