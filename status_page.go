@@ -286,7 +286,7 @@ func (c *Client) ListStatusPagePosts(id string, o ListStatusPagePostOptions) (*L
 	return &result, nil
 }
 
-// CreateStatusPagePost create a Post for a Status Page by Status Page ID
+// CreateStatusPagePost creates a Post for a Status Page by Status Page ID
 func (c *Client) CreateStatusPagePost(id string, p StatusPagePost) (*StatusPagePost, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
@@ -304,6 +304,18 @@ func (c *Client) GetStatusPagePost(statusPageID string, postID string) (*StatusP
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID, h)
+	return getStatusPagePostFromResponse(c, resp, err)
+}
+
+// UpdateStatusPagePost updates a Post for a Status Page by Status Page ID
+func (c *Client) UpdateStatusPagePost(statusPageID string, postID string, p StatusPagePost) (*StatusPagePost, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]StatusPagePost{
+		"post": p,
+	}
+	resp, err := c.put(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID, d, h)
 	return getStatusPagePostFromResponse(c, resp, err)
 }
 
