@@ -69,3 +69,21 @@ func (c *Client) ListStatusPageImpacts(id string, postType string) (*ListStatusP
 
 	return &result, nil
 }
+
+// GetStatusPageImpact gets the specified status page impact
+func (c *Client) GetStatusPageImpact(statusPageID string, impactID string) (*StatusPageImpact, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/impacts/"+impactID, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result StatusPageImpact
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
