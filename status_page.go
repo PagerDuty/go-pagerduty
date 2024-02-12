@@ -503,6 +503,15 @@ func (c *Client) CreateStatusPageSubscription(statusPageID string, s StatusPageS
 	return getStatusPageSubscriptionFromResponse(c, resp, err)
 }
 
+// GetStatusPageSubscription gets the Subscription for a Status Page by Status Page ID and Subscription ID.
+func (c *Client) GetStatusPageSubscription(statusPageID string, subscriptionID string) (*StatusPageSubscription, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/subscriptions/"+subscriptionID, h)
+	return getStatusPageSubscriptionFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
