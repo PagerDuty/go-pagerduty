@@ -27,12 +27,12 @@ type StatusPageImpact struct {
 }
 
 type StatusPageService struct {
-	ID              string
-	Self            string
-	Name            string
-	StatusPage      StatusPage
-	BusinessService Service
-	Type            string
+	ID              string     `json:"id,omitempty"`
+	Self            string     `json:"self,omitempty"`
+	Name            string     `json:"name,omitempty"`
+	StatusPage      StatusPage `json:"status_page,omitempty"`
+	BusinessService Service    `json:"business_service,omitempty"`
+	Type            string     `json:"type,omitempty"`
 }
 
 type StatusPageSeverity struct {

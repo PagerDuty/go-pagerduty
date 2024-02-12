@@ -110,3 +110,42 @@ func TestStatusPage_GetImpact(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// ListStatusPageServices
+func TestStatusPage_ListServices(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"services": [{"id": "1","name":"MyService","status_page":{"id": "1","name":"MyStatusPage","published_at":"2024-02-12T09:23:23Z","status_page_type":"public","url":"https://mypagerduty"},"business_service":{"name":"MyService"}}]}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.ListStatusPageServices("1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListStatusPageServicesResponse{
+		APIListObject: APIListObject{},
+		StatusPageServices: []StatusPageService{
+			{
+				ID:   "1",
+				Name: "MyService",
+				StatusPage: StatusPage{
+					ID:             "1",
+					Name:           "MyStatusPage",
+					PublishedAt:    "2024-02-12T09:23:23Z",
+					StatusPageType: "public",
+					URL:            "https://mypagerduty",
+				},
+				BusinessService: Service{
+					Name: "MyService",
+				},
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
