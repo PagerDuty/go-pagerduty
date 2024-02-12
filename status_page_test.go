@@ -495,3 +495,21 @@ func TestStatusPage_UpdatePost(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// DeleteStatusPagePost
+func TestStatusPage_DeletePost(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+		_, _ = w.Write([]byte(`{"post": {"id": "1","post_type":"incident","status_page":{"id": "1","type":"status_page"},"title":"MyPost","starts_at":"2024-02-12T09:23:23Z","ends_at":"2024-02-12T09:23:23Z"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	err := client.DeleteStatusPagePost("1", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
