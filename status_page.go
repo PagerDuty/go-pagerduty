@@ -73,12 +73,18 @@ type LinkedResource struct {
 }
 
 type Postmortem struct {
-	ID                string `json:"id,omitempty"`
-	Self              string `json:"self,omitempty"`
-	NotifySubscribers bool   `json:"notify_subscribers,omitempty"`
-	ReportedAt        string `json:"reported_at,omitempty"`
-	Type              string `json:"type,omitempty"`
-	Message           string `json:"message,omitempty"`
+	ID                string        `json:"id,omitempty"`
+	Self              string        `json:"self,omitempty"`
+	NotifySubscribers bool          `json:"notify_subscribers,omitempty"`
+	ReportedAt        string        `json:"reported_at,omitempty"`
+	Type              string        `json:"type,omitempty"`
+	Message           string        `json:"message,omitempty"`
+	Post              ShortPostType `json:"post,omitempty"`
+}
+
+type ShortPostType struct {
+	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 
 type StatusPagePostUpdate struct {
