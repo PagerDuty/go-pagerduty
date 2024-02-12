@@ -1178,3 +1178,20 @@ func TestStatusPage_GetSubscription(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// DeleteStatusPageSubscription
+func TestStatusPage_DeleteSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/subscriptions/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	err := client.DeleteStatusPageSubscription("1", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
