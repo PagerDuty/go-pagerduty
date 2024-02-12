@@ -319,6 +319,16 @@ func (c *Client) UpdateStatusPagePost(statusPageID string, postID string, p Stat
 	return getStatusPagePostFromResponse(c, resp, err)
 }
 
+// DeleteStatusPagePost deletes a Post for a Status Page by Status Page ID
+func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) (*StatusPagePost, error) {
+	/* Note: The API requires sending in the below header, but the client does not support headers for the delete() function, so we have to use do() */
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID, nil, h)
+	return getStatusPagePostFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
