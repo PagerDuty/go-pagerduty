@@ -353,3 +353,21 @@ func getStatusPagePostFromResponse(c *Client, resp *http.Response, err error) (*
 
 	return &t, nil
 }
+
+// GetStatusPageStatus gets the specified status page status
+func (c *Client) GetStatusPagePost(statusPageID string, postID string) (*StatusPagePost, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result StatusPagePost
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
