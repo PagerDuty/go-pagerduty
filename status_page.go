@@ -9,12 +9,12 @@ import (
 )
 
 type StatusPage struct {
-	ID             string
-	Name           string
-	PublishedAt    string
-	StatusPageType string
-	URL            string
-	Type           string
+	ID             string `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	PublishedAt    string `json:"published_at,omitempty"`
+	StatusPageType string `json:"status_page_type,omitempty"`
+	URL            string `json:"url,omitempty"`
+	Type           string `json:"type,omitempty"`
 }
 
 type StatusPageImpact struct {
@@ -115,6 +115,10 @@ type SubscribableObject struct {
 	Type string
 }
 
+type ListStatusPageOptions struct {
+	StatusPageType string `url:"status_page_type,omitempty"`
+}
+
 type ListStatusPagePostOptions struct {
 	PostType       string             `url:"post_type,omitempty"`
 	ReviewedStatus string             `url:"reviewed_status,omitempty"`
@@ -175,11 +179,15 @@ type ListStatusPageSubscriptionsResponse struct {
 }
 
 // ListStatusPages lists the given types of status pages
-func (c *Client) ListStatusPages(statusPageType string) (*ListStatusPagesResponse, error) {
+func (c *Client) ListStatusPages(o ListStatusPageOptions) (*ListStatusPagesResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.get(context.Background(), "/status_pages?status_page_type="+statusPageType, h)
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}
