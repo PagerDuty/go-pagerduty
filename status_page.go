@@ -222,3 +222,21 @@ func (c *Client) ListStatusPageStatuses(id string, postType string) (*ListStatus
 
 	return &result, nil
 }
+
+// GetStatusPageStatus gets the specified status page status
+func (c *Client) GetStatusPageStatus(statusPageID string, statusID string) (*StatusPageStatus, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/statuses/"+statusID, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result StatusPageStatus
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
