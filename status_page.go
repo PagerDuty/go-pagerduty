@@ -81,17 +81,18 @@ type Postmortem struct {
 }
 
 type StatusPagePostUpdate struct {
-	ID                string
-	Self              string
-	Message           string
-	ReviewedStatus    string
-	Status            StatusPageStatus
-	Severity          StatusPageSeverity
-	ImpactedServices  []StatusPagePostUpdateImpact
-	UpdateFrequencyMS uint
-	NotifySubscribers bool
-	ReportedAt        string
-	Type              string
+	ID                string                       `json:"id,omitempty"`
+	Self              string                       `json:"self,omitempty"`
+	Message           string                       `json:"message,omitempty"`
+	ReviewedStatus    string                       `json:"reviewed_status,omitempty"`
+	Status            StatusPageStatus             `json:"status,omitempty"`
+	Severity          StatusPageSeverity           `json:"severity,omitempty"`
+	ImpactedServices  []StatusPagePostUpdateImpact `json:"impacted_services,omitempty"`
+	UpdateFrequencyMS uint                         `json:"update_frequency_ms,omitempty"`
+	Post              StatusPagePost               `json:"post,omitempty"`
+	NotifySubscribers bool                         `json:"notify_subscribers,omitempty"`
+	ReportedAt        string                       `json:"reported_at,omitempty"`
+	Type              string                       `json:"type,omitempty"`
 }
 
 type StatusPagePostUpdateImpact struct {
@@ -135,6 +136,10 @@ type ListStatusPagePostOptions struct {
 	PostType       string   `url:"post_type,omitempty"`
 	ReviewedStatus string   `url:"reviewed_status,omitempty"`
 	Status         []string `url:"status,omitempty"`
+}
+
+type ListStatusPagePostUpdateOptions struct {
+	ReviewedStatus string `url:"reviewed_status,omitempty"`
 }
 
 type ListStatusPageSubscriptionsOptions struct {
@@ -399,11 +404,15 @@ func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) error 
 }
 
 // ListStatusPagePostUpdates lists the post updates for the specified status page and post
-func (c *Client) ListStatusPagePostUpdates(statusPageID string, postID string, reviewedStatus string) (*ListStatusPagePostUpdatesResponse, error) {
+func (c *Client) ListStatusPagePostUpdates(statusPageID string, postID string, o ListStatusPagePostUpdateOptions) (*ListStatusPagePostUpdatesResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates?reviewed_status="+reviewedStatus, h)
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}

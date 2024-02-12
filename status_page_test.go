@@ -513,3 +513,69 @@ func TestStatusPage_DeletePost(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// ListStatusPagePostUpdates
+func TestStatusPage_ListPostUpdates(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1/post_updates", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["reviewed_status"], []string{"approved"})
+		_, _ = w.Write([]byte(`{
+			"post_updates": [
+				{
+					"id":"1", "message":"Hello world", "reviewed_status":"approved", "notify_subscribers":false, "impacted_services": [
+					{
+						"impact":{
+							"id":"1"," type":"status_page_impact"
+						},
+						"service":{
+							"id":"1", "type":"status_page_service"
+						}
+					}],
+					"post": {
+						"id":"1", "type":"status_page_post"
+					}
+				}
+			]
+		}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	opts := ListStatusPagePostUpdateOptions{
+		ReviewedStatus: "approved",
+	}
+
+	res, err := client.ListStatusPagePostUpdates("1", "1", opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListStatusPagePostUpdatesResponse{
+		APIListObject: APIListObject{},
+		StatusPagePostUpdates: []StatusPagePostUpdate{
+			{
+				ID:             "1",
+				Message:        "Hello world",
+				ReviewedStatus: "approved",
+				ImpactedServices: []StatusPagePostUpdateImpact{
+					{
+						Service: Service{
+							APIObject: APIObject{
+								ID:   "1",
+								Type: "status_page_service",
+							},
+						},
+					},
+				},
+				NotifySubscribers: false,
+				Post: StatusPagePost{
+					ID:   "1",
+					Type: "status_page_post",
+				},
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
