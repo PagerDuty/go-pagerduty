@@ -374,6 +374,18 @@ func (c *Client) GetStatusPagePostUpdate(statusPageID string, postID string, pos
 	return getStatusPagePostUpdateFromResponse(c, resp, err)
 }
 
+// UpdateStatusPagePostUpdate updates a Post Update for a Status Page by Status Page ID and Post ID
+func (c *Client) UpdateStatusPagePostUpdate(statusPageID string, postID string, postUpdateID string, p StatusPagePostUpdate) (*StatusPagePostUpdate, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]StatusPagePostUpdate{
+		"post": p,
+	}
+	resp, err := c.put(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates/"+postUpdateID, d, h)
+	return getStatusPagePostUpdateFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
