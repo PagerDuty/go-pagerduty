@@ -171,3 +171,21 @@ func (c *Client) ListStatusPageSeverities(id string, postType string) (*ListStat
 
 	return &result, nil
 }
+
+// GetStatusPageSeverity gets the specified status page severity
+func (c *Client) GetStatusPageSeverity(statusPageID string, severityID string) (*StatusPageSeverity, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/severities/"+severityID, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result StatusPageSeverity
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
