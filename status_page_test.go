@@ -223,3 +223,35 @@ func TestStatusPage_ListSeverities(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// GetStatusPageSeverity
+func TestStatusPage_GetSeverity(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/severities/1/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"severity": {"id": "1","description":"Extreme","post_type":"incident","status_page":{"id": "1","name":"MyStatusPage","published_at":"2024-02-12T09:23:23Z","status_page_type":"public","url":"https://mypagerduty"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.GetStatusPageSeverity("1", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &StatusPageSeverity{
+		ID:          "1",
+		Description: "Extreme",
+		PostType:    "incident",
+		StatusPage: StatusPage{
+			ID:             "1",
+			Name:           "MyStatusPage",
+			PublishedAt:    "2024-02-12T09:23:23Z",
+			StatusPageType: "public",
+			URL:            "https://mypagerduty",
+		},
+	}
+
+	testEqual(t, want, res)
+}
