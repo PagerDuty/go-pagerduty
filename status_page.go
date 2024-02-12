@@ -54,17 +54,17 @@ type StatusPageStatus struct {
 }
 
 type StatusPagePost struct {
-	ID             string
-	Self           string
-	Type           string
-	PostType       string
-	StatusPage     StatusPage
-	LinkedResource LinkedResource
-	PostMortem     PostMortem
-	Title          string
-	StartsAt       string
-	EndsAt         string
-	Updates        []StatusPagePostUpdate
+	ID             string                 `json:"id,omitempty"`
+	Self           string                 `json:"self,omitempty"`
+	Type           string                 `json:"type,omitempty"`
+	PostType       string                 `json:"post_type,omitempty"`
+	StatusPage     StatusPage             `json:"status_page,omitempty"`
+	LinkedResource LinkedResource         `json:"linked_resource,omitempty"`
+	Postmortem     Postmortem             `json:"postmortem,omitempty"`
+	Title          string                 `json:"title,omitempty"`
+	StartsAt       string                 `json:"starts_at,omitempty"`
+	EndsAt         string                 `json:"ends_at,omitempty"`
+	Updates        []StatusPagePostUpdate `json:"updates,omitempty"`
 }
 
 type LinkedResource struct {
@@ -72,7 +72,7 @@ type LinkedResource struct {
 	Self string
 }
 
-type PostMortem struct {
+type Postmortem struct {
 	ID                string
 	Self              string
 	NotifySubscribers bool
@@ -132,9 +132,9 @@ type ListStatusPageStatusesOptions struct {
 }
 
 type ListStatusPagePostOptions struct {
-	PostType       string             `url:"post_type,omitempty"`
-	ReviewedStatus string             `url:"reviewed_status,omitempty"`
-	Statuses       []StatusPageStatus `url:"statuses,omitempty"`
+	PostType       string   `url:"post_type,omitempty"`
+	ReviewedStatus string   `url:"reviewed_status,omitempty"`
+	Status         []string `url:"status,omitempty"`
 }
 
 type ListStatusPageSubscriptionsOptions struct {
@@ -458,41 +458,41 @@ func (c *Client) DeleteStatusPagePostUpdate(statusPageID string, postID string, 
 	return err
 }
 
-// GetStatusPagePostPostMortem gets the specified status page post post-mortem
-func (c *Client) GetStatusPagePostPostMortem(statusPageID string, postID string) (*PostMortem, error) {
+// GetStatusPagePostPostmortem gets the specified status page post post-mortem
+func (c *Client) GetStatusPagePostPostmortem(statusPageID string, postID string) (*Postmortem, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", h)
-	return getStatusPagePostPostMortemFromResponse(c, resp, err)
+	return getStatusPagePostPostmortemFromResponse(c, resp, err)
 }
 
-// CreateStatusPagePostPostMortem creates a post-mortem for a Status Page by Status Page ID and Post ID
-func (c *Client) CreateStatusPagePostPostMortem(statusPageID string, postID string, p PostMortem) (*PostMortem, error) {
+// CreateStatusPagePostPostmortem creates a post-mortem for a Status Page by Status Page ID and Post ID
+func (c *Client) CreateStatusPagePostPostmortem(statusPageID string, postID string, p Postmortem) (*Postmortem, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	d := map[string]PostMortem{
+	d := map[string]Postmortem{
 		"postmortem": p,
 	}
 	resp, err := c.post(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", d, h)
-	return getStatusPagePostPostMortemFromResponse(c, resp, err)
+	return getStatusPagePostPostmortemFromResponse(c, resp, err)
 }
 
-// UpdateStatusPagePostPostMortem updates a post-mortem for a Status Page by Status Page ID and Post ID
-func (c *Client) UpdateStatusPagePostPostMortem(statusPageID string, postID string, p PostMortem) (*PostMortem, error) {
+// UpdateStatusPagePostPostmortem updates a post-mortem for a Status Page by Status Page ID and Post ID
+func (c *Client) UpdateStatusPagePostPostmortem(statusPageID string, postID string, p Postmortem) (*Postmortem, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	d := map[string]PostMortem{
+	d := map[string]Postmortem{
 		"postmortem": p,
 	}
 	resp, err := c.put(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", d, h)
-	return getStatusPagePostPostMortemFromResponse(c, resp, err)
+	return getStatusPagePostPostmortemFromResponse(c, resp, err)
 }
 
-// DeleteStatusPagePostPostMortem deletes a post-mortem for a Status Page by Status Page ID and Post ID
-func (c *Client) DeleteStatusPagePostPostMortem(statusPageID string, postID string) error {
+// DeleteStatusPagePostPostmortem deletes a post-mortem for a Status Page by Status Page ID and Post ID
+func (c *Client) DeleteStatusPagePostPostmortem(statusPageID string, postID string) error {
 	/* Note: The API requires sending in the below header, but the client does not support headers for the delete() function, so we have to use do() */
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
@@ -674,12 +674,12 @@ func getStatusPagePostUpdateFromResponse(c *Client, resp *http.Response, err err
 	return &t, nil
 }
 
-func getStatusPagePostPostMortemFromResponse(c *Client, resp *http.Response, err error) (*PostMortem, error) {
+func getStatusPagePostPostmortemFromResponse(c *Client, resp *http.Response, err error) (*Postmortem, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	var target map[string]PostMortem
+	var target map[string]Postmortem
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
 		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}

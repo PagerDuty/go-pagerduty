@@ -329,3 +329,50 @@ func TestStatusPage_GetStatus(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// ListStatusPagePosts
+func TestStatusPage_ListPosts(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["post_type"], []string{"incident"})
+		testEqual(t, r.URL.Query()["reviewed_status"], []string{"approved"})
+		testEqual(t, r.URL.Query()["status"], []string{"status"})
+		_, _ = w.Write([]byte(`{"posts": [{"id": "1","post_type":"incident","status_page":{"id": "1","name":"MyStatusPage","published_at":"2024-02-12T09:23:23Z","status_page_type":"public","url":"https://mypagerduty"},"title":"MyPost","starts_at":"2024-02-12T09:23:23Z","ends_at":"2024-02-12T09:23:23Z"}]}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	opts := ListStatusPagePostOptions{
+		PostType:       "incident",
+		ReviewedStatus: "approved",
+		Status:         []string{"status"},
+	}
+
+	res, err := client.ListStatusPagePosts("1", opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListStatusPagePostsResponse{
+		APIListObject: APIListObject{},
+		StatusPagePosts: []StatusPagePost{
+			{
+				ID:       "1",
+				PostType: "incident",
+				StatusPage: StatusPage{
+					ID:             "1",
+					Name:           "MyStatusPage",
+					PublishedAt:    "2024-02-12T09:23:23Z",
+					StatusPageType: "public",
+					URL:            "https://mypagerduty",
+				},
+				Title:    "MyPost",
+				StartsAt: "2024-02-12T09:23:23Z",
+				EndsAt:   "2024-02-12T09:23:23Z",
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
