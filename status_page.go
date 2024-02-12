@@ -408,6 +408,18 @@ func (c *Client) GetStatusPagePostPostMortem(statusPageID string, postID string)
 	return getStatusPagePostPostMortemFromResponse(c, resp, err)
 }
 
+// CreateStatusPagePostPostMortem creates a post-mortem for a Status Page by Status Page ID and Post ID
+func (c *Client) CreateStatusPagePostPostMortem(statusPageID string, postID string, p PostMortem) (*PostMortem, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]PostMortem{
+		"postmortem": p,
+	}
+	resp, err := c.post(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", d, h)
+	return getStatusPagePostPostMortemFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
