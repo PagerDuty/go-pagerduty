@@ -40,6 +40,15 @@ type StatusPageSeverity struct {
 	Type        string
 }
 
+type StatusPageStatus struct {
+	ID          string
+	Self        string
+	Description string
+	PostType    string
+	StatusPage  StatusPage
+	Type        string
+}
+
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.
 type ListStatusPagesResponse struct {
 	APIListObject
@@ -62,6 +71,12 @@ type ListStatusPageServicesResponse struct {
 type ListStatusPageSeveritiesResponse struct {
 	APIListObject
 	StatusPageSeverities []StatusPageSeverity `json:"severities"`
+}
+
+// ListStatusPageStatusesResponse is the data structure returned from calling the ListStatusPageStatuses API endpoint.
+type ListStatusPageStatusesResponse struct {
+	APIListObject
+	StatusPageStatuses []StatusPageStatus `json:"statuses"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -183,6 +198,24 @@ func (c *Client) GetStatusPageSeverity(statusPageID string, severityID string) (
 	}
 
 	var result StatusPageSeverity
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListStatusPageStatuses lists the statuses for the specified status page
+func (c *Client) ListStatusPageStatuses(id string, postType string) (*ListStatusPageStatusesResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/statuses?post_type="+postType, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPageStatusesResponse
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
