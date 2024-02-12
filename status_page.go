@@ -18,12 +18,12 @@ type StatusPage struct {
 }
 
 type StatusPageImpact struct {
-	ID          string
-	Self        string
-	Description string
-	PostType    string
-	StatusPage  StatusPage
-	Type        string
+	ID          string     `json:"id,omitempty"`
+	Self        string     `json:"self,omitempty"`
+	Description string     `json:"description,omitempty"`
+	PostType    string     `json:"post_type,omitempty"`
+	StatusPage  StatusPage `json:"status_page,omitempty"`
+	Type        string     `json:"type,omitempty"`
 }
 
 type StatusPageService struct {
@@ -119,6 +119,10 @@ type ListStatusPageOptions struct {
 	StatusPageType string `url:"status_page_type,omitempty"`
 }
 
+type ListStatusPageImpactOptions struct {
+	PostType string `url:"post_type,omitempty"`
+}
+
 type ListStatusPagePostOptions struct {
 	PostType       string             `url:"post_type,omitempty"`
 	ReviewedStatus string             `url:"reviewed_status,omitempty"`
@@ -201,11 +205,15 @@ func (c *Client) ListStatusPages(o ListStatusPageOptions) (*ListStatusPagesRespo
 }
 
 // ListStatusPageImpacts lists the given types of impacts for the specified status page
-func (c *Client) ListStatusPageImpacts(id string, postType string) (*ListStatusPageImpactsResponse, error) {
+func (c *Client) ListStatusPageImpacts(id string, o ListStatusPageImpactOptions) (*ListStatusPageImpactsResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.get(context.Background(), "/status_pages/"+id+"/impacts?post_type="+postType, h)
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/impacts?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}
