@@ -491,6 +491,18 @@ func (c *Client) ListStatusPageSubscriptions(id string, o ListStatusPageSubscrip
 	return &result, nil
 }
 
+// CreateStatusPageSubscription creates a Subscription for a Status Page by Status Page ID
+func (c *Client) CreateStatusPageSubscription(statusPageID string, s StatusPageSubscription) (*StatusPageSubscription, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]StatusPageSubscription{
+		"subscription": s,
+	}
+	resp, err := c.post(context.Background(), "/status_pages/"+statusPageID+"/subscriptions", d, h)
+	return getStatusPageSubscriptionFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
@@ -622,6 +634,26 @@ func getStatusPagePostPostMortemFromResponse(c *Client, resp *http.Response, err
 	}
 
 	const rootNode = "postmortem"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPageSubscriptionFromResponse(c *Client, resp *http.Response, err error) (*StatusPageSubscription, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPageSubscription
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "subscription"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
