@@ -325,6 +325,7 @@ func (c *Client) ListStatusPageStatuses(id string, o ListStatusPageStatusesOptio
 
 // GetStatusPageStatus gets the specified status page status
 func (c *Client) GetStatusPageStatus(statusPageID string, statusID string) (*StatusPageStatus, error) {
+	/* Note: Does not currently support the include query parameter */
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
