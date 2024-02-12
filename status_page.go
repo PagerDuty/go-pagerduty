@@ -64,7 +64,7 @@ type StatusPagePost struct {
 	Title          string
 	StartsAt       string
 	EndsAt         string
-	Updates        []StatusPageUpdate
+	Updates        []StatusPagePostUpdate
 }
 
 type LinkedResource struct {
@@ -77,7 +77,7 @@ type PostMortem struct {
 	Self string
 }
 
-type StatusPageUpdate struct {
+type StatusPagePostUpdate struct {
 	ID                string
 	Self              string
 	Message           string
@@ -136,6 +136,12 @@ type ListStatusPageStatusesResponse struct {
 type ListStatusPagePostsResponse struct {
 	APIListObject
 	StatusPagePosts []StatusPagePost `json:"posts"`
+}
+
+// ListStatusPagePostUpdatesResponse is the data structure returned from calling the ListStatusPagePostUpdates API endpoint.
+type ListStatusPagePostUpdatesResponse struct {
+	APIListObject
+	StatusPagePostUpdates []StatusPagePostUpdate `json:"post_updates"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -327,6 +333,24 @@ func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) (*Stat
 	}
 	resp, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID, nil, h)
 	return getStatusPagePostFromResponse(c, resp, err)
+}
+
+// ListStatusPagePostUpdates lists the post updates for the specified status page and post
+func (c *Client) ListStatusPagePostUpdates(statusPageID, string, postID string, reviewedStatus string) (*ListStatusPagePostUpdatesResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates?reviewed_status="+reviewedStatus, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPagePostUpdatesResponse
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
