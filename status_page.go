@@ -2,6 +2,8 @@ package pagerduty
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -318,4 +320,36 @@ func (c *Client) ListStatusPagePosts(id string, o ListStatusPagePostOptions) (*L
 	}
 
 	return &result, nil
+}
+
+// CreateStatusPagePost create a Post for a Status Page by Status Page ID
+func (c *Client) CreateStatusPagePost(id string, p StatusPagePost) (*StatusPagePost, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]StatusPagePost{
+		"post": p,
+	}
+	resp, err := c.post(context.Background(), "/status_pages/"+id+"/posts", d, h)
+	return getStatusPagePostFromResponse(c, resp, err)
+}
+
+func getStatusPagePostFromResponse(c *Client, resp *http.Response, err error) (*StatusPagePost, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPagePost
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "post"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
 }
