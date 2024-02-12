@@ -329,13 +329,13 @@ func (c *Client) UpdateStatusPagePost(statusPageID string, postID string, p Stat
 }
 
 // DeleteStatusPagePost deletes a Post for a Status Page by Status Page ID
-func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) (*StatusPagePost, error) {
+func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) error {
 	/* Note: The API requires sending in the below header, but the client does not support headers for the delete() function, so we have to use do() */
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID, nil, h)
-	return getStatusPagePostFromResponse(c, resp, err)
+	_, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID, nil, h)
+	return err
 }
 
 // ListStatusPagePostUpdates lists the post updates for the specified status page and post
@@ -390,13 +390,13 @@ func (c *Client) UpdateStatusPagePostUpdate(statusPageID string, postID string, 
 }
 
 // DeleteStatusPagePostUpdate deletes a Post Update for a Status Page by Status Page ID and Post ID
-func (c *Client) DeleteStatusPagePostUpdate(statusPageID string, postID string, postUpdateID string) (*StatusPagePostUpdate, error) {
+func (c *Client) DeleteStatusPagePostUpdate(statusPageID string, postID string, postUpdateID string) error {
 	/* Note: The API requires sending in the below header, but the client does not support headers for the delete() function, so we have to use do() */
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates/"+postUpdateID, nil, h)
-	return getStatusPagePostUpdateFromResponse(c, resp, err)
+	_, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates/"+postUpdateID, nil, h)
+	return err
 }
 
 // GetStatusPagePostPostMortem gets the specified status page post post-mortem
