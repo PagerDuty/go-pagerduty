@@ -336,7 +336,7 @@ func (c *Client) DeleteStatusPagePost(statusPageID string, postID string) (*Stat
 }
 
 // ListStatusPagePostUpdates lists the post updates for the specified status page and post
-func (c *Client) ListStatusPagePostUpdates(statusPageID, string, postID string, reviewedStatus string) (*ListStatusPagePostUpdatesResponse, error) {
+func (c *Client) ListStatusPagePostUpdates(statusPageID string, postID string, reviewedStatus string) (*ListStatusPagePostUpdatesResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
@@ -351,6 +351,18 @@ func (c *Client) ListStatusPagePostUpdates(statusPageID, string, postID string, 
 	}
 
 	return &result, nil
+}
+
+// CreateStatusPagePostUpdate creates an Post Update for a Status Page by Status Page ID and Post ID
+func (c *Client) CreateStatusPagePostUpdate(statusPageID string, postID string, u StatusPagePostUpdate) (*StatusPagePostUpdate, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	d := map[string]StatusPagePostUpdate{
+		"post_update": u,
+	}
+	resp, err := c.post(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/post_updates", d, h)
+	return getStatusPagePostUpdateFromResponse(c, resp, err)
 }
 
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
@@ -444,6 +456,26 @@ func getStatusPagePostFromResponse(c *Client, resp *http.Response, err error) (*
 	}
 
 	const rootNode = "post"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPagePostUpdateFromResponse(c *Client, resp *http.Response, err error) (*StatusPagePostUpdate, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPagePostUpdate
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "post_update"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
