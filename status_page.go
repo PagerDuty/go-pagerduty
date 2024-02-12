@@ -68,16 +68,17 @@ type StatusPagePost struct {
 }
 
 type LinkedResource struct {
-	ID   string
-	Self string
+	ID   string `json:"id,omitempty"`
+	Self string `json:"self,omitempty"`
 }
 
 type Postmortem struct {
-	ID                string
-	Self              string
-	NotifySubscribers bool
-	ReportedAt        string
-	Type              string
+	ID                string `json:"id,omitempty"`
+	Self              string `json:"self,omitempty"`
+	NotifySubscribers bool   `json:"notify_subscribers,omitempty"`
+	ReportedAt        string `json:"reported_at,omitempty"`
+	Type              string `json:"type,omitempty"`
+	Message           string `json:"message,omitempty"`
 }
 
 type StatusPagePostUpdate struct {

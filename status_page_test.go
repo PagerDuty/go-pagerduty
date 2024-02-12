@@ -922,3 +922,38 @@ func TestStatusPage_DeletePostUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// GetStatusPagePostPostmortem
+func TestStatusPage_GetPostPostmortem(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1/postmortem", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{
+			"postmortem": {
+				"id": "1",
+				"notify_subscribers": false,
+				"message": "Hello world",
+				"reported_at": "2024-02-12T09:23:23Z",
+				"type": "status_page_post_postmortem"
+			}
+		}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.GetStatusPagePostPostmortem("1", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &Postmortem{
+		ID:                "1",
+		NotifySubscribers: false,
+		Message:           "Hello world",
+		ReportedAt:        "2024-02-12T09:23:23Z",
+		Type:              "status_page_post_postmortem",
+	}
+
+	testEqual(t, want, res)
+}
