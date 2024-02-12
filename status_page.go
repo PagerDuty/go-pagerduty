@@ -31,6 +31,15 @@ type StatusPageService struct {
 	Type            string
 }
 
+type StatusPageSeverity struct {
+	ID          string
+	Self        string
+	Description string
+	PostType    string
+	StatusPage  StatusPage
+	Type        string
+}
+
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.
 type ListStatusPagesResponse struct {
 	APIListObject
@@ -47,6 +56,12 @@ type ListStatusPageImpactsResponse struct {
 type ListStatusPageServicesResponse struct {
 	APIListObject
 	StatusPageServices []StatusPageService `json:"services"`
+}
+
+// ListStatusPageSeveritiesResponse is the data structure returned from calling the ListStatusPageSeverities API endpoint.
+type ListStatusPageSeveritiesResponse struct {
+	APIListObject
+	StatusPageSeverities []StatusPageSeverity `json:"severities"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -114,6 +129,42 @@ func (c *Client) ListStatusPageServices(id string) (*ListStatusPageServicesRespo
 	}
 
 	var result ListStatusPageServicesResponse
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// GetStatusPageService gets the specified status page service
+func (c *Client) GetStatusPageService(statusPageID string, serviceID string) (*StatusPageService, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/services/"+serviceID, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result StatusPageService
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListStatusPageSeverities lists the severities for the specified status page
+func (c *Client) ListStatusPageSeverities(id string, postType string) (*ListStatusPageSeveritiesResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/severities?post_type="+postType, h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPageSeveritiesResponse
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
