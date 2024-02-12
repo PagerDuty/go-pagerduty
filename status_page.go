@@ -103,24 +103,24 @@ type StatusPagePostUpdate struct {
 }
 
 type StatusPagePostUpdateImpact struct {
-	Service  Service
-	Severity StatusPageSeverity
+	Service  Service            `json:"service,omitempty"`
+	Severity StatusPageSeverity `json:"severity,omitempty"`
 }
 
 type StatusPageSubscription struct {
-	Channel            string
-	Contact            string
-	ID                 string
-	Self               string
-	Status             string
-	StatusPage         StatusPage
-	SubscribableObject SubscribableObject
-	Type               string
+	Channel            string             `json:"channel,omitempty"`
+	Contact            string             `json:"contact,omitempty"`
+	ID                 string             `json:"id,omitempty"`
+	Self               string             `json:"self,omitempty"`
+	Status             string             `json:"status,omitempty"`
+	StatusPage         StatusPage         `json:"status_page,omitempty"`
+	SubscribableObject SubscribableObject `json:"subscribable_object,omitempty"`
+	Type               string             `json:"type,omitempty"`
 }
 
 type SubscribableObject struct {
-	ID   string
-	Type string
+	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 
 type ListStatusPageOptions struct {
@@ -150,8 +150,8 @@ type ListStatusPagePostUpdateOptions struct {
 }
 
 type ListStatusPageSubscriptionsOptions struct {
-	Channel string
-	Status  string
+	Channel string `url:"channel,omitempty"`
+	Status  string `url:"status,omitempty"`
 }
 
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.

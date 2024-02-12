@@ -1048,3 +1048,48 @@ func TestStatusPage_DeletePostPostmortem(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// ListStatusPageSubscriptions
+func TestStatusPage_ListSubscriptions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/subscriptions", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["channel"], []string{"email"})
+		testEqual(t, r.URL.Query()["status"], []string{"active"})
+		_, _ = w.Write([]byte(`{"subscriptions": [{"id": "1","channel":"email","contact":"address@email.example","status":"active","status_page":{"id": "1","type":"status_page"},"subscribable_object":{"id": "1","type":"status_page"},"type":"status_page_subscription"}]}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	opts := ListStatusPageSubscriptionsOptions{
+		Channel: "email",
+		Status:  "active",
+	}
+	res, err := client.ListStatusPageSubscriptions("1", opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListStatusPageSubscriptionsResponse{
+		APIListObject: APIListObject{},
+		StatusPageSubscriptions: []StatusPageSubscription{
+			{
+				ID:      "1",
+				Channel: "email",
+				Contact: "address@email.example",
+				Status:  "active",
+				StatusPage: StatusPage{
+					ID:   "1",
+					Type: "status_page",
+				},
+				SubscribableObject: SubscribableObject{
+					ID:   "1",
+					Type: "status_page",
+				},
+				Type: "status_page_subscription",
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
