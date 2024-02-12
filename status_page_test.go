@@ -191,6 +191,7 @@ func TestStatusPage_ListSeverities(t *testing.T) {
 
 	mux.HandleFunc("/status_pages/1/severities", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["post_type"], []string{"incident"})
 		_, _ = w.Write([]byte(`{"severities": [{"id": "1","description":"Extreme","post_type":"incident","status_page":{"id": "1","name":"MyStatusPage","published_at":"2024-02-12T09:23:23Z","status_page_type":"public","url":"https://mypagerduty"}}]}`))
 	})
 
@@ -250,6 +251,47 @@ func TestStatusPage_GetSeverity(t *testing.T) {
 			PublishedAt:    "2024-02-12T09:23:23Z",
 			StatusPageType: "public",
 			URL:            "https://mypagerduty",
+		},
+	}
+
+	testEqual(t, want, res)
+}
+
+// ListStatusPageStatuses
+func TestStatusPage_ListStatuses(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/statuses", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testEqual(t, r.URL.Query()["post_type"], []string{"incident"})
+		_, _ = w.Write([]byte(`{"statuses": [{"id": "1","description":"Extreme","post_type":"incident","status_page":{"id": "1","name":"MyStatusPage","published_at":"2024-02-12T09:23:23Z","status_page_type":"public","url":"https://mypagerduty"}}]}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	opts := ListStatusPageStatusesOptions{
+		PostType: "incident",
+	}
+
+	res, err := client.ListStatusPageStatuses("1", opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ListStatusPageStatusesResponse{
+		APIListObject: APIListObject{},
+		StatusPageStatuses: []StatusPageStatus{
+			{
+				ID:          "1",
+				Description: "Extreme",
+				PostType:    "incident",
+				StatusPage: StatusPage{
+					ID:             "1",
+					Name:           "MyStatusPage",
+					PublishedAt:    "2024-02-12T09:23:23Z",
+					StatusPageType: "public",
+					URL:            "https://mypagerduty",
+				},
+			},
 		},
 	}
 
