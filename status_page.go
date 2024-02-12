@@ -36,12 +36,12 @@ type StatusPageService struct {
 }
 
 type StatusPageSeverity struct {
-	ID          string
-	Self        string
-	Description string
-	PostType    string
-	StatusPage  StatusPage
-	Type        string
+	ID          string     `json:"id,omitempty"`
+	Self        string     `json:"self,omitempty"`
+	Description string     `json:"description,omitempty"`
+	PostType    string     `json:"post_type,omitempty"`
+	StatusPage  StatusPage `json:"status_page,omitempty"`
+	Type        string     `json:"type,omitempty"`
 }
 
 type StatusPageStatus struct {
@@ -120,6 +120,10 @@ type ListStatusPageOptions struct {
 }
 
 type ListStatusPageImpactOptions struct {
+	PostType string `url:"post_type,omitempty"`
+}
+
+type ListStatusPageSeveritiesOptions struct {
 	PostType string `url:"post_type,omitempty"`
 }
 
@@ -263,11 +267,15 @@ func (c *Client) GetStatusPageService(statusPageID string, serviceID string) (*S
 }
 
 // ListStatusPageSeverities lists the severities for the specified status page
-func (c *Client) ListStatusPageSeverities(id string, postType string) (*ListStatusPageSeveritiesResponse, error) {
+func (c *Client) ListStatusPageSeverities(id string, o ListStatusPageSeveritiesOptions) (*ListStatusPageSeveritiesResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
-	resp, err := c.get(context.Background(), "/status_pages/"+id+"/severities?post_type="+postType, h)
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/severities?"+v.Encode(), h)
 	if err != nil {
 		return nil, err
 	}
