@@ -180,16 +180,7 @@ func (c *Client) GetStatusPageImpact(statusPageID string, impactID string) (*Sta
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/impacts/"+impactID, h)
-	if err != nil {
-		return nil, err
-	}
-
-	var result StatusPageImpact
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return getStatusPageImpactFromResponse(c, resp, err)
 }
 
 // ListStatusPageServices lists the services for the specified status page
@@ -216,16 +207,7 @@ func (c *Client) GetStatusPageService(statusPageID string, serviceID string) (*S
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/services/"+serviceID, h)
-	if err != nil {
-		return nil, err
-	}
-
-	var result StatusPageService
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return getStatusPageServiceFromResponse(c, resp, err)
 }
 
 // ListStatusPageSeverities lists the severities for the specified status page
@@ -252,16 +234,7 @@ func (c *Client) GetStatusPageSeverity(statusPageID string, severityID string) (
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/severities/"+severityID, h)
-	if err != nil {
-		return nil, err
-	}
-
-	var result StatusPageSeverity
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return getStatusPageSeverityFromResponse(c, resp, err)
 }
 
 // ListStatusPageStatuses lists the statuses for the specified status page
@@ -288,16 +261,7 @@ func (c *Client) GetStatusPageStatus(statusPageID string, statusID string) (*Sta
 		"X-EARLY-ACCESS": "status-pages-early-access",
 	}
 	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/statuses/"+statusID, h)
-	if err != nil {
-		return nil, err
-	}
-
-	var result StatusPageStatus
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return getStatusPageStatusFromResponse(c, resp, err)
 }
 
 // ListStatusPagePosts lists the posts for the specified status page
@@ -334,6 +298,95 @@ func (c *Client) CreateStatusPagePost(id string, p StatusPagePost) (*StatusPageP
 	return getStatusPagePostFromResponse(c, resp, err)
 }
 
+// GetStatusPagePost gets the specified status page status
+func (c *Client) GetStatusPagePost(statusPageID string, postID string) (*StatusPagePost, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID, h)
+	return getStatusPagePostFromResponse(c, resp, err)
+}
+
+func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPageImpact
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "impact"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPageServiceFromResponse(c *Client, resp *http.Response, err error) (*StatusPageService, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPageService
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "service"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPageStatusFromResponse(c *Client, resp *http.Response, err error) (*StatusPageStatus, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPageStatus
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "status"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPageSeverityFromResponse(c *Client, resp *http.Response, err error) (*StatusPageSeverity, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]StatusPageSeverity
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "severity"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
 func getStatusPagePostFromResponse(c *Client, resp *http.Response, err error) (*StatusPagePost, error) {
 	if err != nil {
 		return nil, err
@@ -352,22 +405,4 @@ func getStatusPagePostFromResponse(c *Client, resp *http.Response, err error) (*
 	}
 
 	return &t, nil
-}
-
-// GetStatusPageStatus gets the specified status page status
-func (c *Client) GetStatusPagePost(statusPageID string, postID string) (*StatusPagePost, error) {
-	h := map[string]string{
-		"X-EARLY-ACCESS": "status-pages-early-access",
-	}
-	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID, h)
-	if err != nil {
-		return nil, err
-	}
-
-	var result StatusPagePost
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
 }
