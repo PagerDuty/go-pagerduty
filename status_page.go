@@ -2,6 +2,8 @@ package pagerduty
 
 import (
 	"context"
+
+	"github.com/google/go-querystring/query"
 )
 
 type StatusPage struct {
@@ -49,6 +51,55 @@ type StatusPageStatus struct {
 	Type        string
 }
 
+type StatusPagePost struct {
+	ID             string
+	Self           string
+	Type           string
+	PostType       string
+	StatusPage     StatusPage
+	LinkedResource LinkedResource
+	PostMortem     PostMortem
+	Title          string
+	StartsAt       string
+	EndsAt         string
+	Updates        []StatusPageUpdate
+}
+
+type LinkedResource struct {
+	ID   string
+	Self string
+}
+
+type PostMortem struct {
+	ID   string
+	Self string
+}
+
+type StatusPageUpdate struct {
+	ID                string
+	Self              string
+	Message           string
+	ReviewedStatus    string
+	Status            StatusPageStatus
+	Severity          StatusPageSeverity
+	ImpactedServices  []StatusPagePostUpdateImpact
+	UpdateFrequencyMS uint
+	NotifySubscribers bool
+	ReportedAt        string
+	Type              string
+}
+
+type StatusPagePostUpdateImpact struct {
+	Service  Service
+	Severity StatusPageSeverity
+}
+
+type ListStatusPagePostOptions struct {
+	PostType       string             `url:"post_type,omitempty"`
+	ReviewedStatus string             `url:"reviewed_status,omitempty"`
+	Statuses       []StatusPageStatus `url:"statuses,omitempty"`
+}
+
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.
 type ListStatusPagesResponse struct {
 	APIListObject
@@ -77,6 +128,12 @@ type ListStatusPageSeveritiesResponse struct {
 type ListStatusPageStatusesResponse struct {
 	APIListObject
 	StatusPageStatuses []StatusPageStatus `json:"statuses"`
+}
+
+// ListStatusPagePostsResponse is the data structure returned from calling the ListStatusPagePosts API endpoint.
+type ListStatusPagePostsResponse struct {
+	APIListObject
+	StatusPagePosts []StatusPagePost `json:"posts"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -234,6 +291,28 @@ func (c *Client) GetStatusPageStatus(statusPageID string, statusID string) (*Sta
 	}
 
 	var result StatusPageStatus
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListStatusPagePosts lists the posts for the specified status page
+func (c *Client) ListStatusPagePosts(id string, o ListStatusPagePostOptions) (*ListStatusPagePostsResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/posts?"+v.Encode(), h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPagePostsResponse
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
