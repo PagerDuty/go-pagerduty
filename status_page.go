@@ -512,6 +512,16 @@ func (c *Client) GetStatusPageSubscription(statusPageID string, subscriptionID s
 	return getStatusPageSubscriptionFromResponse(c, resp, err)
 }
 
+// DeleteStatusPageSubscription deletes a Subscription for a Status Page by Status Page ID and Subscription ID.
+func (c *Client) DeleteStatusPageSubscription(statusPageID string, subscriptionID string) error {
+	/* Note: The API requires sending in the below header, but the client does not support headers for the delete() function, so we have to use do() */
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	_, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/subscriptions/"+subscriptionID, nil, h)
+	return err
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
