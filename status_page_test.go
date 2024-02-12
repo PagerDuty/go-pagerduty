@@ -786,3 +786,123 @@ func TestStatusPage_GetPostUpdate(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// UpdateStatusPagePostUpdate
+func TestStatusPage_UpdatePostUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1/post_updates/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		_, _ = w.Write([]byte(`{
+			"post_update": {
+				"id": "1",
+				"message": "Hello world",
+				"reviewed_status": "approved",
+				"notify_subscribers": false,
+				"update_frequency_ms": 30000,
+				"reported_at": "2024-02-12T09:23:23Z",
+				"impacted_services": [
+					{
+						"severity": {
+							"id": "1",
+							"type": "status_page_severity"
+						},
+						"service": {
+							"id": "1",
+							"type": "status_page_service"
+						}
+					}
+				],
+				"status": {
+					"id": "1",
+					"type": "status_page_status"
+				},
+				"severity": {
+					"id": "1",
+					"type": "status_page_severity"
+				},
+				"post": {
+					"id": "1",
+					"type": "status_page_post"
+				}
+			}
+		}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	input := StatusPagePostUpdate{
+		Message:           "Hello world",
+		NotifySubscribers: false,
+		ReportedAt:        "2024-02-12T09:23:23Z",
+		UpdateFrequencyMS: 30000,
+		ReviewedStatus:    "approved",
+		Post: StatusPagePost{
+			ID:   "1",
+			Type: "status_page_post",
+		},
+		Status: StatusPageStatus{
+			ID:   "1",
+			Type: "status_page_status",
+		},
+		Severity: StatusPageSeverity{
+			ID:   "1",
+			Type: "status_page_severity",
+		},
+		ImpactedServices: []StatusPagePostUpdateImpact{
+			{
+				Service: Service{
+					APIObject: APIObject{
+						ID:   "1",
+						Type: "status_page_service",
+					},
+				},
+				Severity: StatusPageSeverity{
+					ID:   "1",
+					Type: "status_page_severity",
+				},
+			},
+		},
+	}
+	res, err := client.UpdateStatusPagePostUpdate("1", "1", "1", input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &StatusPagePostUpdate{
+		ID:                "1",
+		Message:           "Hello world",
+		NotifySubscribers: false,
+		ReportedAt:        "2024-02-12T09:23:23Z",
+		UpdateFrequencyMS: 30000,
+		ReviewedStatus:    "approved",
+		Post: StatusPagePost{
+			ID:   "1",
+			Type: "status_page_post",
+		},
+		Status: StatusPageStatus{
+			ID:   "1",
+			Type: "status_page_status",
+		},
+		Severity: StatusPageSeverity{
+			ID:   "1",
+			Type: "status_page_severity",
+		},
+		ImpactedServices: []StatusPagePostUpdateImpact{
+			{
+				Service: Service{
+					APIObject: APIObject{
+						ID:   "1",
+						Type: "status_page_service",
+					},
+				},
+				Severity: StatusPageSeverity{
+					ID:   "1",
+					Type: "status_page_severity",
+				},
+			},
+		},
+	}
+
+	testEqual(t, want, res)
+}
