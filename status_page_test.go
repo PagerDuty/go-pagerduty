@@ -1093,3 +1093,52 @@ func TestStatusPage_ListSubscriptions(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// CreateStatusPageSubscription
+func TestStatusPage_CreateSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/subscriptions", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"subscription": {"id": "1","channel":"email","contact":"address@email.example","status":"active","status_page":{"id": "1","type":"status_page"},"subscribable_object":{"id": "1","type":"status_page_service"},"type":"status_page_subscription"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	input := StatusPageSubscription{
+		Channel: "email",
+		Contact: "address@email.example",
+		Status:  "active",
+		StatusPage: StatusPage{
+			ID:   "1",
+			Type: "status_page",
+		},
+		SubscribableObject: SubscribableObject{
+			ID:   "1",
+			Type: "status_page",
+		},
+		Type: "status_page_subscription",
+	}
+	res, err := client.CreateStatusPageSubscription("1", input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &StatusPageSubscription{
+		ID:      "1",
+		Channel: "email",
+		Contact: "address@email.example",
+		Status:  "active",
+		StatusPage: StatusPage{
+			ID:   "1",
+			Type: "status_page",
+		},
+		SubscribableObject: SubscribableObject{
+			ID:   "1",
+			Type: "status_page_service",
+		},
+		Type: "status_page_subscription",
+	}
+
+	testEqual(t, want, res)
+}
