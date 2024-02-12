@@ -22,6 +22,15 @@ type StatusPageImpact struct {
 	Type        string
 }
 
+type StatusPageService struct {
+	ID              string
+	Self            string
+	Name            string
+	StatusPage      StatusPage
+	BusinessService Service
+	Type            string
+}
+
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.
 type ListStatusPagesResponse struct {
 	APIListObject
@@ -32,6 +41,12 @@ type ListStatusPagesResponse struct {
 type ListStatusPageImpactsResponse struct {
 	APIListObject
 	StatusPageImpacts []StatusPageImpact `json:"impacts"`
+}
+
+// ListStatusPageServicesResponse is the data structure returned from calling the ListStatusPagesServices API endpoint.
+type ListStatusPageServicesResponse struct {
+	APIListObject
+	StatusPageServices []StatusPageService `json:"services"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -52,7 +67,7 @@ func (c *Client) ListStatusPages(statusPageType string) (*ListStatusPagesRespons
 	return &result, nil
 }
 
-// ListStatusPageImpacts lists the given types of impacts for the specific status page
+// ListStatusPageImpacts lists the given types of impacts for the specified status page
 func (c *Client) ListStatusPageImpacts(id string, postType string) (*ListStatusPageImpactsResponse, error) {
 	h := map[string]string{
 		"X-EARLY-ACCESS": "status-pages-early-access",
@@ -81,6 +96,24 @@ func (c *Client) GetStatusPageImpact(statusPageID string, impactID string) (*Sta
 	}
 
 	var result StatusPageImpact
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// ListStatusPageServices lists the services for the specified status page
+func (c *Client) ListStatusPageServices(id string) (*ListStatusPageServicesResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/services", h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPageServicesResponse
 	if err := c.decodeJSON(resp, &result); err != nil {
 		return nil, err
 	}
