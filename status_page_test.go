@@ -994,3 +994,40 @@ func TestStatusPage_CreatePostPostmortem(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// UpdateStatusPagePostPostmortem
+func TestStatusPage_UpdatePostPostmortem(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1/postmortem", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		_, _ = w.Write([]byte(`{"postmortem": {"id": "1","message":"Hello world","notify_subscribers":false,"post":{"id": "1","type":"status_page_post"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	input := Postmortem{
+		Message:           "Hello world",
+		NotifySubscribers: false,
+		Post: ShortPostType{
+			ID:   "1",
+			Type: "status_page_post",
+		},
+	}
+	res, err := client.UpdateStatusPagePostPostmortem("1", "1", input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &Postmortem{
+		ID:                "1",
+		Message:           "Hello world",
+		NotifySubscribers: false,
+		Post: ShortPostType{
+			ID:   "1",
+			Type: "status_page_post",
+		},
+	}
+
+	testEqual(t, want, res)
+}
