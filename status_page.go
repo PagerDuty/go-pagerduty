@@ -99,10 +99,31 @@ type StatusPagePostUpdateImpact struct {
 	Severity StatusPageSeverity
 }
 
+type StatusPageSubscription struct {
+	Channel            string
+	Contact            string
+	ID                 string
+	Self               string
+	Status             string
+	StatusPage         StatusPage
+	SubscribableObject SubscribableObject
+	Type               string
+}
+
+type SubscribableObject struct {
+	ID   string
+	Type string
+}
+
 type ListStatusPagePostOptions struct {
 	PostType       string             `url:"post_type,omitempty"`
 	ReviewedStatus string             `url:"reviewed_status,omitempty"`
 	Statuses       []StatusPageStatus `url:"statuses,omitempty"`
+}
+
+type ListStatusPageSubscriptionsOptions struct {
+	Channel string
+	Status  string
 }
 
 // ListStatusPagesResponse is the data structure returned from calling the ListStatusPages API endpoint.
@@ -145,6 +166,12 @@ type ListStatusPagePostsResponse struct {
 type ListStatusPagePostUpdatesResponse struct {
 	APIListObject
 	StatusPagePostUpdates []StatusPagePostUpdate `json:"post_updates"`
+}
+
+// ListStatusPageSubscriptionsResponse is the data structure returned from calling the ListStatusPageSubscriptions API endpoint.
+type ListStatusPageSubscriptionsResponse struct {
+	APIListObject
+	StatusPageSubscriptions []StatusPageSubscription `json:"subscriptions"`
 }
 
 // ListStatusPages lists the given types of status pages
@@ -440,6 +467,28 @@ func (c *Client) DeleteStatusPagePostPostMortem(statusPageID string, postID stri
 	}
 	_, err := c.do(context.Background(), http.MethodDelete, "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", nil, h)
 	return err
+}
+
+// ListStatusPageSubscriptions lists the subscriptions for the specified status page
+func (c *Client) ListStatusPageSubscriptions(id string, o ListStatusPageSubscriptionsOptions) (*ListStatusPageSubscriptionsResponse, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	v, err := query.Values(o)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+id+"/subscriptions?"+v.Encode(), h)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ListStatusPageSubscriptionsResponse
+	if err := c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
