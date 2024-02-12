@@ -73,8 +73,11 @@ type LinkedResource struct {
 }
 
 type PostMortem struct {
-	ID   string
-	Self string
+	ID                string
+	Self              string
+	NotifySubscribers bool
+	ReportedAt        string
+	Type              string
 }
 
 type StatusPagePostUpdate struct {
@@ -396,6 +399,15 @@ func (c *Client) DeleteStatusPagePostUpdate(statusPageID string, postID string, 
 	return getStatusPagePostUpdateFromResponse(c, resp, err)
 }
 
+// GetStatusPagePostPostMortem gets the specified status page post post-mortem
+func (c *Client) GetStatusPagePostPostMortem(statusPageID string, postID string) (*PostMortem, error) {
+	h := map[string]string{
+		"X-EARLY-ACCESS": "status-pages-early-access",
+	}
+	resp, err := c.get(context.Background(), "/status_pages/"+statusPageID+"/posts/"+postID+"/postmortem", h)
+	return getStatusPagePostPostMortemFromResponse(c, resp, err)
+}
+
 func getStatusPageImpactFromResponse(c *Client, resp *http.Response, err error) (*StatusPageImpact, error) {
 	if err != nil {
 		return nil, err
@@ -507,6 +519,26 @@ func getStatusPagePostUpdateFromResponse(c *Client, resp *http.Response, err err
 	}
 
 	const rootNode = "post_update"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+func getStatusPagePostPostMortemFromResponse(c *Client, resp *http.Response, err error) (*PostMortem, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]PostMortem
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "postmortem"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {
