@@ -1031,3 +1031,20 @@ func TestStatusPage_UpdatePostPostmortem(t *testing.T) {
 
 	testEqual(t, want, res)
 }
+
+// DeleteStatusPagePostPostmortem
+func TestStatusPage_DeletePostPostmortem(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/status_pages/1/posts/1/postmortem", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	err := client.DeleteStatusPagePostPostmortem("1", "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
