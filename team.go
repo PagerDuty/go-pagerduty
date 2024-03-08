@@ -14,6 +14,7 @@ type Team struct {
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
 	Parent      *APIObject `json:"parent,omitempty"`
+	DefaultRole string     `json:"default_role,omitempty"`
 }
 
 // ListTeamResponse is the structure used when calling the ListTeams API endpoint.
