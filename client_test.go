@@ -838,3 +838,71 @@ func Test_dupeRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestClientRateLimitBackoff_WithRateLimitHeaders(t *testing.T) {
+	setup()
+	defer teardown()
+
+	count := 0
+
+	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodGet)
+
+		if count == 0 {
+			w.Header().Set("ratelimit-limit", "960")
+			w.Header().Set("ratelimit-remaining", "0")
+			w.Header().Set("ratelimit-reset", "2")
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte(`{"error":{"message":"Rate Limit Exceeded","code":2020}}`))
+			count++
+		}
+
+		w.Header().Set("ratelimit-limit", "960")
+		w.Header().Set("ratelimit-remaining", "956")
+		w.Header().Set("ratelimit-reset", "20")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("ok"))
+	})
+
+	client := NewClient("foo",
+		WithAPIEndpoint(server.URL),
+	)
+
+	_, err := client.do(context.Background(), "GET", "/test", nil, nil)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+}
+
+func TestClientRateLimitBackoff_NoRateLimitHeaders(t *testing.T) {
+	setup()
+	defer teardown()
+
+	count := 0
+
+	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodGet)
+
+		if count == 0 {
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte("Rate Limit Exceeded"))
+			count++
+		}
+
+		w.Header().Set("ratelimit-limit", "960")
+		w.Header().Set("ratelimit-remaining", "956")
+		w.Header().Set("ratelimit-reset", "20")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("ok"))
+	})
+
+	client := NewClient("foo",
+		WithAPIEndpoint(server.URL),
+	)
+
+	_, err := client.do(context.Background(), "GET", "/test", nil, nil)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+}

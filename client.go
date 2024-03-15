@@ -14,10 +14,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -33,6 +36,7 @@ const (
 	apiEndpoint         = "https://api.pagerduty.com"
 	identityEndpoint    = "https://identity.pagerduty.com"
 	v2EventsAPIEndpoint = "https://events.pagerduty.com"
+	jitterPercent       = 0.3
 )
 
 // The type of authentication to use with the API client
@@ -615,9 +619,53 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		}
 	}
 
-	resp, err = c.HTTPClient.Do(req)
+	resp, err = c.doWithRateLimit(req)
 
 	return c.checkResponse(resp, err)
+}
+
+// handleRatelimitError will handle rate limit errors from responses with http
+// code 429. Delaying retry based on ratelimit-reset recommended by PagerDuty
+// https://developer.pagerduty.com/docs/72d3b724589e3-rest-api-rate-limits#reaching-the-limit
+func (c *Client) doWithRateLimit(req *http.Request) (*http.Response, error) {
+	resp, err := c.HTTPClient.Do(req)
+
+	if err != nil || resp.StatusCode != http.StatusTooManyRequests {
+		return resp, err
+	}
+
+	// Rate limited, wait and retry
+	var delay time.Duration
+	rateLimitReset := resp.Header.Get("ratelimit-reset")
+	resetTime, parsingErr := strconv.ParseInt(rateLimitReset, 10, 64)
+
+	if rateLimitReset != "" && parsingErr == nil {
+		baseDelay := 500 * time.Millisecond
+		resetInSeconds := time.Duration(resetTime) * time.Second
+		jitter := 1 + jitterPercent*rand.Float64()
+		extraWait := time.Duration(float64(baseDelay) * jitter)
+
+		delay = resetInSeconds + extraWait
+	}
+
+	if rateLimitReset == "" {
+		baseDelay := 5 * time.Second
+		jitter := 1 + jitterPercent*rand.Float64()
+
+		delay = time.Duration(float64(baseDelay) * jitter)
+	}
+
+	if delay > 0 {
+		log.Printf(
+			"[INFO] Rate limit hit, throttling by %v seconds until next retry to %s: %s",
+			strconv.FormatFloat(delay.Seconds(), 'f', 1, 64),
+			strings.ToUpper(req.Method),
+			req.URL)
+		time.Sleep(delay)
+		resp, err = c.HTTPClient.Do(req)
+	}
+
+	return resp, err
 }
 
 func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers map[string]string) (*http.Response, error) {
