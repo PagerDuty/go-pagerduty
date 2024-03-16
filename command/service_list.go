@@ -7,7 +7,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type ServiceList struct {
@@ -69,9 +68,8 @@ func (c *ServiceList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, service := range serviceList.Services {
-			fmt.Println("Entry: ", i+1)
-			data, err := yaml.Marshal(service)
+		for _, service := range serviceList.Services {
+			data, err := c.Marshaler(service)
 			if err != nil {
 				log.Error(err)
 				return -1
