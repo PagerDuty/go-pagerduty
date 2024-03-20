@@ -14,10 +14,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -273,6 +275,16 @@ type HTTPClient interface {
 // Keep this unexported so consumers of the package can't make changes to it.
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
+type retryPolicy struct {
+	MaxDelay   time.Duration
+	MaxRetries int
+}
+
+var defaultRetryPolicy = retryPolicy{
+	MaxDelay:   20 * time.Second,
+	MaxRetries: 0,
+}
+
 // Client wraps http client
 type Client struct {
 	debugFlag    *uint64
@@ -291,7 +303,8 @@ type Client struct {
 	// HTTPClient is the HTTP client used for making requests against the
 	// PagerDuty API. You can use either *http.Client here, or your own
 	// implementation.
-	HTTPClient HTTPClient
+	HTTPClient  HTTPClient
+	retryPolicy retryPolicy
 
 	userAgent string
 }
@@ -307,6 +320,7 @@ func NewClient(authToken string, options ...ClientOptions) *Client {
 		v2EventsAPIEndpoint: v2EventsAPIEndpoint,
 		authType:            apiToken,
 		HTTPClient:          defaultHTTPClient,
+		retryPolicy:         defaultRetryPolicy,
 	}
 
 	for _, opt := range options {
@@ -328,6 +342,17 @@ type ClientOptions func(*Client)
 func WithAPIEndpoint(endpoint string) ClientOptions {
 	return func(c *Client) {
 		c.apiEndpoint = endpoint
+	}
+}
+
+// WithRetryPolicy configures the client with a retry policy. Configuring a
+// retry policy on the client is currently experimental and should be used with care.
+func WithRetryPolicy(maxRetryAttempts int, maxDelaySeconds int) ClientOptions {
+	return func(c *Client) {
+		c.retryPolicy = retryPolicy{
+			MaxDelay:   time.Duration(maxDelaySeconds) * time.Second,
+			MaxRetries: maxRetryAttempts,
+		}
 	}
 }
 
@@ -580,9 +605,61 @@ func dupeRequest(r *http.Request) (*http.Request, error) {
 }
 
 // needed where pagerduty use a different endpoint for certain actions (eg: v2 events)
-func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path string, authRequired bool, body io.Reader, headers map[string]string) (*http.Response, error) {
-	var dreq *http.Request
+func (c *Client) doWithEndpoint(
+	ctx context.Context,
+	endpoint,
+	method,
+	path string,
+	authRequired bool,
+	body io.Reader,
+	headers map[string]string,
+) (*http.Response, error) {
 	var resp *http.Response
+	var respErr error
+
+	// Attempt with optional retries
+	for attempt := 0; ; attempt++ {
+		// Build a new request for each atempt.
+		req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to build request: %w", err)
+		}
+
+		resp, respErr = c.doSingleRequest(req, authRequired, headers)
+
+		// Handle retry if applicable
+		shouldRetry, delay := c.shouldRetry(resp, respErr, attempt)
+		if !shouldRetry {
+			break
+		}
+
+		select {
+		case <-time.After(delay):
+			continue
+		case <-ctx.Done():
+			err = fmt.Errorf("context completed during retry: %w", ctx.Err())
+			return nil, err
+		}
+	}
+
+	// Handle final results
+	if respErr != nil {
+		return nil, respErr
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return resp, c.getErrorFromResponse(resp)
+	}
+
+	return resp, nil
+}
+
+func (c *Client) doSingleRequest(
+	req *http.Request,
+	authRequired bool,
+	headers map[string]string,
+) (resp *http.Response, err error) {
+	var dreq *http.Request
 
 	// so that the last request and response can be nil if there was an error
 	// before the request could be fully processed by the origin, we defer these
@@ -599,11 +676,6 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 		}()
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, endpoint+path, body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build request: %w", err)
-	}
-
 	if err := c.prepRequest(req, authRequired, headers); err != nil {
 		return nil, err
 	}
@@ -616,8 +688,44 @@ func (c *Client) doWithEndpoint(ctx context.Context, endpoint, method, path stri
 	}
 
 	resp, err = c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error calling the API endpoint: %v", err)
+	}
 
-	return c.checkResponse(resp, err)
+	return resp, nil
+}
+
+// shouldRetry reports whether a request should be retried, and if so, how long to wait before retrying.
+func (c *Client) shouldRetry(resp *http.Response, err error, attempt int) (shouldRetry bool, delay time.Duration) {
+	if attempt >= c.retryPolicy.MaxRetries {
+		return false, 0
+	}
+
+	// For now we only retry on a few known error conditions such as the network errors,
+	// 5xx responses, and rate limiting.
+	if err != nil || resp.StatusCode >= 500 {
+		return true, calculateRetryDelay(attempt, c.retryPolicy)
+	} else if resp.StatusCode == http.StatusTooManyRequests {
+		// The REST API rate limits usually return an indication of how long to wait before retrying
+		resetStr := resp.Header.Get("ratelimit-reset")
+		if delaySeconds, err := strconv.Atoi(resetStr); err == nil {
+			return true, time.Duration(delaySeconds) * time.Second
+		}
+		// otherwise use the default retry delay
+		return true, calculateRetryDelay(attempt, c.retryPolicy)
+	} else {
+		return false, 0
+	}
+}
+
+// calculateRetryDelay uses a binary exponential backoff with jitter algorithm
+func calculateRetryDelay(attempt int, retryPolicy retryPolicy) time.Duration {
+	delay := time.Duration(math.Exp2(float64(attempt))) * time.Second
+	if delay > retryPolicy.MaxDelay {
+		delay = retryPolicy.MaxDelay
+	}
+
+	return delay
 }
 
 func (c *Client) do(ctx context.Context, method, path string, body io.Reader, headers map[string]string) (*http.Response, error) {
@@ -640,18 +748,6 @@ func (c *Client) decodeJSON(resp *http.Response, payload interface{}) error {
 	}
 
 	return json.Unmarshal(body, payload)
-}
-
-func (c *Client) checkResponse(resp *http.Response, err error) (*http.Response, error) {
-	if err != nil {
-		return resp, fmt.Errorf("error calling the API endpoint: %v", err)
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return resp, c.getErrorFromResponse(resp)
-	}
-
-	return resp, nil
 }
 
 func (c *Client) getErrorFromResponse(resp *http.Response) APIError {
