@@ -708,7 +708,7 @@ func (c *Client) shouldRetry(resp *http.Response, err error, attempt int) (shoul
 	} else if resp.StatusCode == http.StatusTooManyRequests {
 		// The REST API rate limits usually return an indication of how long to wait before retrying
 		resetStr := resp.Header.Get("ratelimit-reset")
-		if delaySeconds, err := strconv.Atoi(resetStr); err != nil {
+		if delaySeconds, err := strconv.Atoi(resetStr); err == nil {
 			return true, time.Duration(delaySeconds) * time.Second
 		}
 		// otherwise use the default retry delay
