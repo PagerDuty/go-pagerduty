@@ -50,6 +50,17 @@ const (
 	scopedOAuthAppToken
 )
 
+// RetryOnErrorFlag defines a custom type based on uint64 to represent various retry flags.
+type RetryOnErrorFlag uint64
+
+const (
+	// RetryOn429 is a flag indicating whether to retry on a 429 HTTP status code.
+	RetryOn429 RetryOnErrorFlag = 1 << 0
+
+	// RetryOn429And5xx is a flag indicating whether to retry on both 429 and 5xx HTTP status codes.
+	RetryOn429And5xx RetryOnErrorFlag = 1 << 1
+)
+
 // APIObject represents generic api json response that is shared by most
 // domain objects (like escalation)
 type APIObject struct {
@@ -276,13 +287,15 @@ type HTTPClient interface {
 var defaultHTTPClient HTTPClient = newDefaultHTTPClient()
 
 type retryPolicy struct {
-	MaxDelay   time.Duration
-	MaxRetries int
+	MaxDelay     time.Duration
+	MaxRetries   int
+	RetryOnError RetryOnErrorFlag
 }
 
 var defaultRetryPolicy = retryPolicy{
-	MaxDelay:   20 * time.Second,
-	MaxRetries: 0,
+	MaxDelay:     20 * time.Second,
+	MaxRetries:   0,
+	RetryOnError: RetryOn429And5xx,
 }
 
 // Client wraps http client
@@ -347,11 +360,12 @@ func WithAPIEndpoint(endpoint string) ClientOptions {
 
 // WithRetryPolicy configures the client with a retry policy. Configuring a
 // retry policy on the client is currently experimental and should be used with care.
-func WithRetryPolicy(maxRetryAttempts int, maxDelaySeconds int) ClientOptions {
+func WithRetryPolicy(maxRetryAttempts, maxDelaySeconds int, retryOnError RetryOnErrorFlag) ClientOptions {
 	return func(c *Client) {
 		c.retryPolicy = retryPolicy{
-			MaxDelay:   time.Duration(maxDelaySeconds) * time.Second,
-			MaxRetries: maxRetryAttempts,
+			MaxDelay:     time.Duration(maxDelaySeconds) * time.Second,
+			MaxRetries:   maxRetryAttempts,
+			RetryOnError: retryOnError,
 		}
 	}
 }
@@ -703,19 +717,21 @@ func (c *Client) shouldRetry(resp *http.Response, err error, attempt int) (shoul
 
 	// For now we only retry on a few known error conditions such as the network errors,
 	// 5xx responses, and rate limiting.
-	if err != nil || resp.StatusCode >= 500 {
+	if c.retryPolicy.RetryOnError == RetryOn429And5xx && (err != nil || resp.StatusCode >= 500) {
 		return true, calculateRetryDelay(attempt, c.retryPolicy)
-	} else if resp.StatusCode == http.StatusTooManyRequests {
-		// The REST API rate limits usually return an indication of how long to wait before retrying
+	}
+
+	if (c.retryPolicy.RetryOnError == RetryOn429 || c.retryPolicy.RetryOnError == RetryOn429And5xx) && err == nil && resp.StatusCode == http.StatusTooManyRequests {
+		// Use the delay from the server if one is provided.
 		resetStr := resp.Header.Get("ratelimit-reset")
 		if delaySeconds, err := strconv.Atoi(resetStr); err == nil {
 			return true, time.Duration(delaySeconds) * time.Second
 		}
 		// otherwise use the default retry delay
 		return true, calculateRetryDelay(attempt, c.retryPolicy)
-	} else {
-		return false, 0
 	}
+
+	return false, 0
 }
 
 // calculateRetryDelay uses a binary exponential backoff with jitter algorithm

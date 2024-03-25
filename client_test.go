@@ -717,7 +717,7 @@ func TestClient_RetriesHandleRequestBodies(t *testing.T) {
 
 	client := NewClient("foo",
 		WithAPIEndpoint(server.URL),
-		WithRetryPolicy(2, 1),
+		WithRetryPolicy(2, 1, RetryOn429And5xx),
 	)
 
 	_, err := client.do(context.Background(), "POST", "/test", strings.NewReader("some data\n"), nil)
@@ -760,7 +760,7 @@ func TestClient_RetriesOnVariousConditions(t *testing.T) {
 
 			c := NewClient("foo",
 				WithAPIEndpoint(server.URL),
-				WithRetryPolicy(2, 1),
+				WithRetryPolicy(2, 1, RetryOn429And5xx),
 			)
 
 			attempt := 0
