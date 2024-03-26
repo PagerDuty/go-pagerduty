@@ -715,13 +715,17 @@ func (c *Client) shouldRetry(resp *http.Response, err error, attempt int) (shoul
 		return false, 0
 	}
 
-	// For now we only retry on a few known error conditions such as the network errors,
-	// 5xx responses, and rate limiting.
-	if c.retryPolicy.RetryOnError == RetryOn429And5xx && (err != nil || resp.StatusCode >= 500) {
+	// Retrying on network errors
+	if err != nil {
 		return true, calculateRetryDelay(attempt, c.retryPolicy)
 	}
 
-	if (c.retryPolicy.RetryOnError == RetryOn429 || c.retryPolicy.RetryOnError == RetryOn429And5xx) && err == nil && resp.StatusCode == http.StatusTooManyRequests {
+	// Retrying on 5xx responses, and rate limiting.
+	if c.retryPolicy.RetryOnError == RetryOn429And5xx && resp.StatusCode >= 500 {
+		return true, calculateRetryDelay(attempt, c.retryPolicy)
+	}
+
+	if (c.retryPolicy.RetryOnError == RetryOn429 || c.retryPolicy.RetryOnError == RetryOn429And5xx) && resp.StatusCode == http.StatusTooManyRequests {
 		// Use the delay from the server if one is provided.
 		resetStr := resp.Header.Get("ratelimit-reset")
 		if delaySeconds, err := strconv.Atoi(resetStr); err == nil {
