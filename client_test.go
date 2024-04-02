@@ -48,6 +48,7 @@ func defaultTestClient(serverURL, authToken string) *Client {
 		debugFlag:           new(uint64),
 		lastRequest:         &atomic.Value{},
 		lastResponse:        &atomic.Value{},
+		retryPolicy:         defaultRetryPolicy,
 	}
 }
 
@@ -683,6 +684,109 @@ func TestClient_Do(t *testing.T) {
 
 			if bs := string(body); bs != "ok" {
 				t.Fatalf("body = %s, want ok", bs)
+			}
+		})
+	}
+}
+
+func TestClient_RetriesHandleRequestBodies(t *testing.T) {
+	setup()
+	defer teardown()
+
+	attempt := 1
+
+	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		_, err := io.Copy(io.Discard, r.Body)
+
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+
+		if attempt == 1 {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte(`{"empty":"object"}`))
+			attempt++
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(`{"empty":"object"}`))
+		}
+	})
+
+	client := NewClient("foo",
+		WithAPIEndpoint(server.URL),
+		WithRetryPolicy(2, 1),
+	)
+
+	_, err := client.do(context.Background(), "POST", "/test", strings.NewReader("some data\n"), nil)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if attempt < 2 {
+		t.Fatalf("expected 2 attempts, got %d", attempt)
+	}
+}
+
+func TestClient_RetriesOnVariousConditions(t *testing.T) {
+	tests := []struct {
+		name             string
+		status           int
+		expectedAttempts int
+	}{
+		{
+			name:             "rate_limited",
+			status:           http.StatusTooManyRequests,
+			expectedAttempts: 3,
+		},
+		{
+			name:             "server_error",
+			status:           http.StatusInternalServerError,
+			expectedAttempts: 3,
+		},
+		{
+			name:             "bad_request",
+			status:           http.StatusBadRequest,
+			expectedAttempts: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setup()
+			defer teardown()
+
+			c := NewClient("foo",
+				WithAPIEndpoint(server.URL),
+				WithRetryPolicy(2, 1),
+			)
+
+			attempt := 0
+
+			mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+				attempt++
+				defer r.Body.Close()
+				_, err := io.Copy(io.Discard, r.Body)
+
+				if err != nil {
+					t.Fatalf("expected no error, got %v", err)
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.status)
+				w.Write([]byte(`{"empty":"object"}`))
+			})
+
+			resp, err := c.do(context.Background(), "GET", "/test", nil, nil)
+			testErrCheck(t, "client.do()", "response failed with status code", err)
+
+			defer resp.Body.Close()
+			_, _ = io.Copy(io.Discard, resp.Body)
+
+			if attempt != tt.expectedAttempts {
+				t.Fatalf("expected %d attempts, got %d", tt.expectedAttempts, attempt)
 			}
 		})
 	}
