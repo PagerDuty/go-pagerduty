@@ -90,12 +90,15 @@ type AnalyticsData struct {
 // AnalyticsRawIncident represents the structure of the raw incident analytics we have available.
 type AnalyticsRawIncident struct {
 	AssignmentCount           int    `json:"assignment_count,omitempty"`
+	AutoResolved              bool   `json:"auto_resolved,omitempty"`
 	BusinessHourInterruptions int    `json:"business_hour_interruptions,omitempty"`
 	CreatedAt                 string `json:"created_at,omitempty"`
 	Description               string `json:"description,omitempty"`
 	EngagedSeconds            int    `json:"engaged_seconds,omitempty"`
 	EngagedUserCount          int    `json:"engaged_user_count,omitempty"`
 	EscalationCount           int    `json:"escalation_count,omitempty"`
+	EscalationPolicyID        string `json:"escalation_policy_id,omitempty"`
+	EscalationPolicyName      string `json:"escalation_policy_name,omitempty"`
 	ID                        string `json:"id,omitempty"`
 	IncidentNumber            int    `json:"incident_number,omitempty"`
 	IsMajor                   bool   `json:"major,omitempty"`
@@ -103,6 +106,8 @@ type AnalyticsRawIncident struct {
 	PriorityID                string `json:"priority_id,omitempty"`
 	PriorityName              string `json:"priority_name,omitempty"`
 	ResolvedAt                string `json:"resolved_at,omitempty"`
+	ResolvedByUserID          string `json:"resolved_by_user_id,omitempty"`
+	ResolvedByUserName        string `json:"resolved_by_user_name,omitempty"`
 	SecondsToEngage           int    `json:"seconds_to_engage,omitempty"`
 	SecondsToFirstAck         int    `json:"seconds_to_first_ack,omitempty"`
 	SecondsToMobilize         int    `json:"seconds_to_mobilize,omitempty"`
