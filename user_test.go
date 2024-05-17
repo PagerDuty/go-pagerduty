@@ -483,7 +483,7 @@ func TestUser_GetUserOncallHandoffNotificationRule(t *testing.T) {
 		ID:                     "PXPGF42",
 		HandoffType:            "both",
 		NotifyAdvanceInMinutes: 180,
-		ContactMethod: ContactMethod{
+		ContactMethod: &ContactMethod{
 			ID:      "PXPGF42",
 			Type:    "email_contact_method_reference",
 			Summary: "Work",
@@ -512,7 +512,7 @@ func TestUser_CreateUserOncallHandoffNotificationRule(t *testing.T) {
 	rule := OncallHandoffNotificationRule{
 		HandoffType:            "both",
 		NotifyAdvanceInMinutes: 180,
-		ContactMethod: ContactMethod{
+		ContactMethod: &ContactMethod{
 			ID:      "PXPGF42",
 			Type:    "email_contact_method_reference",
 			Summary: "Work",
@@ -525,7 +525,7 @@ func TestUser_CreateUserOncallHandoffNotificationRule(t *testing.T) {
 		ID:                     "PXPGF42",
 		HandoffType:            "both",
 		NotifyAdvanceInMinutes: 180,
-		ContactMethod: ContactMethod{
+		ContactMethod: &ContactMethod{
 			ID:      "PXPGF42",
 			Type:    "email_contact_method_reference",
 			Summary: "Work",
@@ -554,7 +554,7 @@ func TestUser_UpdateUserOncallHandoffNotificationRule(t *testing.T) {
 		ID:                     "PXPGF42",
 		HandoffType:            "oncall",
 		NotifyAdvanceInMinutes: 30,
-		ContactMethod: ContactMethod{
+		ContactMethod: &ContactMethod{
 			ID:      "PXPGF42",
 			Type:    "email_contact_method_reference",
 			Summary: "Work",
@@ -567,7 +567,7 @@ func TestUser_UpdateUserOncallHandoffNotificationRule(t *testing.T) {
 		ID:                     "PXPGF42",
 		HandoffType:            "oncall",
 		NotifyAdvanceInMinutes: 30,
-		ContactMethod: ContactMethod{
+		ContactMethod: &ContactMethod{
 			ID:      "PXPGF42",
 			Type:    "email_contact_method_reference",
 			Summary: "Work",

@@ -56,10 +56,10 @@ type ContactMethod struct {
 
 // OncallHandoffNotificationRule is a handoff notification rule
 type OncallHandoffNotificationRule struct {
-	ID                     string        `json:"id,omitempty"`
-	HandoffType            string        `json:"handoff_type,omitempty"`
-	NotifyAdvanceInMinutes int           `json:"notify_advance_in_minutes"`
-	ContactMethod          ContactMethod `json:"contact_method"`
+	ID                     string         `json:"id,omitempty"`
+	HandoffType            string         `json:"handoff_type,omitempty"`
+	NotifyAdvanceInMinutes int            `json:"notify_advance_in_minutes"`
+	ContactMethod          *ContactMethod `json:"contact_method,omitempty"`
 }
 
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.
