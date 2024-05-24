@@ -54,6 +54,14 @@ type ContactMethod struct {
 	Enabled        bool   `json:"enabled,omitempty"`
 }
 
+// OncallHandoffNotificationRule is a handoff notification rule
+type OncallHandoffNotificationRule struct {
+	ID                     string         `json:"id,omitempty"`
+	HandoffType            string         `json:"handoff_type,omitempty"`
+	NotifyAdvanceInMinutes int            `json:"notify_advance_in_minutes"`
+	ContactMethod          *ContactMethod `json:"contact_method,omitempty"`
+}
+
 // ListUsersResponse is the data structure returned from calling the ListUsers API endpoint.
 type ListUsersResponse struct {
 	APIListObject
@@ -435,6 +443,58 @@ func getUserNotificationRuleFromResponse(c *Client, resp *http.Response, err err
 	}
 
 	const rootNode = "notification_rule"
+
+	t, nodeOK := target[rootNode]
+	if !nodeOK {
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
+	}
+
+	return &t, nil
+}
+
+// GetUserOncallHandoffNotificationRule gets details about an oncall handoff notification rule.
+func (c *Client) GetUserOncallHandoffNotificationRuleWithContext(ctx context.Context, userID, ruleID string) (*OncallHandoffNotificationRule, error) {
+	resp, err := c.get(ctx, "/users/"+userID+"/oncall_handoff_notification_rules/"+ruleID, nil)
+	return getUserOncallHandoffNotificationRuleFromResponse(c, resp, err)
+}
+
+// CreateUserOncallHandoffNotificationRule creates a new oncall handoff notification rule for a user.
+func (c *Client) CreateUserOncallHandoffNotificationRuleWithContext(ctx context.Context, userID string, rule OncallHandoffNotificationRule) (*OncallHandoffNotificationRule, error) {
+	d := map[string]OncallHandoffNotificationRule{
+		"oncall_handoff_notification_rule": rule,
+	}
+
+	resp, err := c.post(ctx, "/users/"+userID+"/oncall_handoff_notification_rules", d, nil)
+	return getUserOncallHandoffNotificationRuleFromResponse(c, resp, err)
+}
+
+// UpdateUserOncallHandoffNotificationRuleWithContext updates an oncall handoff notification rule for a user.
+func (c *Client) UpdateUserOncallHandoffNotificationRuleWithContext(ctx context.Context, userID string, rule OncallHandoffNotificationRule) (*OncallHandoffNotificationRule, error) {
+	d := map[string]OncallHandoffNotificationRule{
+		"oncall_handoff_notification_rule": rule,
+	}
+
+	resp, err := c.put(ctx, "/users/"+userID+"/oncall_handoff_notification_rules/"+rule.ID, d, nil)
+	return getUserOncallHandoffNotificationRuleFromResponse(c, resp, err)
+}
+
+// DeleteUserOncallHandoffNotificationRuleWithContext deletes an oncall handoff notification rule for a user.
+func (c *Client) DeleteUserOncallHandoffNotificationRuleWithContext(ctx context.Context, userID, ruleID string) error {
+	_, err := c.delete(ctx, "/users/"+userID+"/oncall_handoff_notification_rules/"+ruleID)
+	return err
+}
+
+func getUserOncallHandoffNotificationRuleFromResponse(c *Client, resp *http.Response, err error) (*OncallHandoffNotificationRule, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	var target map[string]OncallHandoffNotificationRule
+	if dErr := c.decodeJSON(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	}
+
+	const rootNode = "oncall_handoff_notification_rule"
 
 	t, nodeOK := target[rootNode]
 	if !nodeOK {

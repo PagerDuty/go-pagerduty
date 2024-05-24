@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -458,6 +459,140 @@ func TestUser_DeleteUserNotificationRule(t *testing.T) {
 
 	client := defaultTestClient(server.URL, "foo")
 	if err := client.DeleteUserNotificationRule(userID, ruleID); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Get user Oncall Handoff NotificationRule
+func TestUser_GetUserOncallHandoffNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/oncall_handoff_notification_rules/PXPGF42", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"oncall_handoff_notification_rule":{"id":"PXPGF42","handoff_type":"both","notify_advance_in_minutes":180,"contact_method":{"id":"PXPGF42","type":"email_contact_method_reference","summary":"Work","self":"https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	ruleID := "PXPGF42"
+	userID := "1"
+
+	res, err := client.GetUserOncallHandoffNotificationRuleWithContext(context.TODO(), userID, ruleID)
+
+	want := &OncallHandoffNotificationRule{
+		ID:                     "PXPGF42",
+		HandoffType:            "both",
+		NotifyAdvanceInMinutes: 180,
+		ContactMethod: &ContactMethod{
+			ID:      "PXPGF42",
+			Type:    "email_contact_method_reference",
+			Summary: "Work",
+			Self:    "https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Create user Oncall Handoff NotificationRule
+func TestUser_CreateUserOncallHandoffNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/oncall_handoff_notification_rules", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write([]byte(`{"oncall_handoff_notification_rule":{"id":"PXPGF42","handoff_type":"both","notify_advance_in_minutes":180,"contact_method":{"id":"PXPGF42","type":"email_contact_method_reference","summary":"Work","self":"https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	userID := "1"
+	rule := OncallHandoffNotificationRule{
+		HandoffType:            "both",
+		NotifyAdvanceInMinutes: 180,
+		ContactMethod: &ContactMethod{
+			ID:      "PXPGF42",
+			Type:    "email_contact_method_reference",
+			Summary: "Work",
+			Self:    "https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42",
+		},
+	}
+	res, err := client.CreateUserOncallHandoffNotificationRuleWithContext(context.TODO(), userID, rule)
+
+	want := &OncallHandoffNotificationRule{
+		ID:                     "PXPGF42",
+		HandoffType:            "both",
+		NotifyAdvanceInMinutes: 180,
+		ContactMethod: &ContactMethod{
+			ID:      "PXPGF42",
+			Type:    "email_contact_method_reference",
+			Summary: "Work",
+			Self:    "https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestUser_UpdateUserOncallHandoffNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/oncall_handoff_notification_rules/PXPGF42", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "PUT")
+		_, _ = w.Write([]byte(`{"oncall_handoff_notification_rule":{"id":"PXPGF42","handoff_type":"oncall","notify_advance_in_minutes":30,"contact_method":{"id":"PXPGF42","type":"email_contact_method_reference","summary":"Work","self":"https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	userID := "1"
+	rule := OncallHandoffNotificationRule{
+		ID:                     "PXPGF42",
+		HandoffType:            "oncall",
+		NotifyAdvanceInMinutes: 30,
+		ContactMethod: &ContactMethod{
+			ID:      "PXPGF42",
+			Type:    "email_contact_method_reference",
+			Summary: "Work",
+			Self:    "https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42",
+		},
+	}
+	res, err := client.UpdateUserOncallHandoffNotificationRuleWithContext(context.TODO(), userID, rule)
+
+	want := &OncallHandoffNotificationRule{
+		ID:                     "PXPGF42",
+		HandoffType:            "oncall",
+		NotifyAdvanceInMinutes: 30,
+		ContactMethod: &ContactMethod{
+			ID:      "PXPGF42",
+			Type:    "email_contact_method_reference",
+			Summary: "Work",
+			Self:    "https://api.pagerduty.com/users/PXPGF42/contact_methods/PXPGF42",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+func TestUser_DeleteUserOncallHandoffNotificationRule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/1/oncall_handoff_notification_rules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "DELETE")
+	})
+	userID := "1"
+	ruleID := "1"
+
+	client := defaultTestClient(server.URL, "foo")
+	if err := client.DeleteUserOncallHandoffNotificationRuleWithContext(context.Background(), userID, ruleID); err != nil {
 		t.Fatal(err)
 	}
 }
