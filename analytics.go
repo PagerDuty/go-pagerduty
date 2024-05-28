@@ -57,6 +57,7 @@ type AnalyticsFilter struct {
 	Urgency        string   `json:"urgency,omitempty"`
 	Major          bool     `json:"major,omitempty"`
 	ServiceIDs     []string `json:"service_ids,omitempty"`
+	EscalationIDs  []string `json:"escalation_policy_ids,omitempty"`
 	TeamIDs        []string `json:"team_ids,omitempty"`
 	PriorityIDs    []string `json:"priority_ids,omitempty"`
 	PriorityNames  []string `json:"priority_names,omitempty"`
