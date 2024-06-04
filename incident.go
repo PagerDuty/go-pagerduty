@@ -305,3 +305,38 @@ type ListAlertResponse struct {
 	APIListObject
 	Alerts []Alert `json:"alerts,omitempty"`
 }
+
+// UpdateIncident is not apart of the go-pagerduty library. Therefore, we need to add it manually.
+// https://developer.pagerduty.com/api-reference/8a0e1aa2ec666-update-an-incident
+
+// UpdateIncidentResponse is the response structure when calling the UpdateIncident API endpoint.
+type UpdateIncidentResponse struct {
+	Incident Incident `json:"incident,omitempty"`
+}
+
+// UpdateIncidentOptions is the structure used when passing parameters to the UpdateIncident API endpoint.
+type UpdateIncidentOptions struct {
+	Type            string `url:"type,omitempty"`
+	Urgency         string `url:"urgency,omitempty"`
+	Status          string `url:"status,omitempty"`
+	Resolution      string `url:"resolution,omitempty,brackets"`
+	EscalationLevel int    `url:"escalation_level,omitempty"`
+}
+
+// ListIncidents lists existing incidents.
+func (c *Client) UpdateIncident(id string, o *UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
+	data := make(map[string]*UpdateIncidentOptions)
+	data["incident"] = o
+	resp, e := c.put("/incidents/"+id, data, nil)
+	if e != nil {
+		return nil, e
+	}
+
+	var ir UpdateIncidentResponse
+	e = json.NewDecoder(resp.Body).Decode(&ir)
+	if e != nil {
+		return nil, e
+	}
+
+	return &ir, nil
+}
