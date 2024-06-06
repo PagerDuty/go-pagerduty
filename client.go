@@ -51,7 +51,7 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("Failed to call API endpoint. Error: %v", e)
+	return fmt.Sprintf("Failed to call API endpoint. Error: %s", e.Message)
 }
 
 func newDefaultHTTPClient() *http.Client {
