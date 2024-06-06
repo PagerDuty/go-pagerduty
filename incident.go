@@ -327,16 +327,11 @@ type UpdateIncidentOptions struct {
 func (c *Client) UpdateIncident(id string, o *UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
 	data := make(map[string]*UpdateIncidentOptions)
 	data["incident"] = o
-	resp, e := c.put("/incidents/"+id, data, nil)
-	if e != nil {
-		return nil, e
+	resp, err := c.put("/incidents/"+id, data, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	var ir UpdateIncidentResponse
-	e = json.NewDecoder(resp.Body).Decode(&ir)
-	if e != nil {
-		return nil, e
-	}
-
-	return &ir, nil
+	var result UpdateIncidentResponse
+	return &result, c.decodeJSON(resp, &result)
 }
