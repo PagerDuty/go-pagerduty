@@ -324,10 +324,12 @@ type UpdateIncidentOptions struct {
 }
 
 // ListIncidents lists existing incidents.
-func (c *Client) UpdateIncident(id string, o *UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
+func (c *Client) UpdateIncident(id string, from string, o *UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
 	data := make(map[string]*UpdateIncidentOptions)
 	data["incident"] = o
-	resp, err := c.put("/incidents/"+id, data, nil)
+	headers := make(map[string]string)
+	headers["From"] = from
+	resp, err := c.put("/incidents/"+id, data, &headers)
 	if err != nil {
 		return nil, err
 	}
