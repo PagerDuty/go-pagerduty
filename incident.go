@@ -323,7 +323,7 @@ type UpdateIncidentOptions struct {
 	EscalationLevel int    `json:"escalation_level,omitempty"`
 }
 
-// ListIncidents lists existing incidents.
+// UpdateIncident updates an existing incident.
 func (c *Client) UpdateIncident(id string, from string, o UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
 	data := make(map[string]UpdateIncidentOptions)
 	data["incident"] = o
