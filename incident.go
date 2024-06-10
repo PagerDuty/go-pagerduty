@@ -316,16 +316,16 @@ type UpdateIncidentResponse struct {
 
 // UpdateIncidentOptions is the structure used when passing parameters to the UpdateIncident API endpoint.
 type UpdateIncidentOptions struct {
-	Type            string `url:"type,omitempty"`
-	Urgency         string `url:"urgency,omitempty"`
-	Status          string `url:"status,omitempty"`
-	Resolution      string `url:"resolution,omitempty,brackets"`
-	EscalationLevel int    `url:"escalation_level,omitempty"`
+	Type            string `json:"type,omitempty"`
+	Urgency         string `json:"urgency,omitempty"`
+	Status          string `json:"status,omitempty"`
+	Resolution      string `json:"resolution,omitempty,brackets"`
+	EscalationLevel int    `json:"escalation_level,omitempty"`
 }
 
-// ListIncidents lists existing incidents.
-func (c *Client) UpdateIncident(id string, from string, o *UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
-	data := make(map[string]*UpdateIncidentOptions)
+// UpdateIncident updates an existing incident.
+func (c *Client) UpdateIncident(id string, from string, o UpdateIncidentOptions) (*UpdateIncidentResponse, error) {
+	data := make(map[string]UpdateIncidentOptions)
 	data["incident"] = o
 	headers := make(map[string]string)
 	headers["From"] = from
@@ -335,5 +335,10 @@ func (c *Client) UpdateIncident(id string, from string, o *UpdateIncidentOptions
 	}
 
 	var result UpdateIncidentResponse
-	return &result, c.decodeJSON(resp, &result)
+	e := json.NewDecoder(resp.Body).Decode(&result)
+	if e != nil {
+		return nil, e
+	}
+
+	return &result, nil
 }
