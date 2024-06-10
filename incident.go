@@ -335,5 +335,10 @@ func (c *Client) UpdateIncident(id string, from string, o UpdateIncidentOptions)
 	}
 
 	var result UpdateIncidentResponse
-	return &result, c.decodeJSON(resp, &result)
+	e := json.NewDecoder(resp.Body).Decode(&result)
+	if e != nil {
+		return nil, e
+	}
+
+	return &result, nil
 }
