@@ -8,7 +8,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type MaintenanceWindowShow struct {
@@ -68,7 +67,7 @@ func (c *MaintenanceWindowShow) Run(args []string) int {
 		return -1
 	}
 
-	data, err := yaml.Marshal(mw)
+	data, err := c.Marshaler(mw)
 	if err != nil {
 		log.Error(err)
 		return -1
