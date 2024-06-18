@@ -13,7 +13,6 @@ type Team struct {
 	APIObject
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
-	Parent      *APIObject `json:"parent,omitempty"`
 	DefaultRole string     `json:"default_role,omitempty"`
 }
 
