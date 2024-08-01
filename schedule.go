@@ -182,6 +182,7 @@ type GetScheduleOptions struct {
 	TimeZone string `url:"time_zone,omitempty"`
 	Since    string `url:"since,omitempty"`
 	Until    string `url:"until,omitempty"`
+	Overflow bool   `url:"overflow,omitempty"`
 }
 
 // GetSchedule shows detailed information about a schedule, including entries
