@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>PagerDuty/renovate-base"
+  ],
+  "enabledManagers": [
+    "terraform"
+  ],
+  "dependencyDashboard": true
+}
