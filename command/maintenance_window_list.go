@@ -8,7 +8,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type MaintenanceWindowList struct {
@@ -73,9 +72,8 @@ func (c *MaintenanceWindowList) Run(args []string) int {
 		return -1
 	}
 
-	for i, mw := range mws.MaintenanceWindows {
-		fmt.Println("Entry: ", i)
-		data, err := yaml.Marshal(mw)
+	for _, mw := range mws.MaintenanceWindows {
+		data, err := c.Marshaler(mw)
 		if err != nil {
 			log.Error(err)
 			return -1
