@@ -11,6 +11,9 @@ jobs:
       - checkout
       - git/rebase_on_main
       - run:
+          name: "Clone nvm"
+          command: "git clone git@github.com:nvm-sh/nvm.git"
+      - run:
           name: "Test"
           command: make test
       - run:
