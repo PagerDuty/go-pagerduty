@@ -12,7 +12,7 @@ jobs:
       - git/rebase_on_main
       - run:
           name: "Clone nvm"
-          command: "git clone git@github.com:nvm-sh/nvm.git"
+          command: "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash;"
       - run:
           name: "Test"
           command: make test
