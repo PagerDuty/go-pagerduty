@@ -11,8 +11,8 @@ jobs:
       - checkout
       - git/rebase_on_main
       - run:
-          name: "Clone nvm"
-          command: "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash;"
+          name: "Clone something else"
+          command: "git clone git@github.com:heimweh/go-pagerduty.git"
       - run:
           name: "Test"
           command: make test
