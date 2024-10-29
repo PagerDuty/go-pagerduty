@@ -31,8 +31,8 @@ type PagerDutyAccount struct {
 	Subdomain string `json:"subdomain"`
 }
 
-// JiraCloudAccountsMappingRule configures the bidirectional synchronization between Jira
-// issues and PagerDuty incidents
+// JiraCloudAccountsMappingRule configures the bidirectional synchronization
+// between Jira issues and PagerDuty incidents
 type JiraCloudAccountsMappingRule struct {
 	AccountsMapping             *APIObject                         `json:"account_mapping,omitempty"`
 	AutocreateJqlDisabledReason string                             `json:"autocreate_jql_disabled_reason,omitempty"`
@@ -44,15 +44,14 @@ type JiraCloudAccountsMappingRule struct {
 	UpdatedAt                   string                             `json:"updated_at,omitempty"`
 }
 
-// JiraCloudAccountsMappingRuleConfig is the configuration for bidirectional synchronization
-// between Jira issues and PagerDuty incidents
+// JiraCloudAccountsMappingRuleConfig is the configuration for bidirectional
+// synchronization between Jira issues and PagerDuty incidents
 type JiraCloudAccountsMappingRuleConfig struct {
 	Jira    JiraCloudSettings `json:"jira"`
 	Service APIObject         `json:"service"`
 }
 
-// JiraCloudSettings are settings for the Jira aspect of the
-// synchronization
+// JiraCloudSettings are settings for the Jira aspect of the synchronization
 type JiraCloudSettings struct {
 	AutocreateJQL                *string                `json:"autocreate_jql"`
 	CreateIssueOnIncidentTrigger bool                   `json:"create_issue_on_incident_trigger"`
@@ -246,9 +245,49 @@ func (c *Client) DeleteJiraCloudAccountsMappingRule(ctx context.Context, id, rul
 	return err
 }
 
+// updateJiraCloudAccountsMappingRuleBody is the body for the call to the
+// UpdateJiraCloudAccountsMappingRule API endpoint
+type updateJiraCloudAccountsMappingRuleBody struct {
+	Config updateJiraCloudAccountsMappingRuleConfig `json:"config"`
+	Name   string                                   `json:"name"`
+}
+
+// updateJiraCloudAccountsMappingRuleOptionsConfig is an special representation
+// of a configuration used for updating a rule.
+type updateJiraCloudAccountsMappingRuleConfig struct {
+	Jira updateJiraCloudSettings `json:"jira"`
+}
+
+// updateJiraCloudSettings are settings to update the Jira aspect of the
+// synchronization
+type updateJiraCloudSettings struct {
+	AutocreateJQL                *string                `json:"autocreate_jql"`
+	CreateIssueOnIncidentTrigger bool                   `json:"create_issue_on_incident_trigger"`
+	CustomFields                 []JiraCloudCustomField `json:"custom_fields"`
+	IssueType                    JiraCloudReference     `json:"issue_type"`
+	Priorities                   []JiraCloudPriority    `json:"priorities"`
+	StatusMapping                JiraCloudStatusMapping `json:"status_mapping"`
+	SyncNotesUser                *UserJiraCloud         `json:"sync_notes_user"`
+}
+
 // UpdateJiraCloudAccountsMappingRule updates an existing rule in Jira Cloud's integration
-func (c *Client) UpdateJiraCloudAccountsMappingRule(ctx context.Context, id string, rule JiraCloudAccountsMappingRule) (*JiraCloudAccountsMappingRule, error) {
-	resp, err := c.put(ctx, "/integration-jira-cloud/accounts_mappings/"+id+"/rules/"+rule.ID, rule, nil)
+func (c *Client) UpdateJiraCloudAccountsMappingRule(ctx context.Context, accountMappingID string, rule JiraCloudAccountsMappingRule) (*JiraCloudAccountsMappingRule, error) {
+	o := updateJiraCloudAccountsMappingRuleBody{
+		Config: updateJiraCloudAccountsMappingRuleConfig{
+			Jira: updateJiraCloudSettings{
+				AutocreateJQL:                rule.Config.Jira.AutocreateJQL,
+				CreateIssueOnIncidentTrigger: rule.Config.Jira.CreateIssueOnIncidentTrigger,
+				CustomFields:                 rule.Config.Jira.CustomFields,
+				IssueType:                    rule.Config.Jira.IssueType,
+				Priorities:                   rule.Config.Jira.Priorities,
+				StatusMapping:                rule.Config.Jira.StatusMapping,
+				SyncNotesUser:                rule.Config.Jira.SyncNotesUser,
+			},
+		},
+		Name: rule.Name,
+	}
+
+	resp, err := c.put(ctx, "/integration-jira-cloud/accounts_mappings/"+accountMappingID+"/rules/"+rule.ID, o, nil)
 	if err != nil {
 		return nil, err
 	}
