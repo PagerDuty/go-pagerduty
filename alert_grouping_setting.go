@@ -107,6 +107,12 @@ func (c *Client) ListAlertGroupingSettings(ctx context.Context, o ListAlertGroup
 	}
 
 	resp, err := c.get(ctx, "/alert_grouping_settings?"+v.Encode(), nil)
+
+	// If there are no alert grouping settings, return an empty response.
+	if resp.StatusCode == 404 {
+		return &ListAlertGroupingSettingsResponse{}, nil
+	}
+
 	if err != nil {
 		return nil, err
 	}
