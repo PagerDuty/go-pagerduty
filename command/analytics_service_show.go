@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -97,7 +96,7 @@ func (c *AnalyticsServiceShow) Run(args []string) int {
 		return -1
 	}
 
-	aggregatedServiceDataBytes, err := json.Marshal(aggregatedServiceData)
+	aggregatedServiceDataBytes, err := c.Marshaler(aggregatedServiceData)
 	if err != nil {
 		log.Error(err)
 		return -1

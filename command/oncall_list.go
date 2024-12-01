@@ -7,7 +7,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 )
 
 type OncallList struct {
@@ -74,7 +73,7 @@ func (c *OncallList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		data, err := yaml.Marshal(oncs.OnCalls)
+		data, err := c.Marshaler(oncs.OnCalls)
 		if err != nil {
 			log.Error(err)
 			return -1
