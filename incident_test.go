@@ -670,7 +670,7 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 	var duration uint = 3600
 	id := "1"
 
-	err := client.SnoozeIncident(id, duration)
+	err := client.SnoozeIncident(id, "from", duration)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -689,7 +689,7 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 	var duration uint = 3600
 	id := "1"
 
-	res, err := client.SnoozeIncidentWithResponse(id, duration)
+	res, err := client.SnoozeIncidentWithResponse(id, "from", duration)
 
 	want := &Incident{
 		APIObject: APIObject{

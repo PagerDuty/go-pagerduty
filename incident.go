@@ -544,17 +544,20 @@ func (c *Client) CreateIncidentNote(id string, note IncidentNote) error {
 // period of time.
 //
 // Deprecated: Use SnoozeIncidentWithContext instead.
-func (c *Client) SnoozeIncidentWithResponse(id string, duration uint) (*Incident, error) {
-	return c.SnoozeIncidentWithContext(context.Background(), id, duration)
+func (c *Client) SnoozeIncidentWithResponse(id, from string, duration uint) (*Incident, error) {
+	return c.SnoozeIncidentWithContext(context.Background(), id, from, duration)
 }
 
 // SnoozeIncidentWithContext sets an incident to not alert for a specified period of time.
-func (c *Client) SnoozeIncidentWithContext(ctx context.Context, id string, duration uint) (*Incident, error) {
-	d := map[string]uint{
+func (c *Client) SnoozeIncidentWithContext(ctx context.Context, id, from string, duration uint) (*Incident, error) {
+	headers := map[string]string{
+		"from": from,
+	}
+	body := map[string]uint{
 		"duration": duration,
 	}
 
-	resp, err := c.post(ctx, "/incidents/"+id+"/snooze", d, nil)
+	resp, err := c.post(ctx, "/incidents/"+id+"/snooze", body, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -570,10 +573,13 @@ func (c *Client) SnoozeIncidentWithContext(ctx context.Context, id string, durat
 // SnoozeIncident sets an incident to not alert for a specified period of time.
 //
 // Deprecated: Use SnoozeIncidentWithContext instead.
-func (c *Client) SnoozeIncident(id string, duration uint) error {
+func (c *Client) SnoozeIncident(id, from string, duration uint) error {
+	headers := make(map[string]string)
+	headers["from"] = from
 	data := make(map[string]uint)
 	data["duration"] = duration
-	_, err := c.post(context.Background(), "/incidents/"+id+"/snooze", data, nil)
+
+	_, err := c.post(context.Background(), "/incidents/"+id+"/snooze", data, headers)
 	return err
 }
 
