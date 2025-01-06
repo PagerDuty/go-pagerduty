@@ -664,13 +664,18 @@ func TestIncident_SnoozeIncident(t *testing.T) {
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
+		testEqual(t, r.Header.Get("From"), "from")
+
 		_, _ = w.Write([]byte(`{"incident": {"id": "1", "pending_actions": [{"type": "unacknowledge", "at":"2019-12-31T16:58:35Z"}]}}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var duration uint = 3600
 	id := "1"
 
-	err := client.SnoozeIncident(id, duration)
+	err := client.SnoozeIncident(id, SnoozeIncidentOptions{
+		From:     "from",
+		Duration: duration,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -683,13 +688,18 @@ func TestIncident_SnoozeIncidentWithResponse(t *testing.T) {
 
 	mux.HandleFunc("/incidents/1/snooze", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
+		testEqual(t, r.Header.Get("From"), "from")
+
 		_, _ = w.Write([]byte(`{"incident": {"id": "1", "pending_actions": [{"type": "unacknowledge", "at":"2019-12-31T16:58:35Z"}]}}`))
 	})
 	client := defaultTestClient(server.URL, "foo")
 	var duration uint = 3600
 	id := "1"
 
-	res, err := client.SnoozeIncidentWithResponse(id, duration)
+	res, err := client.SnoozeIncidentWithResponse(id, SnoozeIncidentOptions{
+		From:     "from",
+		Duration: duration,
+	})
 
 	want := &Incident{
 		APIObject: APIObject{
