@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/cli"
 	"os"
+
+	"github.com/mitchellh/cli"
 )
 
 const (
@@ -25,6 +26,12 @@ func loadCommands() map[string]cli.CommandFactory {
 		"escalation-policy delete": EscalationPolicyDeleteCommand,
 		"escalation-policy show":   EscalationPolicyShowCommand,
 		"escalation-policy update": EscalationPolicyUpdateCommand,
+
+		"event-orchestration list":   EventOrchestrationListCommand,
+		"event-orchestration create": EventOrchestrationCreateCommand,
+		"event-orchestration delete": EventOrchestrationDeleteCommand,
+		"event-orchestration show":   EventOrchestrationShowCommand,
+		"event-orchestration update": EventOrchestrationUpdateCommand,
 
 		"event-v2 manage": EventV2ManageCommand,
 
@@ -69,6 +76,16 @@ func loadCommands() map[string]cli.CommandFactory {
 		"service integration create": ServiceIntegrationCreateCommand,
 		"service integration show":   ServiceIntegrationShowCommand,
 		"service integration update": ServiceIntegrationUpdateCommand,
+		"service rule create":        ServiceRuleCreateCommand,
+		"service rule delete":        ServiceRuleDeleteCommand,
+		"service rule list":          ServiceRuleListCommand,
+		"service rule show":          ServiceRuleShowCommand,
+		"service rule update":        ServiceRuleUpdateCommand,
+
+		"standard list":                        StandardListCommand,
+		"standard update":                      StandardUpdateCommand,
+		"standard resource-scores list":        StandardListResourceScoresCommand,
+		"standard multi-resources-scores list": StandardListMultiResourcesScoresCommand,
 
 		"team list":                     TeamListCommand,
 		"team create":                   TeamShowCommand,
@@ -95,8 +112,11 @@ func loadCommands() map[string]cli.CommandFactory {
 		"user notification-rule show":   UserNotificationRuleShowCommand,
 		"user notification-rule update": UserNotificationRuleUpdateCommand,
 
-		"vendor list": VendorListCommand,
-		"vendor show": VendorShowCommand,
+		"vendor list":             VendorListCommand,
+		"vendor show":             VendorShowCommand,
+		"analytics incident show": AnalyticsGetAggregatedIncidentDataCommand,
+		"analytics service show":  AnalyticsGetAggregatedServiceDataCommand,
+		"analytics team show":     AnalyticsGetAggregatedTeamDataCommand,
 	}
 }
 

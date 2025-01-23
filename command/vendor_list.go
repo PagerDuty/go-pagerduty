@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/Sirupsen/logrus"
-	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
+
+	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type VendorList struct {
@@ -49,9 +50,7 @@ func (c *VendorList) Run(args []string) int {
 		return -1
 	}
 	client := c.Meta.Client()
-	opts := pagerduty.ListVendorOptions{
-		Query: query,
-	}
+	opts := pagerduty.ListVendorOptions{}
 	if resp, err := client.ListVendors(opts); err != nil {
 		log.Error(err)
 		return -1

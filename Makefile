@@ -9,15 +9,23 @@
 # 	go build -o $(BINARY) command/*
 
 .PHONY: build
-build:
-	go get ./...
-	# go test -v -race -cover ./...
-	# go tool vet $(SOURCES)
+build: build-deps
+	go build -mod=vendor -o pd ./command
+
+.PHONY: build-deps
+build-deps:
+	go get
+	go mod verify
+	go mod vendor
+
+.PHONY: install
+install: build
+	cp pd $(GOROOT)/bin
 
 .PHONY: test
 test:
-	go test ./...
+	go test -v ./...
 
+.PHONY: deploy
 deploy:
 	- curl -sL https://git.io/goreleaser | bash
-

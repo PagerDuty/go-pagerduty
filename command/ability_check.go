@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/mitchellh/cli"
 	"strings"
+
+	"github.com/mitchellh/cli"
 )
 
 type AbilityTest struct {
@@ -44,7 +46,7 @@ func (c *AbilityTest) Run(args []string) int {
 		return -1
 	}
 	client := c.Meta.Client()
-	if err := client.TestAbility(flags.Arg(0)); err != nil {
+	if err := client.TestAbilityWithContext(context.Background(), flags.Arg(0)); err != nil {
 		fmt.Println(err)
 		return -1
 	}

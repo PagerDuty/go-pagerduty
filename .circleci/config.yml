@@ -2,10 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/PagerDuty/go-pagerduty
+      - image: cimg/go:1.17
     steps:
       - checkout
+      - run:
+          name: "Test"
+          command: make test
       - run:
           name: "Build"
           command: make build

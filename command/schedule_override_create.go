@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 )
@@ -48,7 +48,7 @@ func (c *ScheduleOverrideCreate) Run(args []string) int {
 	}
 	log.Info("service id is:", flags.Arg(0))
 	log.Info("Input file is:", flags.Arg(1))
-	f, err := os.Open(flags.Arg(0))
+	f, err := os.Open(flags.Arg(1))
 	if err != nil {
 		log.Error(err)
 		return -1

@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/Sirupsen/logrus"
-	"github.com/mitchellh/cli"
 	"os"
 	"strings"
+
+	"github.com/mitchellh/cli"
+	"github.com/PagerDuty/go-pagerduty"
+	log "github.com/sirupsen/logrus"
 )
 
 type ServiceIntegrationCreate struct {
