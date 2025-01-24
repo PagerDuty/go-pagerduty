@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mitchellh/cli"
 	"github.com/PagerDuty/go-pagerduty"
+	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
 )
 
