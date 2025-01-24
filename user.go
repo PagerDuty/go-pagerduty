@@ -36,6 +36,7 @@ type User struct {
 	NotificationRules []NotificationRule `json:"notification_rules,omitempty"`
 	JobTitle          string             `json:"job_title,omitempty"`
 	Teams             []Team             `json:"teams,omitempty"`
+	DeletedAt         string             `json:"deleted_at,omitempty"`
 }
 
 // ContactMethod is a way of contacting the user.
