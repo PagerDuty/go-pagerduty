@@ -115,6 +115,29 @@ type AnalyticsRawIncident struct {
 	TeamName                  string `json:"team_name,omitempty"`
 	Urgency                   string `json:"urgency,omitempty"`
 	UserDefinedEffortSeconds  int    `json:"user_defined_effort_seconds,omitempty"`
+	AcknowledgedUserIDs       []string `json:"acknowledged_user_ids,omitempty"`
+	AcknowledgedUserNames     []string `json:"acknowledged_user_names,omitempty"`
+	AcknowledgementCount      int      `json:"acknowledgement_count,omitempty"`
+	ActiveUserCount           int      `json:"active_user_count,omitempty"`
+	AssignedUserIDs           []string `json:"assigned_user_ids,omitempty"`
+	AssignedUserNames         []string `json:"assigned_user_names,omitempty"`
+	IsAutoResolved            bool     `json:"auto_resolved,omitempty"`
+	UpdatedAt                 string   `json:"updated_at,omitempty"`
+	EscalationPolicyID        string   `json:"escalation_policy_id,omitempty"`
+	EscalationPolicyName      string   `json:"escalation_policy_name,omitempty"`
+	IncidentTypeID            string   `json:"incident_type_id,omitempty"`
+	IncidentTypeName          string   `json:"incident_type_name,omitempty"`
+	JoinedUserIDs             []string `json:"joined_user_ids,omitempty"`
+	JoinedUserNames           []string `json:"joined_user_names,omitempty"`
+	ManualEscalationCount     int      `json:"manual_escalation_count,omitempty"`
+	PriorityOrder             int      `json:"priority_order,omitempty"`
+	ReassignmentCount         int      `json:"reassignment_count,omitempty"`
+	ResolvedByUserID          string   `json:"resolved_by_user_id,omitempty"`
+	ResolvedByUserName        string   `json:"resolved_by_user_name,omitempty"`
+	Status                    string   `json:"status,omitempty"`
+	TimeoutEscalationCount    int      `json:"timeout_escalation_count,omitempty"`
+	TotalInterruptions        int      `json:"total_interruptions,omitempty"`
+	TotalNotifications        int      `json:"total_notifications,omitempty"`
 }
 
 // GetAggregatedIncidentData gets the aggregated incident analytics for the requested data.
