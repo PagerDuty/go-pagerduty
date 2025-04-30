@@ -58,7 +58,7 @@ type ServiceCustomField struct {
 	DataType     ServiceCustomFieldDataType `json:"data_type"`
 	FieldType    ServiceCustomFieldType     `json:"field_type"`
 	DefaultValue interface{}                `json:"default_value,omitempty"`
-	Enabled      bool                       `json:"enabled,omitempty"`
+	Enabled      bool                       `json:"enabled"`
 	FieldOptions []ServiceCustomFieldOption `json:"field_options,omitempty"`
 	CreatedAt    string                     `json:"created_at,omitempty"`
 	UpdatedAt    string                     `json:"updated_at,omitempty"`
