@@ -28,7 +28,7 @@ func (c *Client) GetServiceCustomFieldValues(ctx context.Context, serviceID stri
 		"X-EARLY-ACCESS": "service-custom-fields-preview",
 	}
 
-	resp, err := c.get(ctx, "/services/"+serviceID+"/custom_fields", headers)
+	resp, err := c.get(ctx, "/services/"+serviceID+"/custom_fields/values", headers)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (c *Client) UpdateServiceCustomFieldValues(ctx context.Context, serviceID s
 		"X-EARLY-ACCESS": "service-custom-fields-preview",
 	}
 
-	resp, err := c.put(ctx, "/services/"+serviceID+"/custom_fields", customFields, headers)
+	resp, err := c.put(ctx, "/services/"+serviceID+"/custom_fields/values", customFields, headers)
 	if err != nil {
 		return nil, err
 	}
