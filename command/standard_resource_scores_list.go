@@ -7,7 +7,6 @@ import (
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type StandardListResourceScores struct {
@@ -57,7 +56,7 @@ func (c *StandardListResourceScores) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		data, err := yaml.Marshal(res)
+		data, err := c.Marshaler(res)
 		if err != nil {
 			log.Error(err)
 			return -1
