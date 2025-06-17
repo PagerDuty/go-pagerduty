@@ -10,12 +10,16 @@ const analyticsResponderBaseURL = "/analytics/metrics/responders"
 type AnalyticsResponderRequest struct {
 	Filters  *AnalyticsResponderFilter `json:"filters,omitempty"`
 	TimeZone string                    `json:"time_zone,omitempty"`
+	Order    string                    `json:"order,omitempty"`
+	OrderBy  string                    `json:"order_by,omitempty"`
 }
 
 type AnalyticsResponderResponse struct {
 	Data     []AnalyticsResponderData  `json:"data,omitempty"`
 	Filters  *AnalyticsResponderFilter `json:"filters,omitempty"`
 	TimeZone string                    `json:"time_zone,omitempty"`
+	Order    string                    `json:"order,omitempty"`
+	OrderBy  string                    `json:"order_by,omitempty"`
 }
 
 type AnalyticsResponderFilter struct {
