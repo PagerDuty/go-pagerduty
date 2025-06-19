@@ -523,6 +523,11 @@ func (c *Client) delete(ctx context.Context, path string) (*http.Response, error
 	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
 
+// deleteWithHeaders is like delete but allows passing custom headers
+func (c *Client) deleteWithHeaders(ctx context.Context, path string, headers map[string]string) (*http.Response, error) {
+	return c.do(ctx, http.MethodDelete, path, nil, headers)
+}
+
 func (c *Client) put(ctx context.Context, path string, payload interface{}, headers map[string]string) (*http.Response, error) {
 	if payload != nil {
 		data, err := json.Marshal(payload)
