@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -76,6 +77,7 @@ type ServiceRuleActions struct {
 }
 
 // Service represents something you monitor (like a web service, email service, or database service).
+// Do not update this struct without also updating serviceToMarshal!
 type Service struct {
 	APIObject
 	Name                             string                            `json:"name,omitempty"`
@@ -98,6 +100,86 @@ type Service struct {
 	ResponsePlay                     *APIObject                        `json:"response_play,omitempty"`
 	Addons                           []Addon                           `json:"addons,omitempty"`
 	AutoPauseNotificationsParameters *AutoPauseNotificationsParameters `json:"auto_pause_notifications_parameters,omitempty"`
+}
+
+// A Service that is going to be marshaled.
+// Do not update this struct without also updating Service!
+type serviceToMarshal struct {
+	APIObject
+	Name                             string                            `json:"name,omitempty"`
+	Description                      string                            `json:"description,omitempty"`
+	AutoResolveTimeout               *uint                             `json:"auto_resolve_timeout,omitempty"`
+	AcknowledgementTimeout           *uint                             `json:"acknowledgement_timeout,omitempty"`
+	CreateAt                         string                            `json:"created_at,omitempty"`
+	Status                           string                            `json:"status,omitempty"`
+	LastIncidentTimestamp            string                            `json:"last_incident_timestamp,omitempty"`
+	Integrations                     []Integration                     `json:"integrations,omitempty"`
+	EscalationPolicy                 EscalationPolicy                  `json:"escalation_policy,omitempty"`
+	Teams                            []Team                            `json:"teams,omitempty"`
+	IncidentUrgencyRule              *IncidentUrgencyRule              `json:"incident_urgency_rule,omitempty"`
+	SupportHours                     *SupportHours                     `json:"support_hours,omitempty"`
+	// Because of the logic in MarshalJSON, ScheduledActions cannot have omitempty.
+	ScheduledActions                 []ScheduledAction                 `json:"scheduled_actions"`
+	AlertCreation                    string                            `json:"alert_creation,omitempty"`
+	AlertGrouping                    string                            `json:"alert_grouping,omitempty"`
+	AlertGroupingTimeout             *uint                             `json:"alert_grouping_timeout,omitempty"`
+	AlertGroupingParameters          *AlertGroupingParameters          `json:"alert_grouping_parameters,omitempty"`
+	ResponsePlay                     *APIObject                        `json:"response_play,omitempty"`
+	Addons                           []Addon                           `json:"addons,omitempty"`
+	AutoPauseNotificationsParameters *AutoPauseNotificationsParameters `json:"auto_pause_notifications_parameters,omitempty"`
+}
+
+func (s Service) MarshalJSON() ([]byte, error) {
+	// Marshal and unmarshal the Service so that we can get the data that would be written to the wire.
+	sm := serviceToMarshal{
+		APIObject: s.APIObject,
+		Name: s.Name,
+		Description: s.Description,
+		AutoResolveTimeout: s.AutoResolveTimeout,
+		AcknowledgementTimeout: s.AcknowledgementTimeout,
+		CreateAt: s.CreateAt,
+		Status: s.Status,
+		LastIncidentTimestamp: s.LastIncidentTimestamp,
+		Integrations: s.Integrations,
+		EscalationPolicy: s.EscalationPolicy,
+		Teams: s.Teams,
+		IncidentUrgencyRule: s.IncidentUrgencyRule,
+		SupportHours: s.SupportHours,
+		ScheduledActions: s.ScheduledActions,
+		AlertCreation: s.AlertCreation,
+		AlertGrouping: s.AlertGrouping,
+		AlertGroupingTimeout: s.AlertGroupingTimeout,
+		AlertGroupingParameters: s.AlertGroupingParameters,
+		ResponsePlay: s.ResponsePlay,
+		Addons: s.Addons,
+		AutoPauseNotificationsParameters: s.AutoPauseNotificationsParameters,
+	}
+
+	sb, err := json.Marshal(sm)
+	if err != nil {
+		return nil, err
+	}
+
+	sd := map[string]interface{}{}
+	err = json.Unmarshal(sb, &sd)
+	if err != nil {
+		return nil, err
+	}
+
+	// If support_hours is specified, scheduled_actions also has to be specified.
+	if sd["support_hours"] != nil {
+		if sd["scheduled_actions"] == nil {
+			// This marshalls to JSON's "null".
+			sd["scheduled_actions"] = interface{}(nil)
+		}
+	// Otherwise, enforce Service.ScheduledActions's omitempty behavior.
+	} else if sd["scheduled_actions"] == nil {
+		delete(sd, "scheduled_actions")
+	} else if v, ok := sd["scheduled_actions"].([]interface{}); ok && len(v) == 0 {
+		delete(sd, "scheduled_actions")
+	}
+
+	return json.Marshal(sd)
 }
 
 // AutoPauseNotificationsParameters defines how alerts on the service will be automatically paused
