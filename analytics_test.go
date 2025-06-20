@@ -141,6 +141,50 @@ func TestAnalytics_GetAggregatedTeamData(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+func TestAnalytics_GetAggregatedEscalationPolicyData(t *testing.T) {
+	setup()
+	defer teardown()
+
+	analyticsRequest := AnalyticsRequest{
+		Filters: &AnalyticsFilter{
+			CreatedAtStart:      "2021-01-01T15:00:32Z",
+			CreatedAtEnd:        "2021-01-08T15:00:32Z",
+			EscalationPolicyIDs: []string{"PCDYDX0"},
+		},
+		AggregateUnit: "day",
+		TimeZone:      "Etc/UTC",
+	}
+	analyticsDataWanted := AnalyticsData{MeanAssignmentCount: 1, MeanEngagedSeconds: 502, MeanEngagedUserCount: 0, MeanSecondsToResolve: 34550, MeanSecondsToFirstAck: 70, TotalBusinessHourInterruptions: 1, TotalEngagedSeconds: 2514, TotalIncidentCount: 5, RangeStart: "2021-01-06T00:00:00.000000", EscalationPolicyID: "PCDYDX0", EscalationPolicyName: "FooEscalationPolicy", UpTimePct: 89.86111111111111}
+	analyticsFilterWanted := AnalyticsFilter{CreatedAtStart: "2021-01-06T09:21:41Z", CreatedAtEnd: "2021-01-13T09:21:41Z", EscalationPolicyIDs: []string{"PCDYDX0"}}
+	analyticsResponse := AnalyticsResponse{
+		Data:          []AnalyticsData{analyticsDataWanted},
+		Filters:       &analyticsFilterWanted,
+		AggregateUnit: "day",
+		TimeZone:      "Etc/UTC",
+	}
+	bytesAnalyticsResponse, err := json.Marshal(analyticsResponse)
+	testErrCheck(t, "json.Marshal()", "", err)
+
+	mux.HandleFunc("/analytics/metrics/incidents/escalation_policies", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		_, _ = w.Write(bytesAnalyticsResponse)
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.GetAggregatedEscalationPolicyData(context.Background(), analyticsRequest)
+	want := AnalyticsResponse{
+		Data:          []AnalyticsData{analyticsDataWanted},
+		Filters:       &analyticsFilterWanted,
+		AggregateUnit: "day",
+		TimeZone:      "Etc/UTC",
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 func TestAnalytics_GetAnalyticsIncidentsById(t *testing.T) {
 	setup()
 	defer teardown()

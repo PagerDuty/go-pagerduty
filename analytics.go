@@ -52,14 +52,18 @@ type AnalyticsRawIncidentsResponse struct {
 // AnalyticsFilter represents the set of filters as part of the request to PagerDuty when
 // requesting analytics.
 type AnalyticsFilter struct {
-	CreatedAtStart string   `json:"created_at_start,omitempty"`
-	CreatedAtEnd   string   `json:"created_at_end,omitempty"`
-	Urgency        string   `json:"urgency,omitempty"`
-	Major          bool     `json:"major,omitempty"`
-	ServiceIDs     []string `json:"service_ids,omitempty"`
-	TeamIDs        []string `json:"team_ids,omitempty"`
-	PriorityIDs    []string `json:"priority_ids,omitempty"`
-	PriorityNames  []string `json:"priority_names,omitempty"`
+	CreatedAtStart        string   `json:"created_at_start,omitempty"`
+	CreatedAtEnd          string   `json:"created_at_end,omitempty"`
+	Urgency               string   `json:"urgency,omitempty"`
+	Major                 bool     `json:"major,omitempty"`
+	MinAcknowledgements   int      `json:"min_acknowledgements,omitempty"`
+	MinTimeoutEscalations int      `json:"min_timeout_escalations,omitempty"`
+	MinManualEscalations  int      `json:"min_manual_escalations,omitempty"`
+	TeamIDs               []string `json:"team_ids,omitempty"`
+	ServiceIDs            []string `json:"service_ids,omitempty"`
+	EscalationPolicyIDs   []string `json:"escalation_policy_ids,omitempty"`
+	PriorityIDs           []string `json:"priority_ids,omitempty"`
+	PriorityNames         []string `json:"priority_names,omitempty"`
 }
 
 // AnalyticsData represents the structure of the aggregated analytics we have available.
@@ -68,6 +72,8 @@ type AnalyticsData struct {
 	ServiceName                    string  `json:"service_name,omitempty"`
 	TeamID                         string  `json:"team_id,omitempty"`
 	TeamName                       string  `json:"team_name,omitempty"`
+	EscalationPolicyID             string  `json:"escalation_policy_id,omitempty"`
+	EscalationPolicyName           string  `json:"escalation_policy_name,omitempty"`
 	MeanSecondsToResolve           int     `json:"mean_seconds_to_resolve,omitempty"`
 	MeanSecondsToFirstAck          int     `json:"mean_seconds_to_first_ack,omitempty"`
 	MeanSecondsToEngage            int     `json:"mean_seconds_to_engage,omitempty"`
@@ -153,6 +159,11 @@ func (c *Client) GetAggregatedServiceData(ctx context.Context, analytics Analyti
 // GetAggregatedTeamData gets the aggregated team analytics for the requested data.
 func (c *Client) GetAggregatedTeamData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
 	return c.getAggregatedData(ctx, analytics, "teams")
+}
+
+// GetAggregatedEscalationPolicyData gets the aggregated escalation policy analytics for the requested data.
+func (c *Client) GetAggregatedEscalationPolicyData(ctx context.Context, analytics AnalyticsRequest) (AnalyticsResponse, error) {
+	return c.getAggregatedData(ctx, analytics, "escalation_policies")
 }
 
 func (c *Client) getAggregatedData(ctx context.Context, analytics AnalyticsRequest, endpoint string) (AnalyticsResponse, error) {
