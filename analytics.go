@@ -64,6 +64,7 @@ type AnalyticsFilter struct {
 	EscalationPolicyIDs   []string `json:"escalation_policy_ids,omitempty"`
 	PriorityIDs           []string `json:"priority_ids,omitempty"`
 	PriorityNames         []string `json:"priority_names,omitempty"`
+	PDAdvanceUsed         bool     `json:"pd_advance_used,omitempty"`
 }
 
 // AnalyticsData represents the structure of the aggregated analytics we have available.
