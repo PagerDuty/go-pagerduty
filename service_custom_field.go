@@ -52,14 +52,14 @@ type ServiceCustomFieldOption struct {
 // ServiceCustomField represents a custom field for services
 type ServiceCustomField struct {
 	APIObject
-	Name         string                     `json:"name"`
+	Name         string                     `json:"name,omitempty"`
 	DisplayName  string                     `json:"display_name"`
-	Description  string                     `json:"description,omitempty"`
-	DataType     ServiceCustomFieldDataType `json:"data_type"`
-	FieldType    ServiceCustomFieldType     `json:"field_type"`
-	DefaultValue interface{}                `json:"default_value,omitempty"`
 	Enabled      bool                       `json:"enabled"`
+	DataType     ServiceCustomFieldDataType `json:"data_type,omitempty"`
+	DefaultValue interface{}                `json:"default_value,omitempty"`
+	Description  string                     `json:"description,omitempty"`
 	FieldOptions []ServiceCustomFieldOption `json:"field_options,omitempty"`
+	FieldType    ServiceCustomFieldType     `json:"field_type,omitempty"`
 	CreatedAt    string                     `json:"created_at,omitempty"`
 	UpdatedAt    string                     `json:"updated_at,omitempty"`
 }
@@ -155,11 +155,14 @@ func (c *Client) UpdateServiceCustomField(ctx context.Context, field *ServiceCus
 		"X-EARLY-ACCESS": "service-custom-fields-preview",
 	}
 
+	id := field.ID
+	field.ID = ""
+
 	d := map[string]interface{}{
 		"field": field,
 	}
 
-	resp, err := c.put(ctx, "/services/custom_fields/"+field.ID, d, headers)
+	resp, err := c.put(ctx, "/services/custom_fields/"+id, d, headers)
 	if err != nil {
 		return nil, err
 	}
