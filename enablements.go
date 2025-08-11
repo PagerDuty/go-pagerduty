@@ -3,7 +3,6 @@ package pagerduty
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -28,6 +27,18 @@ type EnablementResponse struct {
 type ListEnablementsResponse struct {
 	Enablements []Enablement `json:"enablements,omitempty"`
 	Warnings    []string     `json:"warnings,omitempty"`
+}
+
+// EnablementWithWarnings represents an enablement with associated API warnings
+type EnablementWithWarnings struct {
+	Enablement *Enablement
+	Warnings   []string
+}
+
+// EnablementsWithWarnings represents multiple enablements with associated API warnings
+type EnablementsWithWarnings struct {
+	Enablements []Enablement
+	Warnings    []string
 }
 
 // validateEntityID validates that the entity ID is not empty
@@ -82,14 +93,6 @@ func validateEnablementRequest(req *EnablementRequest) error {
 	return validateFeatureName(req.Enablement.Feature)
 }
 
-// handleAPIWarnings logs warnings from API responses without treating them as errors
-func handleAPIWarnings(warnings []string) {
-	if len(warnings) > 0 {
-		for _, warning := range warnings {
-			log.Printf("[WARN] PagerDuty API warning: %s", warning)
-		}
-	}
-}
 
 // getEnablementPath constructs the API path for enablements based on entity type
 func getEnablementPath(entityType, entityID string) (string, error) {
@@ -170,44 +173,75 @@ func handleEnablementError(err error, operation, entityType, entityID string) er
 		operation, entityType, entityID, err)
 }
 
-// getEnablementsFromResponse processes the response from list enablements API
-func getEnablementsFromResponse(c *Client, resp *http.Response, err error, entityType, entityID string) ([]Enablement, error) {
+
+// getEnablementsFromResponseWithWarnings processes the response from list enablements API and returns warnings
+func getEnablementsFromResponseWithWarnings(c *Client, resp *http.Response, err error, entityType, entityID string) ([]Enablement, []string, error) {
 	if err != nil {
-		return nil, handleEnablementError(err, "listing", entityType, entityID)
+		return nil, nil, handleEnablementError(err, "listing", entityType, entityID)
 	}
 
 	var target ListEnablementsResponse
 	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, handleEnablementError(
+		return nil, nil, handleEnablementError(
 			fmt.Errorf("could not decode JSON response: %w", dErr),
 			"listing", entityType, entityID)
 	}
 
-	// Handle warnings without failing the operation
-	handleAPIWarnings(target.Warnings)
-
-	return target.Enablements, nil
+	// Return warnings to caller instead of logging them
+	return target.Enablements, target.Warnings, nil
 }
 
-// getEnablementFromResponse processes the response from update enablement API
-func getEnablementFromResponse(c *Client, resp *http.Response, err error, entityType, entityID, feature string) (*Enablement, error) {
+
+// getEnablementFromResponseWithWarnings processes the response from update enablement API and returns warnings
+func getEnablementFromResponseWithWarnings(c *Client, resp *http.Response, err error, entityType, entityID, feature string) (*Enablement, []string, error) {
 	if err != nil {
-		return nil, handleEnablementError(err, "updating", entityType, entityID)
+		return nil, nil, handleEnablementError(err, "updating", entityType, entityID)
 	}
 
-	var target EnablementResponse
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, handleEnablementError(
+	// Different API endpoints use different response formats:
+	// - Service endpoints return {"enablements": [...]}
+	// - Event orchestration endpoints return {"enablement": {...}}
+
+	var dErr error
+	// Based on entity type, try the appropriate parsing method first
+	if entityType == "event_orchestration" {
+		// Try parsing as single enablement response (event orchestrations)
+		var singleTarget EnablementResponse
+		dErr = c.decodeJSON(resp, &singleTarget)
+		if dErr == nil && singleTarget.Enablement.Feature == feature {
+			// Event orchestration responses don't include warnings in the single format
+			return &singleTarget.Enablement, []string{}, nil
+		}
+	}
+
+	if entityType == "service" {
+		// Try parsing as array response (services)
+		var listTarget ListEnablementsResponse
+		dErr = c.decodeJSON(resp, &listTarget)
+		if dErr == nil {
+			// Find the matching enablement in the list
+			for _, enablement := range listTarget.Enablements {
+				if enablement.Feature == feature {
+					// Return warnings to caller instead of logging them
+					return &enablement, listTarget.Warnings, nil
+				}
+			}
+		}
+	}
+
+	if dErr != nil {
+		return nil, nil, handleEnablementError(
 			fmt.Errorf("could not decode JSON response: %w", dErr),
 			"updating", entityType, entityID)
 	}
 
-	return &target.Enablement, nil
+	return nil, nil, handleEnablementError(
+		fmt.Errorf("enablement %s not found in API response", feature),
+		"updating", entityType, entityID)
 }
 
-
 // ListServiceEnablementsWithContext lists all enablements for a service.
-func (c *Client) ListServiceEnablementsWithContext(ctx context.Context, serviceID string) ([]Enablement, error) {
+func (c *Client) ListServiceEnablementsWithContext(ctx context.Context, serviceID string) (*EnablementsWithWarnings, error) {
 	if err := validateEntityID(serviceID); err != nil {
 		return nil, handleEnablementError(err, "listing", "service", serviceID)
 	}
@@ -218,12 +252,19 @@ func (c *Client) ListServiceEnablementsWithContext(ctx context.Context, serviceI
 	}
 
 	resp, err := c.get(ctx, path, nil)
-	return getEnablementsFromResponse(c, resp, err, "service", serviceID)
+	enablements, warnings, err := getEnablementsFromResponseWithWarnings(c, resp, err, "service", serviceID)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &EnablementsWithWarnings{
+		Enablements: enablements,
+		Warnings:    warnings,
+	}, nil
 }
 
-
 // ListEventOrchestrationEnablementsWithContext lists all enablements for an event orchestration.
-func (c *Client) ListEventOrchestrationEnablementsWithContext(ctx context.Context, orchestrationID string) ([]Enablement, error) {
+func (c *Client) ListEventOrchestrationEnablementsWithContext(ctx context.Context, orchestrationID string) (*EnablementsWithWarnings, error) {
 	if err := validateEntityID(orchestrationID); err != nil {
 		return nil, handleEnablementError(err, "listing", "event_orchestration", orchestrationID)
 	}
@@ -234,12 +275,19 @@ func (c *Client) ListEventOrchestrationEnablementsWithContext(ctx context.Contex
 	}
 
 	resp, err := c.get(ctx, path, nil)
-	return getEnablementsFromResponse(c, resp, err, "event_orchestration", orchestrationID)
+	enablements, warnings, err := getEnablementsFromResponseWithWarnings(c, resp, err, "event_orchestration", orchestrationID)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &EnablementsWithWarnings{
+		Enablements: enablements,
+		Warnings:    warnings,
+	}, nil
 }
 
-
 // UpdateServiceEnablementWithContext updates a specific enablement for a service.
-func (c *Client) UpdateServiceEnablementWithContext(ctx context.Context, serviceID, feature string, enabled bool) (*Enablement, error) {
+func (c *Client) UpdateServiceEnablementWithContext(ctx context.Context, serviceID, feature string, enabled bool) (*EnablementWithWarnings, error) {
 	if err := validateEntityID(serviceID); err != nil {
 		return nil, handleEnablementError(err, "updating", "service", serviceID)
 	}
@@ -265,12 +313,19 @@ func (c *Client) UpdateServiceEnablementWithContext(ctx context.Context, service
 	}
 
 	resp, err := c.put(ctx, path, req, nil)
-	return getEnablementFromResponse(c, resp, err, "service", serviceID, feature)
+	enablement, warnings, err := getEnablementFromResponseWithWarnings(c, resp, err, "service", serviceID, feature)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &EnablementWithWarnings{
+		Enablement: enablement,
+		Warnings:   warnings,
+	}, nil
 }
 
-
 // UpdateEventOrchestrationEnablementWithContext updates a specific enablement for an event orchestration.
-func (c *Client) UpdateEventOrchestrationEnablementWithContext(ctx context.Context, orchestrationID, feature string, enabled bool) (*Enablement, error) {
+func (c *Client) UpdateEventOrchestrationEnablementWithContext(ctx context.Context, orchestrationID, feature string, enabled bool) (*EnablementWithWarnings, error) {
 	if err := validateEntityID(orchestrationID); err != nil {
 		return nil, handleEnablementError(err, "updating", "event_orchestration", orchestrationID)
 	}
@@ -296,6 +351,13 @@ func (c *Client) UpdateEventOrchestrationEnablementWithContext(ctx context.Conte
 	}
 
 	resp, err := c.put(ctx, path, req, nil)
-	return getEnablementFromResponse(c, resp, err, "event_orchestration", orchestrationID, feature)
+	enablement, warnings, err := getEnablementFromResponseWithWarnings(c, resp, err, "event_orchestration", orchestrationID, feature)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &EnablementWithWarnings{
+		Enablement: enablement,
+		Warnings:   warnings,
+	}, nil
 }
-

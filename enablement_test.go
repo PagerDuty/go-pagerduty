@@ -62,14 +62,34 @@ const (
 		"warnings": ["You can't use AIOps functionality with this Orchestration because your account hasn't purchased AIOps"]
 	}`
 
-	mockUpdateEnablementSuccessResponse = `{
+	// Service enablement update response (uses list format)
+	mockServiceUpdateEnablementSuccessResponse = `{
+		"enablements": [
+			{
+				"feature": "aiops",
+				"enabled": false
+			}
+		]
+	}`
+
+	mockServiceUpdateEnablementEnabledResponse = `{
+		"enablements": [
+			{
+				"feature": "aiops",
+				"enabled": true
+			}
+		]
+	}`
+
+	// Event orchestration enablement update response (uses single format)
+	mockEventOrchestrationUpdateEnablementSuccessResponse = `{
 		"enablement": {
 			"feature": "aiops",
 			"enabled": false
 		}
 	}`
 
-	mockUpdateEnablementEnabledResponse = `{
+	mockEventOrchestrationUpdateEnablementEnabledResponse = `{
 		"enablement": {
 			"feature": "aiops",
 			"enabled": true
@@ -123,11 +143,14 @@ func TestService_ListEnablements(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListServiceEnablementsWithContext(context.Background(), testServiceID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -136,7 +159,7 @@ func TestService_ListEnablements(t *testing.T) {
 	testEqual(t, want, res)
 }
 
-// ListServiceEnablements - Success Response with Warning (warnings are logged, not returned in result)
+// ListServiceEnablements - Success Response with Warning (warnings are now returned in result)
 func TestService_ListEnablementsWithWarning(t *testing.T) {
 	setup()
 	defer teardown()
@@ -150,11 +173,14 @@ func TestService_ListEnablementsWithWarning(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListServiceEnablementsWithContext(context.Background(), testServiceID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: []string{"Your account is not entitled to use AIOps features for this Service."},
 	}
 
 	if err != nil {
@@ -177,11 +203,14 @@ func TestService_ListEnablementsDisabled(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListServiceEnablementsWithContext(context.Background(), testServiceID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: false,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: false,
+			},
 		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -258,15 +287,18 @@ func TestService_UpdateEnablement(t *testing.T) {
 	mux.HandleFunc("/services/"+testServiceID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementSuccessResponse))
+		_, _ = w.Write([]byte(mockServiceUpdateEnablementSuccessResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateServiceEnablementWithContext(context.Background(), testServiceID, testEnablementFeatureAIOps, false)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: false,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: false,
+		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -283,15 +315,18 @@ func TestService_UpdateEnablementEnable(t *testing.T) {
 	mux.HandleFunc("/services/"+testServiceID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementEnabledResponse))
+		_, _ = w.Write([]byte(mockServiceUpdateEnablementEnabledResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateServiceEnablementWithContext(context.Background(), testServiceID, testEnablementFeatureAIOps, true)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: true,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: true,
+		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -400,11 +435,14 @@ func TestEventOrchestration_ListEnablements(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListEventOrchestrationEnablementsWithContext(context.Background(), testEventOrchestrationID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -427,11 +465,14 @@ func TestEventOrchestration_ListEnablementsWithWarning(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListEventOrchestrationEnablementsWithContext(context.Background(), testEventOrchestrationID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: []string{"You can't use AIOps functionality with this Orchestration because your account hasn't purchased AIOps"},
 	}
 
 	if err != nil {
@@ -508,15 +549,18 @@ func TestEventOrchestration_UpdateEnablement(t *testing.T) {
 	mux.HandleFunc("/event_orchestrations/"+testEventOrchestrationID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementSuccessResponse))
+		_, _ = w.Write([]byte(mockEventOrchestrationUpdateEnablementSuccessResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateEventOrchestrationEnablementWithContext(context.Background(), testEventOrchestrationID, testEnablementFeatureAIOps, false)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: false,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: false,
+		},
+		Warnings: []string{},
 	}
 
 	if err != nil {
@@ -533,15 +577,18 @@ func TestEventOrchestration_UpdateEnablementEnable(t *testing.T) {
 	mux.HandleFunc("/event_orchestrations/"+testEventOrchestrationID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementEnabledResponse))
+		_, _ = w.Write([]byte(mockEventOrchestrationUpdateEnablementEnabledResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateEventOrchestrationEnablementWithContext(context.Background(), testEventOrchestrationID, testEnablementFeatureAIOps, true)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: true,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: true,
+		},
+		Warnings: []string{},
 	}
 
 	if err != nil {
@@ -650,11 +697,14 @@ func TestService_ListEnablementsWithContext(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListServiceEnablementsWithContext(context.Background(), testServiceID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -670,15 +720,18 @@ func TestService_UpdateEnablementWithContext(t *testing.T) {
 	mux.HandleFunc("/services/"+testServiceID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementSuccessResponse))
+		_, _ = w.Write([]byte(mockServiceUpdateEnablementSuccessResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateServiceEnablementWithContext(context.Background(), testServiceID, testEnablementFeatureAIOps, false)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: false,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: false,
+		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -700,11 +753,14 @@ func TestEventOrchestration_ListEnablementsWithContext(t *testing.T) {
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.ListEventOrchestrationEnablementsWithContext(context.Background(), testEventOrchestrationID)
 
-	want := []Enablement{
-		{
-			Feature: testEnablementFeatureAIOps,
-			Enabled: true,
+	want := &EnablementsWithWarnings{
+		Enablements: []Enablement{
+			{
+				Feature: testEnablementFeatureAIOps,
+				Enabled: true,
+			},
 		},
+		Warnings: nil,
 	}
 
 	if err != nil {
@@ -720,15 +776,18 @@ func TestEventOrchestration_UpdateEnablementWithContext(t *testing.T) {
 	mux.HandleFunc("/event_orchestrations/"+testEventOrchestrationID+"/enablements/"+testEnablementFeatureAIOps, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(mockUpdateEnablementSuccessResponse))
+		_, _ = w.Write([]byte(mockEventOrchestrationUpdateEnablementSuccessResponse))
 	})
 
 	client := defaultTestClient(server.URL, "foo")
 	res, err := client.UpdateEventOrchestrationEnablementWithContext(context.Background(), testEventOrchestrationID, testEnablementFeatureAIOps, false)
 
-	want := &Enablement{
-		Feature: testEnablementFeatureAIOps,
-		Enabled: false,
+	want := &EnablementWithWarnings{
+		Enablement: &Enablement{
+			Feature: testEnablementFeatureAIOps,
+			Enabled: false,
+		},
+		Warnings: []string{},
 	}
 
 	if err != nil {
