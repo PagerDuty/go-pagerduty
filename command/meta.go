@@ -102,8 +102,14 @@ func (m *Meta) loadConfig() error {
 	if err := yaml.Unmarshal(data, other); err != nil {
 		return err
 	}
+	// precedence:
+	// 1. CLI flag
+	// 2. environment variable
+	// 3. config file
 	if m.Authtoken == "" {
-		m.Authtoken = other.Authtoken
+		if m.Authtoken = os.Getenv("PAGERDUTY_API_KEY"); m.Authtoken == "" {
+			m.Authtoken = other.Authtoken
+		}
 	}
 	if m.Loglevel == "" {
 		m.Loglevel = other.Loglevel
