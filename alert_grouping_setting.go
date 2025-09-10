@@ -17,8 +17,9 @@ type AlertGroupingSettingConfigTime struct {
 // AlertGroupingSettingConfigIntelligent is the configuration content for a
 // AlertGroupingSetting of type "intelligent"
 type AlertGroupingSettingConfigIntelligent struct {
-	TimeWindow            uint  `json:"time_window"`
-	RecommendedTimeWindow *uint `json:"recommended_time_window,omitempty"`
+	TimeWindow            uint     `json:"time_window"`
+	RecommendedTimeWindow *uint    `json:"recommended_time_window,omitempty"`
+	IagFields             []string `json:"iag_fields"`
 }
 
 // AlertGroupingSettingConfigContentBased is the configuration content for a
