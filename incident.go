@@ -2,6 +2,7 @@ package pagerduty
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/go-querystring/query"
@@ -47,8 +48,8 @@ type ResolveReason struct {
 
 // IncidentBody is the datastructure containing data describing the incident.
 type IncidentBody struct {
-	Type    string `json:"type,omitempty"`
-	Details string `json:"details,omitempty"`
+	Type    string          `json:"type,omitempty"`
+	Details json.RawMessage `json:"details,omitempty"`
 }
 
 // Assignee is an individual assigned to an incident.
