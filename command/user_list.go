@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 

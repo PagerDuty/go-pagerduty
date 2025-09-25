@@ -795,5 +795,3 @@ func TestEventOrchestration_UpdateEnablementWithContext(t *testing.T) {
 	}
 	testEqual(t, want, res)
 }
-
-

@@ -39,7 +39,7 @@ func (c *AnalyticsServiceShow) Synopsis() string {
 	return "Get aggregated service data analytics"
 }
 
-//Run executes analytics cli command and displays service analytics for the requested data.
+// Run executes analytics cli command and displays service analytics for the requested data.
 func (c *AnalyticsServiceShow) Run(args []string) int {
 	flags := c.Meta.FlagSet("analytics service show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
