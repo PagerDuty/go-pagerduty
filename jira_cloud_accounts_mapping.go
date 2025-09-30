@@ -38,6 +38,7 @@ type JiraCloudAccountsMappingRule struct {
 	AutocreateJqlDisabledReason string                             `json:"autocreate_jql_disabled_reason,omitempty"`
 	AutocreateJqlDisabledUntil  string                             `json:"autocreate_jql_disabled_until,omitempty"`
 	Config                      JiraCloudAccountsMappingRuleConfig `json:"config"`
+	Enabled                     *bool                              `json:"enabled,omitempty"`
 	ID                          string                             `json:"id,omitempty"`
 	Name                        string                             `json:"name"`
 	CreatedAt                   string                             `json:"created_at,omitempty"`
@@ -248,8 +249,9 @@ func (c *Client) DeleteJiraCloudAccountsMappingRule(ctx context.Context, id, rul
 // updateJiraCloudAccountsMappingRuleBody is the body for the call to the
 // UpdateJiraCloudAccountsMappingRule API endpoint
 type updateJiraCloudAccountsMappingRuleBody struct {
-	Config updateJiraCloudAccountsMappingRuleConfig `json:"config"`
-	Name   string                                   `json:"name"`
+	Config  updateJiraCloudAccountsMappingRuleConfig `json:"config"`
+	Enabled *bool                                    `json:"enabled,omitempty"`
+	Name    string                                   `json:"name"`
 }
 
 // updateJiraCloudAccountsMappingRuleOptionsConfig is an special representation
@@ -284,7 +286,8 @@ func (c *Client) UpdateJiraCloudAccountsMappingRule(ctx context.Context, account
 				SyncNotesUser:                rule.Config.Jira.SyncNotesUser,
 			},
 		},
-		Name: rule.Name,
+		Enabled: rule.Enabled,
+		Name:    rule.Name,
 	}
 
 	resp, err := c.put(ctx, "/integration-jira-cloud/accounts_mappings/"+accountMappingID+"/rules/"+rule.ID, o, nil)
