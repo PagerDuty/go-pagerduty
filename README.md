@@ -20,7 +20,8 @@ go get github.com/PagerDuty/go-pagerduty@latest
 ### CLI
 
 The CLI requires an [authentication token](https://v2.developer.pagerduty.com/docs/authentication), which can be specified in `.pd.yml`
-file in the home directory of the user, or passed as a command-line argument.
+file in the home directory of the user, set in the `PAGERDUTY_API_KEY` environment variable, or passed as a command-line argument.
+
 Example of config file:
 
 ```yaml
@@ -30,7 +31,10 @@ authtoken: fooBar
 
 #### Commands
 `pd` command provides a single entrypoint for all the API endpoints, with individual
-API represented by their own sub commands. For an exhaustive list of sub-commands, try:
+API represented by their own sub commands. It requires an API token; you can provide
+this in the environment variable `PAGERDUTY_API_KEY`, or via the `-authtoken` flag.
+
+For an exhaustive list of sub-commands, try:
 ```
 pd --help
 ```
