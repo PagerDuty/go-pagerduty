@@ -145,6 +145,7 @@ type ListServiceOptions struct {
 	SortBy   string   `url:"sort_by,omitempty"`
 	Query    string   `url:"query,omitempty"`
 	Includes []string `url:"include,omitempty,brackets"`
+	Name     string   `url:"name,omitempty"`
 }
 
 // ListServiceResponse is the data structure returned from calling the ListServices API endpoint.
