@@ -41,7 +41,7 @@ func (c *AnalyticsShow) Synopsis() string {
 	return "Get aggregated incident data analytics"
 }
 
-//Run executes analytics cli command and displays incident analytics for the requested data.
+// Run executes analytics cli command and displays incident analytics for the requested data.
 func (c *AnalyticsShow) Run(args []string) int {
 	flags := c.Meta.FlagSet("analytics incident show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
