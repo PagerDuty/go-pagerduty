@@ -378,6 +378,9 @@ func WithOAuth() ClientOptions {
 	}
 }
 
+// WithScopedOAuthApp creates a client using Scoped OAuth with string-based scopes.
+//
+// This function does not validate that the scopes are appropriate for Scoped OAuth.
 func WithScopedOAuthApp(ctx context.Context, clientId string, clientSecret string, scopes []string) ClientOptions {
 	ts := baseTokenSource(ctx, clientId, clientSecret, scopes)
 
@@ -387,10 +390,35 @@ func WithScopedOAuthApp(ctx context.Context, clientId string, clientSecret strin
 	}
 }
 
+// WithScopedOAuthAppValidated creates a client using Scoped OAuth with string-based scopes,
+// but validates that the scopes are appropriate for Scoped OAuth (not Classic OAuth scopes).
+// Returns an error if validation fails.
+func WithScopedOAuthAppValidated(ctx context.Context, clientID, clientSecret string, scopes []string) (ClientOptions, error) {
+	if err := ValidateScopedOAuthScopes(scopes); err != nil {
+		return nil, err
+	}
+
+	ts := baseTokenSource(ctx, clientID, clientSecret, scopes)
+
+	return func(c *Client) {
+		c.authType = scopedOAuthAppToken
+		c.tokenSource = ts
+	}, nil
+}
+
 func WithScopedOAuthAppTokenSource(tokenSource oauth2.TokenSource) ClientOptions {
 	return func(c *Client) {
 		c.authType = scopedOAuthAppToken
 		c.tokenSource = tokenSource
+	}
+}
+
+// WithClassicOAuth creates a client using Classic OAuth.
+// Classic OAuth only supports broad "read" and "write" scopes.
+func WithClassicOAuth(token string, scopes ...ClassicScope) ClientOptions {
+	return func(c *Client) {
+		c.authType = oauthToken
+		c.authToken = token
 	}
 }
 
