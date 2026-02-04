@@ -82,7 +82,9 @@ type AnalyticsData struct {
 	MeanEngagedSeconds             int     `json:"mean_engaged_seconds,omitempty"`
 	MeanEngagedUserCount           int     `json:"mean_engaged_user_count,omitempty"`
 	TotalEscalationCount           int     `json:"total_escalation_count,omitempty"`
+	TotalIncidentsTimeoutEscalated int     `json:"total_incidents_timeout_escalated,omitempty"`
 	MeanAssignmentCount            int     `json:"mean_assignment_count,omitempty"`
+	TotalInterruptions             int     `json:"total_interruptions,omitempty"`
 	TotalBusinessHourInterruptions int     `json:"total_business_hour_interruptions,omitempty"`
 	TotalSleepHourInterruptions    int     `json:"total_sleep_hour_interruptions,omitempty"`
 	TotalOffHourInterruptions      int     `json:"total_off_hour_interruptions,omitempty"`
