@@ -10,7 +10,7 @@
 
 .PHONY: build
 build: build-deps
-	go build -mod=vendor -o pd ./command
+	go build -mod=vendor -ldflags "-X main.version=$$(git describe --tags --abbrev=0)" -o pd ./command
 
 .PHONY: build-deps
 build-deps:
