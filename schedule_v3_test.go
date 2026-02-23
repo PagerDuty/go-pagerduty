@@ -160,7 +160,7 @@ func TestScheduleV3_List(t *testing.T) {
 	}
 
 	want := &ListSchedulesV3Response{
-		Schedules: []ScheduleV3Reference{
+		Schedules: []APIObject{
 			{
 				ID:      testScheduleV3ID,
 				Type:    "schedule_reference",
@@ -192,7 +192,7 @@ func TestScheduleV3_ListWithQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	want := &ListSchedulesV3Response{Schedules: []ScheduleV3Reference{}}
+	want := &ListSchedulesV3Response{Schedules: []APIObject{}}
 	testEqual(t, want, res)
 }
 

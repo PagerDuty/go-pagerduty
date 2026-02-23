@@ -103,16 +103,7 @@ type scheduleV3Response struct {
 
 // ListSchedulesV3Response is the response for listing v3 schedules.
 type ListSchedulesV3Response struct {
-	Schedules []ScheduleV3Reference `json:"schedules"`
-}
-
-// ScheduleV3Reference is a lightweight reference returned in v3 list responses.
-type ScheduleV3Reference struct {
-	ID      string `json:"id"`
-	Type    string `json:"type"`
-	Summary string `json:"summary"`
-	Self    string `json:"self"`
-	HTMLURL string `json:"html_url"`
+	Schedules []APIObject `json:"schedules"`
 }
 
 // ListSchedulesV3Options are query parameters for listing v3 schedules.
