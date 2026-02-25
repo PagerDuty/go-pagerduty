@@ -85,7 +85,11 @@ func (c *Client) CreateTeam(t *Team) (*Team, error) {
 
 // CreateTeamWithContext creates a new team.
 func (c *Client) CreateTeamWithContext(ctx context.Context, t *Team) (*Team, error) {
-	resp, err := c.post(ctx, "/teams", t, nil)
+	p := map[string]*Team{
+		"team": t,
+	}
+
+	resp, err := c.post(ctx, "/teams", p, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 
@@ -124,7 +128,11 @@ func (c *Client) UpdateTeam(id string, t *Team) (*Team, error) {
 
 // UpdateTeamWithContext updates an existing team.
 func (c *Client) UpdateTeamWithContext(ctx context.Context, id string, t *Team) (*Team, error) {
-	resp, err := c.put(ctx, "/teams/"+id, t, nil)
+	p := map[string]*Team{
+		"team": t,
+	}
+
+	resp, err := c.put(ctx, "/teams/"+id, p, nil)
 	return getTeamFromResponse(c, resp, err)
 }
 
