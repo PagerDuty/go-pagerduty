@@ -119,6 +119,22 @@ func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
 		aeo.Errors = fallback2
 		return aeo, nil
 	}
+	// v3 API returns errors as a map[string][]string (e.g. {"field": ["msg"]})
+	var fallback3 struct {
+		Code    int                 `json:"code,omitempty"`
+		Message string              `json:"message,omitempty"`
+		Errors  map[string][]string `json:"errors,omitempty"`
+	}
+	if json.Unmarshal(data, &fallback3) == nil {
+		aeo.Code = fallback3.Code
+		aeo.Message = fallback3.Message
+		for field, msgs := range fallback3.Errors {
+			for _, msg := range msgs {
+				aeo.Errors = append(aeo.Errors, field+": "+msg)
+			}
+		}
+		return aeo, nil
+	}
 	// still failed, so return the original error
 	return aeo, err
 }
