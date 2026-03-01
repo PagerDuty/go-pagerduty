@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
-
 	pagerduty "github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 )
 
 type ScheduleList struct {
@@ -54,9 +52,8 @@ func (c *ScheduleList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, schedule := range scheduleList.Schedules {
-			fmt.Println("Entry: ", i+1)
-			data, err := yaml.Marshal(schedule)
+		for _, schedule := range scheduleList.Schedules {
+			data, err := c.Marshaler(schedule)
 			if err != nil {
 				log.Error(err)
 				return -1

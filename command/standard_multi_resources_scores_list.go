@@ -8,7 +8,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type StandardListMultiResourcesScores struct {
@@ -65,7 +64,7 @@ func (c *StandardListMultiResourcesScores) Run(args []string) int {
 			if i > 0 {
 				fmt.Println("---")
 			}
-			data, err := yaml.Marshal(r)
+			data, err := c.Marshaler(r)
 			if err != nil {
 				log.Error(err)
 				return -1
