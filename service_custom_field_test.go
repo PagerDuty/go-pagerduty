@@ -411,12 +411,12 @@ func TestServiceCustomFields_Delete(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.WriteHeader(204)
 	})
 

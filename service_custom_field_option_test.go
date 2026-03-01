@@ -13,12 +13,12 @@ func TestServiceCustomFieldOptions_List(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42/field_options", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{
 			"field_options": [
@@ -107,12 +107,12 @@ func TestServiceCustomFieldOptions_Get(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42/field_options/OPT1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{
 			"field_option": {
@@ -155,12 +155,12 @@ func TestServiceCustomFieldOptions_Create(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42/field_options", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		_, _ = w.Write([]byte(`{
@@ -210,12 +210,12 @@ func TestServiceCustomFieldOptions_Update(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42/field_options/OPT1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{
 			"field_option": {
@@ -265,12 +265,12 @@ func TestServiceCustomFieldOptions_Delete(t *testing.T) {
 
 	mux.HandleFunc("/services/custom_fields/PXPGF42/field_options/OPT1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
-		
+
 		// Verify that the X-EARLY-ACCESS header is present with the correct value
 		if r.Header.Get("X-EARLY-ACCESS") != "service-custom-fields-preview" {
 			t.Errorf("Expected X-EARLY-ACCESS header to be 'service-custom-fields-preview', got %s", r.Header.Get("X-EARLY-ACCESS"))
 		}
-		
+
 		w.WriteHeader(http.StatusNoContent)
 	})
 

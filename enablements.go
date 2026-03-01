@@ -93,7 +93,6 @@ func validateEnablementRequest(req *EnablementRequest) error {
 	return validateFeatureName(req.Enablement.Feature)
 }
 
-
 // getEnablementPath constructs the API path for enablements based on entity type
 func getEnablementPath(entityType, entityID string) (string, error) {
 	if err := validateEntityType(entityType); err != nil {
@@ -173,7 +172,6 @@ func handleEnablementError(err error, operation, entityType, entityID string) er
 		operation, entityType, entityID, err)
 }
 
-
 // getEnablementsFromResponseWithWarnings processes the response from list enablements API and returns warnings
 func getEnablementsFromResponseWithWarnings(c *Client, resp *http.Response, err error, entityType, entityID string) ([]Enablement, []string, error) {
 	if err != nil {
@@ -190,7 +188,6 @@ func getEnablementsFromResponseWithWarnings(c *Client, resp *http.Response, err 
 	// Return warnings to caller instead of logging them
 	return target.Enablements, target.Warnings, nil
 }
-
 
 // getEnablementFromResponseWithWarnings processes the response from update enablement API and returns warnings
 func getEnablementFromResponseWithWarnings(c *Client, resp *http.Response, err error, entityType, entityID, feature string) (*Enablement, []string, error) {
@@ -256,7 +253,7 @@ func (c *Client) ListServiceEnablementsWithContext(ctx context.Context, serviceI
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &EnablementsWithWarnings{
 		Enablements: enablements,
 		Warnings:    warnings,
@@ -279,7 +276,7 @@ func (c *Client) ListEventOrchestrationEnablementsWithContext(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &EnablementsWithWarnings{
 		Enablements: enablements,
 		Warnings:    warnings,
@@ -317,7 +314,7 @@ func (c *Client) UpdateServiceEnablementWithContext(ctx context.Context, service
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &EnablementWithWarnings{
 		Enablement: enablement,
 		Warnings:   warnings,
@@ -355,7 +352,7 @@ func (c *Client) UpdateEventOrchestrationEnablementWithContext(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &EnablementWithWarnings{
 		Enablement: enablement,
 		Warnings:   warnings,
