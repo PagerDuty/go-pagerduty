@@ -7,9 +7,7 @@ import (
 	"github.com/mitchellh/cli"
 )
 
-const (
-	version = "0.0.0"
-)
+var version = "0.0.0"
 
 func loadCommands() map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
