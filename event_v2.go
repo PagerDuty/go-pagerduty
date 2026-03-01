@@ -11,14 +11,27 @@ import (
 
 // V2Event includes the incident/alert details
 type V2Event struct {
-	RoutingKey string        `json:"routing_key"`
-	Action     string        `json:"event_action"`
-	DedupKey   string        `json:"dedup_key,omitempty"`
-	Images     []interface{} `json:"images,omitempty"`
-	Links      []interface{} `json:"links,omitempty"`
-	Client     string        `json:"client,omitempty"`
-	ClientURL  string        `json:"client_url,omitempty"`
-	Payload    *V2Payload    `json:"payload,omitempty"`
+	RoutingKey string         `json:"routing_key"`
+	Action     string         `json:"event_action"`
+	DedupKey   string         `json:"dedup_key,omitempty"`
+	Images     []V2EventImage `json:"images,omitempty"`
+	Links      []V2EventLink  `json:"links,omitempty"`
+	Client     string         `json:"client,omitempty"`
+	ClientURL  string         `json:"client_url,omitempty"`
+	Payload    *V2Payload     `json:"payload,omitempty"`
+}
+
+// EventLink is a link to be included on an event
+type V2EventLink struct {
+	Href string `json:"href"`
+	Text string `json:"text"`
+}
+
+// EventImage is an image to be included, with an optional link and alt text
+type V2EventImage struct {
+	Src  string `json:"src"`
+	Href string `json:"href,omitempty"`
+	Alt  string `json:"alt,omitempty"`
 }
 
 // V2Payload represents the individual event details for an event
