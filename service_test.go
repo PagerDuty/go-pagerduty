@@ -3,6 +3,7 @@ package pagerduty
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"testing"
@@ -141,6 +142,12 @@ func TestService_Create(t *testing.T) {
 
 	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
+
+		defer r.Body.Close()
+		body, err := io.ReadAll(r.Body)
+		testEqual(t, nil, err)
+		testEqual(t, []uint8(`{"service":{"escalation_policy":{"teams":null},"name":"foo"}}`), body)
+
 		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
 	})
 
@@ -161,6 +168,99 @@ func TestService_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 	testEqual(t, want, res)
+}
+
+// Create Service with empty ScheduledActions
+func TestService_CreateWithEmptyScheduledActions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+
+		defer r.Body.Close()
+		body, err := io.ReadAll(r.Body)
+		testEqual(t, nil, err)
+		testEqual(t, []uint8(`{"service":{"escalation_policy":{"teams":null},"name":"foo"}}`), body)
+
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	input := Service{
+		Name: "foo",
+		ScheduledActions: []ScheduledAction{},
+	}
+	res, err := client.CreateService(input)
+
+	want := &Service{
+		APIObject: APIObject{
+			ID: "1",
+		},
+		Name: "foo",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
+// Create Service with SupportHours
+func TestService_CreateWithSupportHours(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+
+		defer r.Body.Close()
+		body, err := io.ReadAll(r.Body)
+		testEqual(t, nil, err)
+		testEqual(t, []uint8(`{"service":{"escalation_policy":{"teams":null},"name":"foo","scheduled_actions":null,"support_hours":{"days_of_week":[1]}}}`), body)
+
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	input := Service{
+		Name: "foo",
+		SupportHours: &SupportHours{DaysOfWeek: []uint{1}},
+	}
+	_, err := client.CreateService(input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Create Service with SupportHours and empty ScheduledActions
+func TestService_CreateWithSupportHoursAndEmptyScheduledActions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/services", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		defer r.Body.Close()
+
+		body, err := io.ReadAll(r.Body)
+		testEqual(t, nil, err)
+		testEqual(t, []uint8(`{"service":{"escalation_policy":{"teams":null},"name":"foo","scheduled_actions":[],"support_hours":{"days_of_week":[1]}}}`), body)
+
+		_, _ = w.Write([]byte(`{"service": {"id": "1","name":"foo"}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+	input := Service{
+		Name: "foo",
+		SupportHours: &SupportHours{DaysOfWeek: []uint{1}},
+		ScheduledActions: []ScheduledAction{},
+	}
+	_, err := client.CreateService(input)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // Create Service with AlertGroupingParameters of type time
