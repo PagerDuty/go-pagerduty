@@ -50,7 +50,7 @@ func (m *Meta) Help() string {
 	helpText := `
 	Common options:
 
-	-authtoken PagerDuty API authentication token
+	-authtoken PagerDuty API authentication token (or set PAGERDUTY_TOKEN env var)
 	-loglevel Logging level
 `
 	return strings.TrimSpace(helpText)
@@ -86,6 +86,10 @@ func (m *Meta) setupLogging() {
 }
 
 func (m *Meta) loadConfig() error {
+	if m.Authtoken == "" {
+		m.Authtoken = os.Getenv("PAGERDUTY_TOKEN")
+	}
+
 	path, err := homedir.Dir()
 	if err != nil {
 		return err

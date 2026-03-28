@@ -19,13 +19,24 @@ go get github.com/PagerDuty/go-pagerduty@latest
 
 ### CLI
 
-The CLI requires an [authentication token](https://v2.developer.pagerduty.com/docs/authentication), which can be specified in `.pd.yml`
-file in the home directory of the user, or passed as a command-line argument.
+The CLI requires an [authentication token](https://v2.developer.pagerduty.com/docs/authentication), which can be specified in one of the following ways (in order of precedence):
+
+1. The `-authtoken` command-line flag
+2. The `PAGERDUTY_TOKEN` environment variable
+3. The `authtoken` field in `.pd.yml` in the home directory
+
 Example of config file:
 
 ```yaml
 ---
 authtoken: fooBar
+```
+
+Example using the environment variable:
+
+```
+export PAGERDUTY_TOKEN=your-token-here
+pd service list
 ```
 
 #### Commands
