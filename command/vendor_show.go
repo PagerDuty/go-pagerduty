@@ -4,7 +4,6 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
 	"strings"
 )
 
@@ -53,7 +52,7 @@ func (c *VendorShow) Run(args []string) int {
 		log.Error(err)
 		return -1
 	}
-	data, err := yaml.Marshal(result)
+	data, err := c.Marshaler(result)
 	if err != nil {
 		log.Error(err)
 		return -1

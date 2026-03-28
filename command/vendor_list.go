@@ -7,7 +7,6 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type VendorList struct {
@@ -55,9 +54,8 @@ func (c *VendorList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, p := range resp.Vendors {
-			fmt.Println("Entry: ", i)
-			data, err := yaml.Marshal(p)
+		for _, p := range resp.Vendors {
+			data, err := c.Marshaler(p)
 			if err != nil {
 				log.Error(err)
 				return -1

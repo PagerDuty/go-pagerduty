@@ -28,7 +28,25 @@ Example of config file:
 authtoken: fooBar
 ```
 
+#### Output formats
+
+YAML and JSON output formats are supported. The default is YAML.
+
+The key `outputformat` can be set in `.pd.yml`:
+
+```yaml
+authtoken: yourtokenhere
+outputformat: json
+```
+
+Alternatively, the `--outputformat` command line flag can be used:
+
+```
+pd incident list --outputformat=json
+```
+
 #### Commands
+
 `pd` command provides a single entrypoint for all the API endpoints, with individual
 API represented by their own sub commands. For an exhaustive list of sub-commands, try:
 ```

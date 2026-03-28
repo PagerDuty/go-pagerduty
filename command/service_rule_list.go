@@ -7,7 +7,6 @@ import (
 
 	"github.com/mitchellh/cli"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type ServiceRuleList struct {
@@ -51,9 +50,8 @@ func (c *ServiceRuleList) Run(args []string) int {
 		log.Error(err)
 		return -1
 	} else {
-		for i, rule := range rulesList {
-			fmt.Println("Entry: ", i+1)
-			data, err := yaml.Marshal(rule)
+		for _, rule := range rulesList {
+			data, err := c.Marshaler(rule)
 			if err != nil {
 				log.Error(err)
 				return -1
