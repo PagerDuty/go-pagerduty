@@ -7,8 +7,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	pagerduty "github.com/PagerDuty/go-pagerduty"
-	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
+	log "github.com/sirupsen/logrus"
 )
 
 type ScheduleList struct {

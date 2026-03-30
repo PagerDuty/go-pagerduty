@@ -39,7 +39,7 @@ func (c *AnalyticsTeamShow) Synopsis() string {
 	return "Get aggregated team data analytics"
 }
 
-//Run executes analytics cli command and displays team analytics for the requested data.
+// Run executes analytics cli command and displays team analytics for the requested data.
 func (c *AnalyticsTeamShow) Run(args []string) int {
 	flags := c.Meta.FlagSet("analytics team show")
 	flags.Usage = func() { fmt.Println(c.Help()) }
