@@ -20,7 +20,7 @@ type MaintenanceWindow struct {
 	CreatedBy      *APIObject  `json:"created_by,omitempty"`
 }
 
-// ListMaintenanceWindowsResponse is the data structur returned from calling the ListMaintenanceWindows API endpoint.
+// ListMaintenanceWindowsResponse is the data structure returned from calling the ListMaintenanceWindows API endpoint.
 type ListMaintenanceWindowsResponse struct {
 	APIListObject
 	MaintenanceWindows []MaintenanceWindow `json:"maintenance_windows"`
@@ -120,7 +120,7 @@ func (c *Client) CreateMaintenanceWindows(o MaintenanceWindow) (*MaintenanceWind
 }
 
 // DeleteMaintenanceWindow deletes an existing maintenance window if it's in the
-// future, or ends it if it's currently on-going.
+// future, or ends it if it's currently ongoing.
 //
 // Deprecated: Use DeleteMaintenanceWindowWithContext instead.
 func (c *Client) DeleteMaintenanceWindow(id string) error {
@@ -128,7 +128,7 @@ func (c *Client) DeleteMaintenanceWindow(id string) error {
 }
 
 // DeleteMaintenanceWindowWithContext deletes an existing maintenance window if it's in the
-// future, or ends it if it's currently on-going.
+// future, or ends it if it's currently ongoing.
 func (c *Client) DeleteMaintenanceWindowWithContext(ctx context.Context, id string) error {
 	_, err := c.delete(ctx, "/maintenance_windows/"+id)
 	return err

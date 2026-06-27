@@ -82,7 +82,7 @@ func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusine
 // ListBusinessServicesPaginated lists existing business services, automatically
 // handling pagination and returning the full collection.
 func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusinessServiceOptions) ([]*BusinessService, error) {
-	queryParms, err := query.Values(o)
+	queryParams, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusine
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet(ctx, "/business_services?"+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/business_services?"+queryParams.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
 

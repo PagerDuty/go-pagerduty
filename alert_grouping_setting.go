@@ -8,13 +8,13 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// AlertGroupingSettingConfigTime is the configuration content for a
+// AlertGroupingSettingConfigTime is the configuration content for an
 // AlertGroupingSetting of type "time"
 type AlertGroupingSettingConfigTime struct {
 	Timeout uint `json:"timeout"`
 }
 
-// AlertGroupingSettingConfigIntelligent is the configuration content for a
+// AlertGroupingSettingConfigIntelligent is the configuration content for an
 // AlertGroupingSetting of type "intelligent"
 type AlertGroupingSettingConfigIntelligent struct {
 	TimeWindow            uint     `json:"time_window"`
@@ -22,7 +22,7 @@ type AlertGroupingSettingConfigIntelligent struct {
 	IagFields             []string `json:"iag_fields"`
 }
 
-// AlertGroupingSettingConfigContentBased is the configuration content for a
+// AlertGroupingSettingConfigContentBased is the configuration content for an
 // AlertGroupingSetting of type "content_based" or "content_based_intelligent"
 type AlertGroupingSettingConfigContentBased struct {
 	TimeWindow            uint     `json:"time_window"`
@@ -140,7 +140,7 @@ func (c *Client) ListAlertGroupingSettings(ctx context.Context, o ListAlertGroup
 	return result, nil
 }
 
-// GetAlertGroupingSetting get an existing Alert Grouping Setting.
+// GetAlertGroupingSetting gets an existing Alert Grouping Setting.
 func (c *Client) GetAlertGroupingSetting(ctx context.Context, id string) (*AlertGroupingSetting, error) {
 	resp, err := c.get(ctx, "/alert_grouping_settings/"+id, nil)
 	if err != nil {
@@ -191,7 +191,7 @@ type alertGroupingSettingRaw struct {
 	Config json.RawMessage `json:"config,omitempty"`
 }
 
-// getAlertGroupingSettingFromRaw transform the content of a Alert Grouping
+// getAlertGroupingSettingFromRaw transforms the content of an Alert Grouping
 // Setting "config" field from a json raw message into the data structure
 // corresponding to its "type".
 func getAlertGroupingSettingFromRaw(raw alertGroupingSettingRaw) (*AlertGroupingSetting, error) {
