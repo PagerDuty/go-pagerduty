@@ -34,7 +34,7 @@ type ListAuditRecordsResponse struct {
 	// into a JSON.
 	ResponseMetaData *ResponseMetadata `json:"response_metadata,omitempty"`
 	Limit            uint              `json:"limit,omitempty"`
-	// NextCursor is an  opaque string that will deliver the next set of results
+	// NextCursor is an opaque string that will deliver the next set of results
 	// when provided as the cursor parameter in a subsequent request.
 	// A null value for this field indicates that there are no additional results.
 	// We use a pointer here to marshall the string value into null
@@ -42,7 +42,7 @@ type ListAuditRecordsResponse struct {
 	NextCursor *string `json:"next_cursor"`
 }
 
-// AuditRecord is a audit trail record that matches the query criteria.
+// AuditRecord is an audit trail record that matches the query criteria.
 type AuditRecord struct {
 	ID               string           `json:"id,omitempty"`
 	Self             string           `json:"self,omitempty"`
@@ -100,7 +100,7 @@ type Reference struct {
 	Removed     []APIObject `json:"removed,omitempty"`
 }
 
-// ListAuditRecords lists audit trial records matching provided query params
+// ListAuditRecords lists audit trail records matching provided query params
 // or default criteria.
 func (c *Client) ListAuditRecords(ctx context.Context, o ListAuditRecordsOptions) (ListAuditRecordsResponse, error) {
 	v, err := query.Values(o)
@@ -122,7 +122,7 @@ func (c *Client) ListAuditRecords(ctx context.Context, o ListAuditRecordsOptions
 	return result, nil
 }
 
-// ListAuditRecordsPaginated lists audit trial records matching provided query
+// ListAuditRecordsPaginated lists audit trail records matching provided query
 // params or default criteria, processing paginated responses. The include
 // function decides whether or not to include a specific AuditRecord in
 // the final result. If the include function is nil, all audit records from

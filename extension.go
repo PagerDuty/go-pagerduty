@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// Extension represents a single PagerDuty extension. These are addtional
+// Extension represents a single PagerDuty extension. These are additional
 // features to be used as part of the incident management process.
 type Extension struct {
 	APIObject
