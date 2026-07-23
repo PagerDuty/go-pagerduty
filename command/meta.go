@@ -11,7 +11,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ArrayFlags []string
