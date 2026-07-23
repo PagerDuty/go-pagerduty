@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 
 	pagerduty "github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"

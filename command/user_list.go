@@ -7,7 +7,7 @@ import (
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 	"github.com/mitchellh/cli"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type UserList struct {
