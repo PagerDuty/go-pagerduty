@@ -47,7 +47,7 @@ type Schedule struct {
 	Users               []APIObject     `json:"users,omitempty"`
 	Teams               []APIObject     `json:"teams,omitempty"`
 	ScheduleLayers      []ScheduleLayer `json:"schedule_layers,omitempty"`
-	OverrideSubschedule ScheduleLayer   `json:"override_subschedule,omitempty"`
+	OverrideSubschedule ScheduleLayer   `json:"overrides_subschedule,omitempty"`
 	FinalSchedule       ScheduleLayer   `json:"final_schedule,omitempty"`
 }
 
