@@ -126,6 +126,36 @@ func TestSchedule_Get(t *testing.T) {
 	testEqual(t, want, res)
 }
 
+// Get a schedule with an overrides subschedule
+func TestSchedule_GetOverridesSubschedule(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/schedules/1", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		_, _ = w.Write([]byte(`{"schedule": {"id": "1","summary":"foo","overrides_subschedule":{"name":"Overrides"}}}`))
+	})
+
+	client := defaultTestClient(server.URL, "foo")
+
+	res, err := client.GetSchedule("1", GetScheduleOptions{})
+
+	want := &Schedule{
+		APIObject: APIObject{
+			ID:      "1",
+			Summary: "foo",
+		},
+		OverrideSubschedule: ScheduleLayer{
+			Name: "Overrides",
+		},
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEqual(t, want, res)
+}
+
 // Update a schedule
 func TestSchedule_Update(t *testing.T) {
 	setup()
