@@ -1,8 +1,11 @@
 package pagerduty
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -379,5 +382,67 @@ func TestEventsAPIV2Error_UnmarshalJSON(t *testing.T) {
 	v := &EventsAPIV2Error{}
 	if err := v.UnmarshalJSON([]byte(`{`)); !strings.Contains(err.Error(), "unexpected end of JSON input") {
 		t.Error("exepcted error not seen")
+	}
+}
+
+func TestClientManageEventErrorDetails(t *testing.T) {
+	for _, debug := range []bool{false, true} {
+		for _, tc := range []struct {
+			name   string
+			status int
+			body   string
+			valid  bool
+		}{
+			{"invalid_event", 400, `{"errors":["'payload.source' is missing or blank"],"message":"Event object is invalid","status":"invalid event"}`, true},
+			{"rate_limit", 429, `{"status":"throttle exceeded","message":"Please retry later"}`, true},
+			{"malformed_json", 500, `{"status":`, false},
+			{"plain_text", 400, `Invalid routing key`, false},
+		} {
+			t.Run(fmt.Sprintf("%s/debug=%t", tc.name, debug), func(t *testing.T) {
+				setup()
+				defer teardown()
+				mux.HandleFunc("/v2/enqueue", func(w http.ResponseWriter, r *http.Request) {
+					testMethod(t, r, http.MethodPost)
+					w.Header().Set("Content-Type", "application/json; charset=utf-8")
+					w.WriteHeader(tc.status)
+					fmt.Fprint(w, tc.body)
+				})
+				client := defaultTestClient(server.URL, "foo")
+				if debug {
+					client.SetDebugFlag(DebugCaptureLastResponse)
+				}
+				result, err := client.ManageEventWithContext(context.Background(), &V2Event{RoutingKey: "key"})
+				if result != nil || err == nil {
+					t.Fatalf("result = %v, err = %v", result, err)
+				}
+				var apiErr EventsAPIV2Error
+				if !errors.As(err, &apiErr) {
+					t.Fatalf("expected EventsAPIV2Error, got %T: %v", err, err)
+				}
+				testEqual(t, tc.status, apiErr.StatusCode)
+				testEqual(t, tc.valid, apiErr.APIError.Valid)
+				if tc.valid {
+					var expected EventsAPIV2ErrorObject
+					if err := json.Unmarshal([]byte(tc.body), &expected); err != nil {
+						t.Fatal(err)
+					}
+					testEqual(t, expected, apiErr.APIError.ErrorObject)
+					if !strings.Contains(err.Error(), expected.Message) {
+						t.Fatalf("missing message: %v", err)
+					}
+				}
+				if debug {
+					response, ok := client.LastAPIResponse()
+					if !ok {
+						t.Fatal("missing captured response")
+					}
+					var body strings.Builder
+					if _, err := io.Copy(&body, response.Body); err != nil {
+						t.Fatal(err)
+					}
+					testEqual(t, tc.body, body.String())
+				}
+			})
+		}
 	}
 }
