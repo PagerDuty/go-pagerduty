@@ -635,6 +635,17 @@ func (c *Client) doWithEndpoint(
 	body io.Reader,
 	headers map[string]string,
 ) (*http.Response, error) {
+	return c.doWithEndpointAndErrorHandler(ctx, endpoint, method, path, authRequired, body, headers, nil)
+}
+
+func (c *Client) doWithEndpointAndErrorHandler(
+	ctx context.Context,
+	endpoint, method, path string,
+	authRequired bool,
+	body io.Reader,
+	headers map[string]string,
+	errorHandler func(*http.Response) error,
+) (*http.Response, error) {
 	var resp *http.Response
 	var respErr error
 
@@ -669,6 +680,9 @@ func (c *Client) doWithEndpoint(
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		if errorHandler != nil {
+			return resp, errorHandler(resp)
+		}
 		return resp, c.getErrorFromResponse(resp)
 	}
 

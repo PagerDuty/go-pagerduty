@@ -237,7 +237,7 @@ func (c *Client) ManageEventWithContext(ctx context.Context, e *V2Event) (*V2Eve
 		return nil, err
 	}
 
-	resp, err := c.doWithEndpoint(ctx, c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), nil)
+	resp, err := c.doWithEndpointAndErrorHandler(ctx, c.v2EventsAPIEndpoint, http.MethodPost, "/v2/enqueue", false, bytes.NewBuffer(data), nil, c.getEventsAPIV2ErrorFromResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -248,4 +248,16 @@ func (c *Client) ManageEventWithContext(ctx context.Context, e *V2Event) (*V2Eve
 	}
 
 	return &result, err
+}
+
+func (c *Client) getEventsAPIV2ErrorFromResponse(resp *http.Response) error {
+	var document EventsAPIV2Error
+	if err := c.decodeJSON(resp, &document); err != nil {
+		return EventsAPIV2Error{
+			StatusCode: resp.StatusCode,
+			message:    fmt.Sprintf("HTTP response with status code %d, JSON error object decode failed: %s", resp.StatusCode, err),
+		}
+	}
+	document.StatusCode = resp.StatusCode
+	return document
 }
